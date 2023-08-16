@@ -1,6 +1,6 @@
 package com.recipia.recipe.domain;
 
-import com.diningtalk.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.domain.auditingfield.CreateDateTime;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,15 +24,15 @@ public class RecipeHistLog extends CreateDateTime {
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
-    private RecipeHistLog(Recipe recipe, Long userId) {
+    private RecipeHistLog(Recipe recipe, Long memberId) {
         this.recipe = recipe;
-        this.userId = userId;
+        this.memberId = memberId;
     }
 
-    public static RecipeHistLog of(Recipe recipe, Long userId) {
-        return new RecipeHistLog(recipe, userId);
+    public static RecipeHistLog of(Recipe recipe, Long memberId) {
+        return new RecipeHistLog(recipe, memberId);
     }
 }

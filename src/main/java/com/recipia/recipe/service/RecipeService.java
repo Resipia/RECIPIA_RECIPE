@@ -1,7 +1,7 @@
 package com.recipia.recipe.service;
 
-import com.diningtalk.recipe.domain.Recipe;
-import com.diningtalk.recipe.domain.repository.RecipeRepository;
+import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ public class RecipeService {
 
         return Optional.of(recipeRepository.save(recipe))
                     .orElseThrow(
-                            () -> new IllegalArgumentException("userId, recipe name is required")
+                            () -> new IllegalArgumentException("memberId, recipe name is required")
                     );
     }
 }

@@ -1,25 +1,25 @@
 package com.recipia.recipe.dto;
 
-import com.diningtalk.recipe.domain.RecipeFile;
-import com.diningtalk.recipe.domain.RecipeHistLog;
+import com.recipia.recipe.domain.RecipeFile;
+import com.recipia.recipe.domain.RecipeHistLog;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link com.diningtalk.recipe.domain.RecipeHistLog}
+ * DTO for {@link com.recipia.recipe.domain.RecipeHistLog}
  */
 public record RecipeHistLogDto(
         Long id,
-        Long userId,
+        Long memberId,
         LocalDateTime createDateTime
 ) {
 
     /**
      * 전체 생성자 factory method 선전
      */
-    public static RecipeHistLogDto of(Long id, Long userId, LocalDateTime createDateTime) {
-        return new RecipeHistLogDto(id, userId, createDateTime);
+    public static RecipeHistLogDto of(Long id, Long memberId, LocalDateTime createDateTime) {
+        return new RecipeHistLogDto(id, memberId, createDateTime);
     }
 
     /**
@@ -28,7 +28,7 @@ public record RecipeHistLogDto(
     public static RecipeHistLogDto fromEntity(RecipeHistLog entity) {
         return of(
                 entity.getId(),
-                entity.getUserId(),
+                entity.getMemberId(),
                 entity.getCreateDateTime()
         );
     }

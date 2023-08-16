@@ -1,7 +1,7 @@
 package com.recipia.recipe.domain;
 
 
-import com.diningtalk.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.domain.auditingfield.CreateDateTime;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

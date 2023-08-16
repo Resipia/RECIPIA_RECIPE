@@ -1,16 +1,16 @@
 package com.recipia.recipe.dto;
 
-import com.diningtalk.recipe.domain.StarRate;
+import com.recipia.recipe.domain.StarRate;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link com.diningtalk.recipe.domain.StarRate}
+ * DTO for {@link com.recipia.recipe.domain.StarRate}
  */
 public record StarRateDto(
         Long id,
-        Long userId,
+        Long memberId,
         Double starRateValue,
         LocalDateTime createDateTime
 ) {
@@ -18,8 +18,8 @@ public record StarRateDto(
     /**
      * 전체 생성자 factory method 선전
      */
-    public static StarRateDto of(Long id, Long userId, Double starRateValue, LocalDateTime createDateTime) {
-        return new StarRateDto(id, userId, starRateValue, createDateTime);
+    public static StarRateDto of(Long id, Long memberId, Double starRateValue, LocalDateTime createDateTime) {
+        return new StarRateDto(id, memberId, starRateValue, createDateTime);
     }
 
     /**
@@ -28,7 +28,7 @@ public record StarRateDto(
     public static StarRateDto fromEntity(StarRate entity) {
         return of(
                 entity.getId(),
-                entity.getUserId(),
+                entity.getMemberId(),
                 entity.getStarRateValue(),
                 entity.getCreateDateTime()
         );

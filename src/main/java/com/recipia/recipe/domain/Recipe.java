@@ -1,6 +1,6 @@
 package com.recipia.recipe.domain;
 
-import com.diningtalk.recipe.domain.auditingfield.UpdateDateTime;
+import com.recipia.recipe.domain.auditingfield.UpdateDateTime;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,8 +22,8 @@ public class Recipe extends UpdateDateTime {
     @Column(name = "recipe_id", nullable = false)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @Column(name = "recipe_nm", nullable = false)
     private String recipeName;
@@ -70,8 +70,8 @@ public class Recipe extends UpdateDateTime {
     @OneToMany(mappedBy = "recipe")
     private List<RecipeViewCnt> recipeViewCntList = new ArrayList<>();
 
-    private Recipe(Long userId, String recipeName, String recipeDesc, Integer timeTaken, String createUsername, String updateUsername, String createNickname, String delYn) {
-        this.userId = userId;
+    private Recipe(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String createUsername, String updateUsername, String createNickname, String delYn) {
+        this.memberId = memberId;
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
         this.timeTaken = timeTaken;
@@ -81,7 +81,7 @@ public class Recipe extends UpdateDateTime {
         this.delYn = delYn;
     }
 
-    public static Recipe of(Long userId, String recipeName, String recipeDesc, Integer timeTaken, String createUsername, String updateUsername, String createNickname, String delYn) {
-        return new Recipe(userId, recipeName, recipeDesc, timeTaken, createUsername, updateUsername, createNickname, delYn);
+    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String createUsername, String updateUsername, String createNickname, String delYn) {
+        return new Recipe(memberId, recipeName, recipeDesc, timeTaken, createUsername, updateUsername, createNickname, delYn);
     }
 }

@@ -1,6 +1,6 @@
 logging:
   level:
-    com.diningtalk.recipe: debug
+    com.recipia.recipe: debug
     org.springframework.web.servlet: debug
     org.hibernate.orm.jdbc.bind: trace
 
@@ -37,11 +37,16 @@ spring:
     password:
 
   jpa:
+    defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+    open-in-view: false
+    show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        default_batch_fetch_size: 10
+        highlight_sql: true
 
 ---
 

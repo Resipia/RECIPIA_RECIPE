@@ -1,6 +1,6 @@
 package com.recipia.recipe.domain.repository;
 
-import com.diningtalk.recipe.domain.Recipe;
+import com.recipia.recipe.domain.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

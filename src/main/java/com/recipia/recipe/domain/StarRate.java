@@ -1,7 +1,7 @@
 package com.recipia.recipe.domain;
 
 
-import com.diningtalk.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.domain.auditingfield.CreateDateTime;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,8 +20,8 @@ public class StarRate extends CreateDateTime {
     @Column(name = "star_rate_id", nullable = false)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,14 +31,14 @@ public class StarRate extends CreateDateTime {
     @Column(name = "star_rate_value", nullable = false)
     private Double starRateValue;
 
-    private StarRate(Long userId, Recipe recipe, Double starRateValue) {
-        this.userId = userId;
+    private StarRate(Long memberId, Recipe recipe, Double starRateValue) {
+        this.memberId = memberId;
         this.recipe = recipe;
         this.starRateValue = starRateValue;
     }
 
-    public static StarRate of(Long userId, Recipe recipe, Double starRateValue) {
-        return new StarRate(userId, recipe, starRateValue);
+    public static StarRate of(Long memberId, Recipe recipe, Double starRateValue) {
+        return new StarRate(memberId, recipe, starRateValue);
     }
 
 }

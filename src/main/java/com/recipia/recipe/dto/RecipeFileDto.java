@@ -1,12 +1,12 @@
 package com.recipia.recipe.dto;
 
-import com.diningtalk.recipe.domain.RecipeFile;
+import com.recipia.recipe.domain.RecipeFile;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link com.diningtalk.recipe.domain.RecipeFile}
+ * DTO for {@link com.recipia.recipe.domain.RecipeFile}
  */
 public record RecipeFileDto(
         Long id,

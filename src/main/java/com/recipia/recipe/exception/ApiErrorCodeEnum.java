@@ -26,8 +26,8 @@ public enum ApiErrorCodeEnum {
     DB_ERROR(500, "8004", "DB ERROR"),
 
     // 9.0 EXTERNAL
-    USER_SERVICE_ERROR(500, "9001", "USER 서비스 에러"),
-    WRIGGLE_SERVICE_ERROR(500, "9003", "WRIGGLE 서비스 에러"),
+    MEMBER_SERVICE_ERROR(500, "9001", "MEMBER 서비스 에러"),
+    YORI_ZORI_SERVICE_ERROR(500, "9003", "YORIZORI 서비스 에러"),
     CHAT_SERVICE_ERROR(500, "9004", "CHAT 서비스 에러")
 
     ;

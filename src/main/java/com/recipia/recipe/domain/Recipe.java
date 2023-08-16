@@ -14,7 +14,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "RECIPE")
 public class Recipe extends UpdateDateTime {
 
     @Id

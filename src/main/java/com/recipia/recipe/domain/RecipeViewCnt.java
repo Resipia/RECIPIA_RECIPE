@@ -11,7 +11,6 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "RECIPE_VIEW_CNT")
 public class RecipeViewCnt extends UpdateDateTime {
 
     @Id

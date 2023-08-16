@@ -11,7 +11,6 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "RECIPE_HIST_LOG")
 public class RecipeHistLog extends CreateDateTime {
 
     @Id

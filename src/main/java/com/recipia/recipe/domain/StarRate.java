@@ -12,7 +12,6 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "STAR_RATE")
 public class StarRate extends CreateDateTime {
 
     @Id

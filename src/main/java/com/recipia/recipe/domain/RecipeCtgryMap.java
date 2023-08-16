@@ -11,7 +11,6 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "RECIPE_CTGRY_MAP")
 public class RecipeCtgryMap extends CreateDateTime {
 
     @Id

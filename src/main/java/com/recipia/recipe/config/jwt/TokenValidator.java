@@ -1,5 +1,6 @@
 package com.recipia.recipe.config.jwt;
 
+import com.recipia.recipe.kafka.service.RecipeKafkaProducer;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenValidator {
 
+    private final RecipeKafkaProducer kafkaProducer;
+
     public boolean isValidToken(String token, String tokenType) {
         try {
             Claims claims = TokenUtils.getClaimsFromToken(token);
@@ -17,6 +20,7 @@ public class TokenValidator {
                 return false;
             }
             String username = claims.get("username", String.class);
+            kafkaProducer.sendUsername(username);
             // todo: kafka로 MEMBER 서버 통신
 //            Member member = memberRepository.findMemberByUsernameAndStatus(username, MemberStatus.ACTIVE).orElse(null);
 //            return member != null;

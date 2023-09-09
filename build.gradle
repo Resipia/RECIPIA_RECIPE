@@ -48,6 +48,10 @@ dependencies {
 		exclude group: 'org.json', module: 'json'
 	}
 
+	// kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+
 }
 
 tasks.named('test') {

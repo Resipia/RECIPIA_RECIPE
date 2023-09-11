@@ -5,11 +5,12 @@ import com.recipia.recipe.domain.IngredientRecipeMap;
 public record IngredientRecipeMapDto(
         Long id,
         IngredientDto ingredient,
-        CustomIngredientDto customIngredient
+        CustomIngredientDto customIngredient,
+        RecipeDto recipeDto
 ) {
 
-    public static IngredientRecipeMapDto of(Long id, IngredientDto ingredient, CustomIngredientDto customIngredient) {
-        return new IngredientRecipeMapDto(id, ingredient, customIngredient);
+    public static IngredientRecipeMapDto of(Long id, IngredientDto ingredient, CustomIngredientDto customIngredient, RecipeDto recipeDto) {
+        return new IngredientRecipeMapDto(id, ingredient, customIngredient, recipeDto);
     }
 
     // entity -> dto 변환 메서드
@@ -17,7 +18,8 @@ public record IngredientRecipeMapDto(
         return of(
                 entity.getId(),
                 IngredientDto.fromEntity(entity.getIngredient()),
-                CustomIngredientDto.fromEntity(entity.getCustomIngredient())
+                CustomIngredientDto.fromEntity(entity.getCustomIngredient()),
+                RecipeDto.fromEntity(entity.getRecipe())
         );
     }
 

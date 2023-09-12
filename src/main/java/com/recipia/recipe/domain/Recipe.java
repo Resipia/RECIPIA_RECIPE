@@ -63,7 +63,7 @@ public class Recipe extends UpdateDateTime {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "recipe")
-    private List<Ingredient> ingredientList = new ArrayList<>();
+    private List<IngredientRecipeMap> ingredientList = new ArrayList<>();
 
     @ToString.Exclude
     @OneToMany(mappedBy = "recipe")

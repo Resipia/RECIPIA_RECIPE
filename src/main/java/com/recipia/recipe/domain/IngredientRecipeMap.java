@@ -25,16 +25,22 @@ public class IngredientRecipeMap extends CreateDateTime {
     @ManyToOne(fetch = FetchType.LAZY)
     private CustomIngredient customIngredient;
 
+    @ToString.Exclude
+    @JoinColumn(name = "recipe_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Recipe recipe;
+
     // 생성자 factory method
     @Builder
-    private IngredientRecipeMap(Ingredient ingredient, CustomIngredient customIngredient) {
+    private IngredientRecipeMap(Ingredient ingredient, CustomIngredient customIngredient, Recipe recipe) {
         this.ingredient = ingredient;
         this.customIngredient = customIngredient;
+        this.recipe = recipe;
     }
 
     // static method 생성
-    public static IngredientRecipeMap of(Ingredient ingredient, CustomIngredient customIngredient) {
-        return new IngredientRecipeMap(ingredient, customIngredient);
+    public static IngredientRecipeMap of(Ingredient ingredient, CustomIngredient customIngredient, Recipe recipe) {
+        return new IngredientRecipeMap(ingredient, customIngredient, recipe);
     }
 
 

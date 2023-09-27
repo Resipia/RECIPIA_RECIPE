@@ -24,12 +24,18 @@ public class Ingredient extends CreateDateTime {
     @Column(name = "del_yn", nullable = false)
     private String delYn;
 
-    private Ingredient(String ingredientName, String delYn) {
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private Recipe recipe;
+
+    private Ingredient(String ingredientName, String delYn, Recipe recipe) {
         this.ingredientName = ingredientName;
         this.delYn = delYn;
+        this.recipe = recipe;
     }
 
-    public static Ingredient of(String ingredientName, String delYn) {
-        return new Ingredient(ingredientName, delYn);
+    public static Ingredient of(String ingredientName, String delYn, Recipe recipe) {
+        return new Ingredient(ingredientName, delYn, recipe);
     }
 }

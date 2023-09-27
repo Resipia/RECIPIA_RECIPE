@@ -21,7 +21,7 @@ public class TokenValidator {
             }
             String username = claims.get("username", String.class);
             kafkaProducer.sendUsername(username);
-            // todo: kafka로 MEMBER 서버 통신
+            // todo: kafka로 MEMBER 서버 통신 -> CompletableFuture를 사용할지 조사하기
 //            Member member = memberRepository.findMemberByUsernameAndStatus(username, MemberStatus.ACTIVE).orElse(null);
 //            return member != null;
             return true;

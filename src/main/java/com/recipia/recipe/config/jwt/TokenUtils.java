@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,6 +48,11 @@ public class TokenUtils {
     public static Claims getClaimsFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key)
                 .build().parseClaimsJws(token).getBody();
+    }
+
+    // New method to get claims as a Map
+    public static Map<String, Object> getClaimsMapFromToken(String token) {
+        return getClaimsFromToken(token);
     }
 
 }

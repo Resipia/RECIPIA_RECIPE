@@ -11,11 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,8 +37,25 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // Remove "Bearer " prefix
 
+//            if (validateToken(token)) {
+//                UsernamePasswordAuthenticationToken authenticationToken = extractUserDetails(token);
+//                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+//            }
             if (validateToken(token)) {
-                UsernamePasswordAuthenticationToken authenticationToken = extractUserDetails(token);
+                // Extract claims from the token
+                Map<String, Object> mapClaims = TokenUtils.getClaimsMapFromToken(token);  // Replace this with your token extraction logic
+
+                // Create Jwt object
+                String finalToken = token;
+                Jwt jwt = Jwt.withTokenValue(token)
+                        .header("typ", "JWT")
+                        .claims(claims -> claims.putAll(TokenUtils.getClaimsMapFromToken(finalToken)))
+                        .build();
+
+                // Create UsernamePasswordAuthenticationToken
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwt, null, extractAuthorities(token));
+
+                // Set it in the SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
@@ -48,15 +67,20 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         return tokenValidator.isValidToken(token, ACCESS_TOKEN_TYPE);
     }
 
-    // 토큰에서 사용자 정보를 추출하여 UsernamePasswordAuthenticationToken 객체로 반환하는 메서드
-    private UsernamePasswordAuthenticationToken extractUserDetails(String token) {
-        // JWT 토큰에서 사용자 정보를 추출
-        String username = TokenUtils.getUsernameFromToken(token);
-        // 사용자의 권한을 토큰에서 직접 추출
-        String role = TokenUtils.getRoleFromToken(token);
-        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
-
-        return new UsernamePasswordAuthenticationToken(username, null, authorities);
+    private List<SimpleGrantedAuthority> extractAuthorities(String token) {
+        String role = TokenUtils.getRoleFromToken(token);  // Replace this with your token extraction logic
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
+
+    // 토큰에서 사용자 정보를 추출하여 UsernamePasswordAuthenticationToken 객체로 반환하는 메서드
+//    private UsernamePasswordAuthenticationToken extractUserDetails(String token) {
+//        // JWT 토큰에서 사용자 정보를 추출
+//        String username = TokenUtils.getUsernameFromToken(token);
+//        // 사용자의 권한을 토큰에서 직접 추출
+//        String role = TokenUtils.getRoleFromToken(token);
+//        List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
+//
+//        return new UsernamePasswordAuthenticationToken(username, null, authorities);
+//    }
 
 }

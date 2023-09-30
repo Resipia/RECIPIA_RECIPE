@@ -53,6 +53,9 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 
+	// OAuth2 Resource Server (JWT 지원 포함)
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
 }
 
 tasks.named('test') {

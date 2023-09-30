@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -48,5 +51,22 @@ public class TokenUtils {
         return Jwts.parserBuilder().setSigningKey(key)
                 .build().parseClaimsJws(token).getBody();
     }
+
+    // New method to get claims as a Map
+    public static Map<String, Object> getClaimsMapFromToken(String token) {
+        return getClaimsFromToken(token);
+    }
+
+
+    /**
+     * "exp" 클레임을 Instant 타입으로 반환할 수 있는 메서드
+     * 원인: JWT의 "exp" (유효기간) 클레임은 Instant 타입이어야 함. Integer로 설정하면 문제가 발생할 수 있음.
+     * 해결: "exp" 클레임의 값을 Instant 타입으로 변환해야 함.
+     */
+    public static Instant getExpirationFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("exp", Date.class).toInstant();
+    }
+
 
 }

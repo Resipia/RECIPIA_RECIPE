@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,19 +38,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // Remove "Bearer " prefix
 
-//            if (validateToken(token)) {
-//                UsernamePasswordAuthenticationToken authenticationToken = extractUserDetails(token);
-//                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//            }
             if (validateToken(token)) {
                 // Extract claims from the token
-                Map<String, Object> mapClaims = TokenUtils.getClaimsMapFromToken(token);  // Replace this with your token extraction logic
+                Map<String, Object> claimsMap = TokenUtils.getClaimsMapFromToken(token);  // Replace this with your token extraction logic
+                Instant expiration = TokenUtils.getExpirationFromToken(token);
 
                 // Create Jwt object
-                String finalToken = token;
                 Jwt jwt = Jwt.withTokenValue(token)
                         .header("typ", "JWT")
-                        .claims(claims -> claims.putAll(TokenUtils.getClaimsMapFromToken(finalToken)))
+                        .claims(claims -> claims.putAll(claimsMap))
+                        .claim("exp", expiration)
                         .build();
 
                 // Create UsernamePasswordAuthenticationToken

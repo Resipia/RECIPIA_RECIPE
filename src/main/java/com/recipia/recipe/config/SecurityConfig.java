@@ -2,6 +2,7 @@ package com.recipia.recipe.config;
 
 import com.recipia.recipe.config.filter.JwtAuthorizationFilter;
 import com.recipia.recipe.config.jwt.TokenValidator;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -10,14 +11,23 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
 
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
 
     private final TokenValidator tokenValidator;
+    private static final String jwtSecretKey = "thisIsASecretKeyUsedForJwtTokenGenerationAndItIsLongEnoughToMeetTheRequirementOf256Bits";
+    SecretKeySpec hmacSecretKey = new SecretKeySpec(jwtSecretKey.getBytes(StandardCharsets.UTF_8), "HMACSHA256");
+
 
     /**
      * 이 메서드는 정적 자원에 대해 보안을 적용하지 않도록 설정한다.
@@ -29,18 +39,44 @@ public class SecurityConfig {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
+//    @Bean
+//    public SecurityFilterChain filterChain(
+//            HttpSecurity http,
+//            JwtAuthorizationFilter jwtAuthorizationFilter
+//    ) throws Exception {
+//        return http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .anyRequest().authenticated()
+//                )
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+//                .oauth2ResourceServer(httpSecurity -> httpSecurity
+//                        .authenticationManager(authenticationManagerBean())
+//                        .jwt()
+//                        .decoder(jwtDecoder())
+//                        .authorizeRequests(authorize -> authorize
+//                                .anyRequest().authenticated()
+//                        )
+//                )
+//                .build();
+//    }
+
     @Bean
-    public SecurityFilterChain filterChain(
-            HttpSecurity http,
-            JwtAuthorizationFilter jwtAuthorizationFilter
-    ) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder())
+                        )
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .build();
     }
 
@@ -53,6 +89,8 @@ public class SecurityConfig {
         return new JwtAuthorizationFilter(tokenValidator);
     }
 
-
-
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withSecretKey(hmacSecretKey).build();
+    }
 }

@@ -68,5 +68,14 @@ public class TokenUtils {
         return claims.get("exp", Date.class).toInstant();
     }
 
+    /**
+     * "memberId" 클레임을 Long 타입으로 변환할 수 있는 메서드
+     */
+    public static Long getMemberIdFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        Object memberIdObj = claims.get("memberId");
+        return Long.parseLong(memberIdObj.toString());
+    }
+
 
 }

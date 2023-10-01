@@ -42,12 +42,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 // Extract claims from the token
                 Map<String, Object> claimsMap = TokenUtils.getClaimsMapFromToken(token);  // Replace this with your token extraction logic
                 Instant expiration = TokenUtils.getExpirationFromToken(token);
+                Long memberId = TokenUtils.getMemberIdFromToken(token);
 
                 // Create Jwt object
                 Jwt jwt = Jwt.withTokenValue(token)
                         .header("typ", "JWT")
                         .claims(claims -> claims.putAll(claimsMap))
                         .claim("exp", expiration)
+                        .claim("memberId", memberId)
                         .build();
 
                 // Create UsernamePasswordAuthenticationToken

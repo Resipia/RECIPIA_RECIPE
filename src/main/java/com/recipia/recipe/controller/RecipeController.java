@@ -15,7 +15,8 @@ public class RecipeController {
     public String kafkatest (
             @AuthenticationPrincipal Jwt jwt
     ) {
-        String username = (String) jwt.getClaims().get("username");
+        Long memberId = (Long) jwt.getClaims().get("memberId");
+        String nickname = (String) jwt.getClaims().get("nickname");
 
         return null;
     }

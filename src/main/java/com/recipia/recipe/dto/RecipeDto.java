@@ -13,9 +13,7 @@ public record RecipeDto(
         String recipeName,
         String recipeDesc,
         Integer timeTaken,
-        String createUsername,
-        String updateUsername,
-        String createNickname,
+        String nickname,
         String delYn,
         LocalDateTime createDateTime,
         LocalDateTime updateDateTime
@@ -24,8 +22,8 @@ public record RecipeDto(
     /**
      * 전체 생성자 factory method 선전
      */
-    public static RecipeDto of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String createUsername, String updateUsername, String createNickname, String delYn, LocalDateTime createDateTime, LocalDateTime updateDateTime) {
-        return new RecipeDto(id, memberId, recipeName, recipeDesc, timeTaken, createUsername, updateUsername, createNickname, delYn, createDateTime, updateDateTime);
+    public static RecipeDto of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn, LocalDateTime createDateTime, LocalDateTime updateDateTime) {
+        return new RecipeDto(id, memberId, recipeName, recipeDesc, timeTaken, nickname, delYn, createDateTime, updateDateTime);
     }
 
     /**
@@ -38,9 +36,7 @@ public record RecipeDto(
                 entity.getRecipeName(),
                 entity.getRecipeDesc(),
                 entity.getTimeTaken(),
-                entity.getCreateUsername(),
-                entity.getUpdateUsername(),
-                entity.getCreateNickname(),
+                entity.getNickname(),
                 entity.getDelYn(),
                 entity.getCreateDateTime(),
                 entity.getUpdateDateTime()

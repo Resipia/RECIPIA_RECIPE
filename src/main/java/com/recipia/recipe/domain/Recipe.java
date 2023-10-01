@@ -2,13 +2,11 @@ package com.recipia.recipe.domain;
 
 import com.recipia.recipe.domain.auditingfield.UpdateDateTime;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @ToString(callSuper = true)
 @Getter
@@ -33,14 +31,8 @@ public class Recipe extends UpdateDateTime {
     @Column(name = "time_taken")
     private Integer timeTaken;
 
-    @Column(name = "create_username", nullable = false)
-    private String createUsername;
-
-    @Column(name = "update_username", nullable = false)
-    private String updateUsername;
-
-    @Column(name = "create_nickname", nullable = false)
-    private String createNickname;
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
 
     @Column(name = "del_yn", nullable = false)
     private String delYn;
@@ -69,18 +61,30 @@ public class Recipe extends UpdateDateTime {
     @OneToMany(mappedBy = "recipe")
     private List<RecipeViewCnt> recipeViewCntList = new ArrayList<>();
 
-    private Recipe(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String createUsername, String updateUsername, String createNickname, String delYn) {
+    @Builder
+    private Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn) {
+        this.id = id;
         this.memberId = memberId;
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
         this.timeTaken = timeTaken;
-        this.createUsername = createUsername;
-        this.updateUsername = updateUsername;
-        this.createNickname = createNickname;
+        this.nickname = nickname;
         this.delYn = delYn;
     }
 
-    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String createUsername, String updateUsername, String createNickname, String delYn) {
-        return new Recipe(memberId, recipeName, recipeDesc, timeTaken, createUsername, updateUsername, createNickname, delYn);
+    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn) {
+        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, nickname, delYn);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Recipe recipe)) return false;
+        return this.id != null && Objects.equals(getId(), recipe.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

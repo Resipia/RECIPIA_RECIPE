@@ -26,25 +26,26 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final TokenValidator tokenValidator;
 
-    /**
-     * 문자열 리터럴은 상수로 선언하여 사용하는 것이 좋다. 이렇게 하면 코드의 가독성이 향상되며, 나중에 변경이 필요할 때 한 곳에서만 수정하면 된다.
-     */
+    // 상수로 선언된 액세스 토큰 유형
     private static final String ACCESS_TOKEN_TYPE = "access";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // 클라이언트로부터 전달받은 Authorization 헤더값을 추출
         String token = request.getHeader("Authorization");
 
+        // 토큰이 Bearer 스키마를 따르는지 확인
         if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // Remove "Bearer " prefix
+            token = token.substring(7); // "Bearer " 접두어 제거
 
+            // 토큰 유효성 검사
             if (validateToken(token)) {
-                // Extract claims from the token
+                // 토큰에서 클레임 추출
                 Map<String, Object> claimsMap = TokenUtils.getClaimsMapFromToken(token);  // Replace this with your token extraction logic
                 Instant expiration = TokenUtils.getExpirationFromToken(token);
                 Long memberId = TokenUtils.getMemberIdFromToken(token);
 
-                // Create Jwt object
+                // Jwt 객체 생성
                 Jwt jwt = Jwt.withTokenValue(token)
                         .header("typ", "JWT")
                         .claims(claims -> claims.putAll(claimsMap))
@@ -52,13 +53,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                         .claim("memberId", memberId)
                         .build();
 
-                // Create UsernamePasswordAuthenticationToken
+                // 인증 객체 생성
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwt, null, extractAuthorities(token));
 
-                // Set it in the SecurityContext
+                // SecurityContext에 인증 객체 설정
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
+        // 필터 체인 실행
         filterChain.doFilter(request, response);
     }
 
@@ -67,6 +69,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         return tokenValidator.isValidToken(token, ACCESS_TOKEN_TYPE);
     }
 
+    // 토큰에서 권한 정보를 추출
     private List<SimpleGrantedAuthority> extractAuthorities(String token) {
         String role = TokenUtils.getRoleFromToken(token);  // Replace this with your token extraction logic
         return Collections.singletonList(new SimpleGrantedAuthority(role));

@@ -83,6 +83,7 @@ public class KafkaConsumerConfig {
 
         // DeadLetterPublishingRecoverer 설정 (개별 DLQ)
         DeadLetterPublishingRecoverer deadLetterPublishingRecoverer = new DeadLetterPublishingRecoverer(
+                // cr = consumerRecord(실패한 메시지)
                 kafkaTemplate, (cr, e) -> new TopicPartition("dlq_for_" + cr.topic() + "_" + cr.partition(), 0)
         );
 

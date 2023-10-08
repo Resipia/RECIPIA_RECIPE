@@ -23,6 +23,7 @@ import java.util.Map;
 
 /**
  * Kafka 소비자 설정 클래스.
+ * todo: 카프카의 파티션을 미리 설정해서 consumer를 일치시켜주는것이 좋은데 어떻게 할지 상의가 필요하다.
  *
  * @version 1.0
  * @since 2023-10-02

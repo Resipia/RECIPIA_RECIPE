@@ -1,8 +1,6 @@
 package com.recipia.recipe.config.jwt;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -20,43 +18,48 @@ import java.util.Map;
 @Component
 public class TokenUtils {
 
+    // JWT 비밀 키, HMAC-SHA 알고리즘을 위한 키 생성
     private static final String jwtSecretKey = "thisIsASecretKeyUsedForJwtTokenGenerationAndItIsLongEnoughToMeetTheRequirementOf256Bits";
     private static final Key key = Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
+
+    // JWT에 저장될 사용자 정보의 키
     private static final String USERNAME = "username";
     private static final String NICKNAME = "nickname";
     private static final String ROLE = "role";
+
+    // 액세스 토큰 유형 상수
     public static final String ACCESS_TOKEN_TYPE = "access";
 
 
+    // 토큰에서 사용자 이름을 가져오는 메서드
     public static String getUsernameFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         return claims.get(USERNAME, String.class);
     }
 
+    // 토큰에서 닉네임을 가져오는 메서드
     public static String getNicknameFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         return claims.get(NICKNAME, String.class);
     }
 
+    // 토큰에서 역할(role)을 가져오는 메서드
     public static String getRoleFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         return claims.get(ROLE, String.class);
     }
 
-    /**
-     * 토큰 정보를 기반으로 Claims 정보를 반환받는 메서드
-     * @return Claims : Claims
-     */
+    // 토큰에서 Claims 정보를 추출하는 메서드
     public static Claims getClaimsFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key)
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
                 .build().parseClaimsJws(token).getBody();
     }
 
-    // New method to get claims as a Map
+    // 토큰에서 Claims 정보를 맵 형태로 가져오는 메서드
     public static Map<String, Object> getClaimsMapFromToken(String token) {
         return getClaimsFromToken(token);
     }
-
 
     /**
      * "exp" 클레임을 Instant 타입으로 반환할 수 있는 메서드
@@ -68,14 +71,11 @@ public class TokenUtils {
         return claims.get("exp", Date.class).toInstant();
     }
 
-    /**
-     * "memberId" 클레임을 Long 타입으로 변환할 수 있는 메서드
-     */
+    // 토큰의 "memberId" 클레임을 Long 타입으로 가져오는 메서드
     public static Long getMemberIdFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         Object memberIdObj = claims.get("memberId");
         return Long.parseLong(memberIdObj.toString());
     }
-
 
 }

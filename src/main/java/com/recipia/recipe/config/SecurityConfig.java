@@ -2,7 +2,6 @@ package com.recipia.recipe.config;
 
 import com.recipia.recipe.config.filter.JwtAuthorizationFilter;
 import com.recipia.recipe.config.jwt.TokenValidator;
-import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +13,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 public class SecurityConfig {
 
     private final TokenValidator tokenValidator;
+
+    // JWT 토큰 생성을 위한 비밀키 선언
     private static final String jwtSecretKey = "thisIsASecretKeyUsedForJwtTokenGenerationAndItIsLongEnoughToMeetTheRequirementOf256Bits";
     SecretKeySpec hmacSecretKey = new SecretKeySpec(jwtSecretKey.getBytes(StandardCharsets.UTF_8), "HMACSHA256");
 
@@ -38,29 +38,6 @@ public class SecurityConfig {
         return web -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
-
-//    @Bean
-//    public SecurityFilterChain filterChain(
-//            HttpSecurity http,
-//            JwtAuthorizationFilter jwtAuthorizationFilter
-//    ) throws Exception {
-//        return http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(authorize -> authorize
-//                        .anyRequest().authenticated()
-//                )
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-//                .oauth2ResourceServer(httpSecurity -> httpSecurity
-//                        .authenticationManager(authenticationManagerBean())
-//                        .jwt()
-//                        .decoder(jwtDecoder())
-//                        .authorizeRequests(authorize -> authorize
-//                                .anyRequest().authenticated()
-//                        )
-//                )
-//                .build();
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -89,6 +66,9 @@ public class SecurityConfig {
         return new JwtAuthorizationFilter(tokenValidator);
     }
 
+    /**
+     * JWT 디코더를 생성하는 메서드.
+     */
     @Bean
     public JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withSecretKey(hmacSecretKey).build();

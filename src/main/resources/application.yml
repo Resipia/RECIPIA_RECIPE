@@ -8,25 +8,6 @@ logging:
   pattern:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
 
-#spring:
-#  datasource:
-#    url: ${LOCAL_DB_URL}
-#    username: ${LOCAL_DB_USERNAME}
-#    password: ${LOCAL_DB_PASSWORD}
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#
-#  jpa:
-#    defer-datasource-initialization: true
-#    hibernate.ddl-auto: none
-#    open-in-view: false
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
-#        default_batch_fetch_size: 100
-#        highlight_sql: true
-#
-#  sql.init.mode: always
 
 ---
 
@@ -96,20 +77,3 @@ spring:
     console:
       enabled: true
 
----
-spring:
-  config:
-    activate:
-      on-profile: test
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-  sql:
-    init:
-      mode: never

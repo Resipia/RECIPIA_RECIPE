@@ -22,21 +22,31 @@ repositories {
 }
 
 dependencies {
+
+	// springBoot web
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// database
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	runtimeOnly 'org.postgresql:postgresql'
+
+	// dev + code
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	// queryDsl
 	implementation 'com.querydsl:querydsl-core:5.0.0'
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
@@ -48,21 +58,20 @@ dependencies {
 	runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.2') {
 		exclude group: 'org.json', module: 'json'
 	}
-
-	// kafka
-	implementation 'org.springframework.kafka:spring-kafka'
-	testImplementation 'org.springframework.kafka:spring-kafka-test'
-
-	// OAuth2 Resource Server (JWT 지원 포함)
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
-	// zipkin
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+	// AWS
+	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sns'
 
-	// kafka, zipkin 연동용
-	implementation 'io.zipkin.brave:brave-instrumentation-kafka-clients'
+	// zipkin
+//	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+//	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+//	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+
+//	// kafka, zipkin 연동용
+//	implementation 'io.zipkin.brave:brave-instrumentation-kafka-clients'
 }
 
 dependencyManagement {

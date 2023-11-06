@@ -22,4 +22,9 @@ public class RecipeController {
         return null;
     }
 
+    @GetMapping("/test")
+    public String pingTest() {
+        return "ping success!!!";
+    }
+
 }

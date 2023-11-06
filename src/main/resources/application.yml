@@ -58,23 +58,3 @@ spring:
 server:
   port: 8082
 
----
-
-spring:
-  config:
-    activate:
-      on-profile: local
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    defer-datasource-initialization: true # (2.5~) Hibernate 초기화 이후 data.sql이 실행됨
-
-  h2:
-    console:
-      enabled: true
-

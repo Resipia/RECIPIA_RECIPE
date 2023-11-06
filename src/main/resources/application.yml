@@ -14,14 +14,14 @@ logging:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${url}
-    username: ${username}
-    password: ${password}
+    url: ${RECIPE_DB_URL}
+    username: ${DB_MASTER_USERNAME}
+    password: ${DB_MASTER_PASSWORD}
 
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     open-in-view: false
     show-sql: true
     properties:

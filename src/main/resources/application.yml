@@ -40,7 +40,7 @@ spring:
           nickname-change: arn:aws:sns:${REGION}:${ACCOUNT_ID}:sns-test
       #          topic1: arn:aws:sns:${REGION}:${ACCOUNT_ID}:topic1
       sqs:
-        nickname-sqs-name: sqs-test
+        nickname-sqs-name: sqs-recipe-test
 
 server:
   port: 8082

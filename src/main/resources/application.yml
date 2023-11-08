@@ -3,11 +3,6 @@ logging:
     com.recipia.recipe: debug
     org.springframework.web.servlet: debug
     org.hibernate.orm.jdbc.bind: trace
-#    org.springframework.cloud.sleuth: info
-
-#  pattern:
-#    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
-
 
 ---
 
@@ -46,14 +41,6 @@ spring:
       #          topic1: arn:aws:sns:${REGION}:${ACCOUNT_ID}:topic1
       sqs:
         nickname-sqs-name: sqs-test
-
-#  zipkin:
-#    base-url: http://localhost:9411/
-#
-#  sleuth:
-#    enabled: true
-#    sampler:
-#      probability: 1.0
 
 server:
   port: 8082

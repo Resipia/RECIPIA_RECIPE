@@ -23,8 +23,8 @@ public class AwsXrayConfig {
                 .withPlugin(new EC2Plugin())
                 .withPlugin(new ECSPlugin());
 
-        URL ruleFile = AwsXrayConfig.class.getResource("/sampling-rules.json");
-        builder.withSamplingStrategy(new LocalizedSamplingStrategy(ruleFile));
+//        URL ruleFile = AwsXrayConfig.class.getResource("/sampling-rules.json");
+//        builder.withSamplingStrategy(new LocalizedSamplingStrategy(ruleFile));
 
         AWSXRay.setGlobalRecorder(builder.build());
     }
@@ -33,9 +33,9 @@ public class AwsXrayConfig {
      * 이 빈은 들어오는 HTTP 요청을 필터링하고 AWS X-Ray를 사용하여 추적하는 데 사용된다.
      * 필터는 "springbootService"라는 이름을 사용하여 추적되는 서비스를 식별한다.
      */
-    @Bean
-    public AWSXRayServletFilter TracingFilter() {
-        return new AWSXRayServletFilter("recipia-member");
-    }
+//    @Bean
+//    public AWSXRayServletFilter TracingFilter() {
+//        return new AWSXRayServletFilter("recipia-member");
+//    }
 
 }

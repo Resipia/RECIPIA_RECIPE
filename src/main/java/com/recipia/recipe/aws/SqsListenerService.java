@@ -21,7 +21,7 @@ public class SqsListenerService {
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
     public void receiveMessage(String messageJson) {
 
-        Subsegment subsegment = AWSXRay.beginSubsegment("processSQSMessage");
+        Subsegment subsegment = AWSXRay.beginSubsegment("publishNicknameToTopic");
 
         try {
             JsonNode messageNode = objectMapper.readTree(messageJson);

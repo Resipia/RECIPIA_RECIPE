@@ -1,5 +1,7 @@
 package com.recipia.recipe.aws;
 
+import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.entities.Subsegment;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.awspring.cloud.sqs.annotation.SqsListener;
@@ -19,6 +21,8 @@ public class SqsListenerService {
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
     public void receiveMessage(String messageJson) {
 
+        Subsegment subsegment = AWSXRay.beginSubsegment("processSQSMessage");
+
         try {
             JsonNode messageNode = objectMapper.readTree(messageJson);
             String topicArn = messageNode.get("TopicArn").asText();
@@ -31,8 +35,10 @@ public class SqsListenerService {
             log.info("Topic ARN: {}", topicArn);
             log.info("Message:  {}", message.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            subsegment.addException(e);
             throw new RuntimeException("Error parsing message JSON", e);
+        } finally {
+            AWSXRay.endSubsegment();
         }
 
     }

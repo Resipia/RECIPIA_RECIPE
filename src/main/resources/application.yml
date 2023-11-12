@@ -3,6 +3,10 @@ logging:
     com.recipia.recipe: debug
     org.springframework.web.servlet: debug
     org.hibernate.orm.jdbc.bind: trace
+    org.springframework.cloud.sleuth: info
+
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
 
 ---
 
@@ -27,6 +31,15 @@ spring:
 
   application:
     name: recipe
+
+  zipkin:
+    base-url: http://${EC2_PUBLIC_DNS}:9411/
+    enabled: true
+
+  sleuth:
+    enabled: true
+    sampler:
+      probability: 1.0
 
   cloud:
     aws:

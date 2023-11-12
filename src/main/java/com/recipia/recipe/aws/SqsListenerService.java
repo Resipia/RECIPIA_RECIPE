@@ -23,6 +23,11 @@ public class SqsListenerService {
         String topicArn = messageNode.get("TopicArn").asText();
         String messageContent = messageNode.get("Message").asText();
 
+        // messageId 추출 및 로깅 (만약 메시지에 messageId 정보가 있다면)
+        String messageId = messageNode.get("MessageId").asText();
+        log.info("[RECIPE] Received message from SQS with messageId: {}", messageId);
+
+
         // Assuming the "Message" is also a JSON string, we parse it to print as JSON object
         JsonNode message = objectMapper.readTree(messageContent);
 

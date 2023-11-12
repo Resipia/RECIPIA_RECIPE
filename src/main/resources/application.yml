@@ -32,15 +32,6 @@ spring:
   application:
     name: recipe
 
-  zipkin:
-    base-url: http://${EC2_PUBLIC_DNS}:9411/
-    enabled: true
-
-  sleuth:
-    enabled: true
-    sampler:
-      probability: 1.0
-
   cloud:
     aws:
       credentials:
@@ -57,4 +48,17 @@ spring:
 
 server:
   port: 8082
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      consume: B3
+      produce: B3
+  zipkin:
+    tracing:
+      endpoint: http://${EC2_PUBLIC_DNS}:9411/api/v2/spans
+
+
 

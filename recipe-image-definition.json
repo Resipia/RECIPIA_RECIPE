@@ -2,9 +2,5 @@
   {
     "name": "recipia-recipe-container",
     "imageUri": "473709498430.dkr.ecr.ap-northeast-2.amazonaws.com/recipia-recipe"
-  },
-  {
-    "name": "recipe-xray-container",
-    "imageUri": "amazon/aws-xray-daemon"
   }
 ]

@@ -1,5 +1,7 @@
 package com.recipia.recipe.aws;
 
+import brave.Span;
+import brave.Tracer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,32 +10,35 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class SqsListenerService {
 
     private final ObjectMapper objectMapper;
+    private final Tracer tracer;
 
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
     public void receiveMessage(String messageJson) throws JsonProcessingException {
+
         JsonNode messageNode = objectMapper.readTree(messageJson);
-        String topicArn = messageNode.get("TopicArn").asText();
-        String messageContent = messageNode.get("Message").asText();
+        String messageId = messageNode.get("MessageId").asText();  // 메시지 ID 추출
 
-        // messageId 추출 및 로깅 (만약 메시지에 messageId 정보가 있다면)
-        String messageId = messageNode.get("MessageId").asText();
-        log.info("[RECIPE] Received message from SQS with messageId: {}", messageId);
+        Span newSpan = tracer.nextSpan().name(messageId).start(); // Span 이름을 메시지 ID로 설정
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(newSpan)) {
+            // SQS 메시지 처리 로직
+            String topicArn = messageNode.get("TopicArn").asText();
+            String messageContent = messageNode.get("Message").asText();
 
+            log.info("[RECIPE] Received message from SQS with messageId: {}", messageId);
 
-        // Assuming the "Message" is also a JSON string, we parse it to print as JSON object
-        JsonNode message = objectMapper.readTree(messageContent);
+            // Assuming the "Message" is also a JSON string, we parse it to print as JSON object
+            JsonNode message = objectMapper.readTree(messageContent);
+            log.info("Message:  {}", message.toString());
+        } finally {
+            newSpan.finish();
+        }
 
-
-        log.info("Topic ARN: {}", topicArn);
-        log.info("Message:  {}", message.toString());
     }
 
 }

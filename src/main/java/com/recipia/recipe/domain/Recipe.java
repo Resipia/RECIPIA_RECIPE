@@ -76,6 +76,8 @@ public class Recipe extends UpdateDateTime {
         return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, nickname, delYn);
     }
 
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,4 +89,9 @@ public class Recipe extends UpdateDateTime {
     public int hashCode() {
         return Objects.hash(getId());
     }
+
+    public void changeNickname(String recipeName) {
+        this.recipeName = recipeName;
+    }
+
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class SnsService {
+public class AwsSnsService {
 
     private final SnsClient snsClient;
     private final AwsSnsConfig awsSnsConfig;
@@ -26,26 +26,28 @@ public class SnsService {
     private final Tracer tracer;
 
 
-    public PublishResponse publishNicknameToTopic(Map<String, Object> messageMap) {
-        // 메시지를 JSON 형태로 변환
-        String messageJson = convertMapToJson(messageMap);
+    public PublishResponse publishNicknameToTopic(String message) {
 
         // SNS 발행 요청 생성
         PublishRequest publishRequest = PublishRequest.builder()
-                .message(messageJson)
+                .message(message)
                 .topicArn(awsSnsConfig.getSnsTopicNicknameChangeARN())
                 .build();
+
 
         // SNS 클라이언트를 통해 메시지 발행
         PublishResponse response = snsClient.publish(publishRequest);
 
         // messageId 로깅
-        log.info("[RECIPE] Published message to SNS with messageId: {}", response.messageId());
+        log.info("[RECIPE] Published message to SNS with recipeId: {}", response.messageId());
 
         // 새로운 Span 생성 및 시작
         Span newSpan = tracer.nextSpan().name(response.messageId()).start(); // Span 이름을 SNS 메시지 ID로 설정
+
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(newSpan)) {
-            newSpan.tag("messageId", String.valueOf(response)); // messageId 태그 추가
+            newSpan.tag("recipeId", String.valueOf(response)); // messageId 태그 추가
+            newSpan.tag("producer", "RECIPE"); // messageId 태그 추가
+
             // 별도의 추가 작업 없음
         } finally {
             newSpan.finish(); // Span 완료

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class SqsListenerService {
+public class AwsSqsListenerService {
 
     private final ObjectMapper objectMapper;
     private final Tracer tracer;

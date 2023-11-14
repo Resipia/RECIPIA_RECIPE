@@ -1,6 +1,6 @@
 package com.recipia.recipe.controller;
 
-import com.recipia.recipe.aws.SnsService;
+import com.recipia.recipe.aws.AwsSnsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +17,14 @@ import java.util.Map;
 @RequestMapping("/message")
 public class MessageController {
 
-    private final SnsService snsService;
+    private final AwsSnsService awsSnsService;
 
     @PostMapping("/publish")
     public ResponseEntity<String> publishMessage(@RequestBody Map<String, Object> messageMap) {
         try {
             // SnsService를 사용해서 메시지 발행
             String message = (String) messageMap.get("message");
-            PublishResponse response = snsService.publishNicknameToTopic(message);
+            PublishResponse response = awsSnsService.publishNicknameToTopic(message);
 
             // 발행 결과를 HTTP 응답으로 반환
             return ResponseEntity.ok().body(response.messageId());

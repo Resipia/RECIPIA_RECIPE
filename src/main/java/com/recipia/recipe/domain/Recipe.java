@@ -90,8 +90,8 @@ public class Recipe extends UpdateDateTime {
         return Objects.hash(getId());
     }
 
-    public void changeNickname(String recipeName) {
-        this.recipeName = recipeName;
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
     }
 
 }

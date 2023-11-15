@@ -2,7 +2,7 @@ package com.recipia.recipe.service;
 
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.repository.RecipeRepository;
-import com.recipia.recipe.event.RecipeNameChange;
+import com.recipia.recipe.event.springevent.NicknameChangeEvent;
 import com.recipia.recipe.exception.ApiErrorCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class RecipeService {
         recipe.changeNickname("NEW-Recipe-NICKNAME-222");
 
         log.info("레시피 이름 변경 Service [레시피 pk : {}]", recipe.getId());
-        eventPublisher.publishEvent(new RecipeNameChange(recipe.getId()));
+        eventPublisher.publishEvent(new NicknameChangeEvent(recipe.getId()));
     }
 
 }

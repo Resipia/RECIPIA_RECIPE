@@ -69,4 +69,9 @@ management:
       endpoint: http://${EC2_PUBLIC_DNS}:9411/api/v2/spans
 
 
+feign:
+  member_url: ${MEMBER_URL}
+#  member_url: http://127.0.0.1:8081
+
+
 

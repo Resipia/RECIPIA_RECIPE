@@ -32,6 +32,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+	// feign client
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
 	// database
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	runtimeOnly 'org.postgresql:postgresql'

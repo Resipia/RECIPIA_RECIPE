@@ -26,25 +26,26 @@ public class AwsSqsListenerService {
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
     public void receiveMessage(String messageJson) throws JsonProcessingException {
         JsonNode messageNode = objectMapper.readTree(messageJson);
-        String messageId = messageNode.get("MessageId").asText(); // 메시지 ID 추출
-
+        String messageId = messageNode.get("MessageId").asText();
         String messageContent = messageNode.get("Message").asText();
+
         log.info("[RECIPE] Received message from SQS with messageId: {}", messageId);
 
         JsonNode message = objectMapper.readTree(messageContent);
-        log.info("Message: {}", message.toString());
+        String traceId = extractTraceIdFromMessage(message);
 
-        // TraceID 추출 및 처리
-        String traceId = message.get("traceId").asText();
         TraceContext context = buildTraceContext(traceId);
 
-        // 새로운 Span 생성 및 컨텍스트 적용
-        Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context));
-        try (Tracer.SpanInScope ws = tracer.withSpanInScope(span.start())) {
+        Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context)).start();
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
             processNicknameMessage(message);
         } finally {
             span.finish();
         }
+    }
+
+    private String extractTraceIdFromMessage(JsonNode message) {
+        return message.get("traceId").asText();
     }
 
     private TraceContext buildTraceContext(String traceId) {
@@ -57,7 +58,9 @@ public class AwsSqsListenerService {
             long traceIdLow = Long.parseUnsignedLong(traceId, 16);
             contextBuilder.traceId(traceIdLow);
         }
+        // 새로운 Span ID 생성 (tracer 인스턴스를 사용)
         contextBuilder.spanId(tracer.nextSpan().context().spanId());
+
         return contextBuilder.build();
     }
 
@@ -73,5 +76,4 @@ public class AwsSqsListenerService {
         eventPublisher.publishEvent(new NicknameChangeEvent(memberId));
         log.info("Processed NicknameChangeEvent for memberId: {}", memberId);
     }
-
 }

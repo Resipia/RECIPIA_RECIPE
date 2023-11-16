@@ -25,6 +25,8 @@ public class FeignClientConfig {
                     // TraceID를 HTTP 요청 헤더에 추가
                     template.header("X-Trace-Id", traceId);
                 }
+                // Feign 요청임을 나타내는 헤더 추가
+                template.header("X-Feign-Client", "true");
             }
         };
     }

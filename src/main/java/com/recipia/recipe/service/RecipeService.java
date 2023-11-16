@@ -1,7 +1,7 @@
 package com.recipia.recipe.service;
 
 import com.recipia.recipe.domain.Recipe;
-import com.recipia.recipe.domain.repository.RecipeRepository;
+import com.recipia.recipe.repository.RecipeRepository;
 import com.recipia.recipe.event.springevent.NicknameChangeEvent;
 import com.recipia.recipe.exception.ApiErrorCodeEnum;
 import lombok.RequiredArgsConstructor;

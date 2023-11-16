@@ -2,7 +2,7 @@ package com.recipia.recipe.event.sqseventlistener;
 
 
 import com.recipia.recipe.domain.Recipe;
-import com.recipia.recipe.domain.repository.RecipeRepository;
+import com.recipia.recipe.repository.RecipeRepository;
 import com.recipia.recipe.event.springevent.NicknameChangeEvent;
 import com.recipia.recipe.feign.MemberFeignClient;
 import com.recipia.recipe.feign.dto.NicknameDto;

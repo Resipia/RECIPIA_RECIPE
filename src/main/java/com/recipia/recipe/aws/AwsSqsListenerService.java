@@ -36,7 +36,10 @@ public class AwsSqsListenerService {
 
         TraceContext context = buildTraceContext(traceId);
 
-        Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context)).start();
+        Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context))
+                .name("Process SQS Message") // Span 이름 지정
+                .start();
+
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
             processNicknameMessage(message);
         } finally {

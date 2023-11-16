@@ -1,7 +1,5 @@
 package com.recipia.recipe.aws;
 
-import brave.Span;
-import brave.Tracer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.config.aws.AwsSnsConfig;
@@ -23,7 +21,6 @@ public class AwsSnsService {
     private final SnsClient snsClient;
     private final AwsSnsConfig awsSnsConfig;
     private final ObjectMapper objectMapper;
-    private final Tracer tracer;
 
 
     public PublishResponse publishNicknameToTopic(String message) {
@@ -34,24 +31,11 @@ public class AwsSnsService {
                 .topicArn(awsSnsConfig.getSnsTopicNicknameChangeARN())
                 .build();
 
-
         // SNS 클라이언트를 통해 메시지 발행
         PublishResponse response = snsClient.publish(publishRequest);
 
         // messageId 로깅
         log.info("[RECIPE] Published message to SNS with recipeId: {}", response.messageId());
-
-        // 새로운 Span 생성 및 시작
-        Span newSpan = tracer.nextSpan().name(response.messageId()).start(); // Span 이름을 SNS 메시지 ID로 설정
-
-        try (Tracer.SpanInScope ws = tracer.withSpanInScope(newSpan)) {
-            newSpan.tag("recipeId", String.valueOf(response)); // messageId 태그 추가
-            newSpan.tag("producer", "RECIPE"); // messageId 태그 추가
-
-            // 별도의 추가 작업 없음
-        } finally {
-            newSpan.finish(); // Span 완료
-        }
 
         return response;
     }

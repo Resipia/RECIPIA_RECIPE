@@ -1,4 +1,4 @@
-package com.recipia.recipe.domain.repository;
+package com.recipia.recipe.repository;
 
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.dto.member.MemberDto;

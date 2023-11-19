@@ -23,8 +23,13 @@ public class AwsSqsListenerService {
     private final ApplicationEventPublisher eventPublisher;
     private final Tracer tracer;
 
+    // span 태그의 상태저장을 위한 ThreadLocal추가
+    private static final ThreadLocal<Span> currentSpan = new ThreadLocal<>();
+
+
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
     public void receiveMessage(String messageJson) throws JsonProcessingException {
+
         JsonNode messageNode = objectMapper.readTree(messageJson);
         String messageId = messageNode.get("MessageId").asText();
         String messageContent = messageNode.get("Message").asText();
@@ -40,11 +45,12 @@ public class AwsSqsListenerService {
                 .name("Process SQS Message") // Span 이름 지정
                 .start();
 
+        currentSpan.set(span); // Span을 ThreadLocal에 저장
+
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
             processNicknameMessage(message);
-        } finally {
-            span.finish();
         }
+
     }
 
     private String extractTraceIdFromMessage(JsonNode message) {
@@ -52,6 +58,7 @@ public class AwsSqsListenerService {
     }
 
     private TraceContext buildTraceContext(String traceId) {
+
         TraceContext.Builder contextBuilder = TraceContext.newBuilder();
         if (traceId.length() == 32) {
             long traceIdHigh = Long.parseUnsignedLong(traceId.substring(0, 16), 16);
@@ -65,6 +72,7 @@ public class AwsSqsListenerService {
         contextBuilder.spanId(tracer.nextSpan().context().spanId());
 
         return contextBuilder.build();
+
     }
 
     private void processNicknameMessage(JsonNode message) throws JsonProcessingException {
@@ -78,5 +86,13 @@ public class AwsSqsListenerService {
         // 추출된 memberId로 이벤트 발행 및 로깅
         eventPublisher.publishEvent(new NicknameChangeEvent(memberId));
         log.info("Processed NicknameChangeEvent for memberId: {}", memberId);
+    }
+
+    public void closeCurrentSpan() {
+        Span span = currentSpan.get();
+        if (span != null) {
+            span.finish(); // Span을 닫는 메소드
+            currentSpan.remove(); // ThreadLocal에서 제거
+        }
     }
 }

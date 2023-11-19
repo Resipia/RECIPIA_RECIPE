@@ -1,6 +1,7 @@
 package com.recipia.recipe.event.sqseventlistener;
 
 
+import com.recipia.recipe.aws.AwsSqsListenerService;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.repository.RecipeRepository;
 import com.recipia.recipe.event.springevent.NicknameChangeEvent;
@@ -22,6 +23,8 @@ public class RequestFeignListener {
     private final MemberFeignClient memberFeignClient;
     private final RecipeRepository recipeRepository;
 
+    private final AwsSqsListenerService awsSqsListenerService;
+
     /**
      * Feign 클라이언트로 Member서버에 변경된 닉네임을 요청하는 리스너
      */
@@ -38,6 +41,8 @@ public class RequestFeignListener {
                 recipe.changeNickname(nicknameDto.nickname());
             });
         }
+        // Span을 닫는 메소드 호출
+        awsSqsListenerService.closeCurrentSpan();
     }
 
 }

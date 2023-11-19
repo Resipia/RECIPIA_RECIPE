@@ -23,9 +23,6 @@ public class AwsSqsListenerService {
     private final ApplicationEventPublisher eventPublisher;
     private final Tracer tracer;
 
-    // span 태그의 상태저장을 위한 ThreadLocal추가
-    private static final ThreadLocal<Span> currentSpan = new ThreadLocal<>();
-
 
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
     public void receiveMessage(String messageJson) throws JsonProcessingException {
@@ -42,13 +39,16 @@ public class AwsSqsListenerService {
         TraceContext context = buildTraceContext(traceId);
 
         Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context))
-                .name("Process SQS Message") // Span 이름 지정
+                .name("[RECIPE] nickname-change SQS Received") // Span 이름 지정
                 .start();
-
-        currentSpan.set(span); // Span을 ThreadLocal에 저장
 
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
             processNicknameMessage(message);
+        } catch (Exception e) {
+            span.tag("error", e.toString());
+            log.error("Error processing SQS message: ", e);
+        } finally {
+            span.finish();
         }
 
     }
@@ -86,13 +86,5 @@ public class AwsSqsListenerService {
         // 추출된 memberId로 이벤트 발행 및 로깅
         eventPublisher.publishEvent(new NicknameChangeEvent(memberId));
         log.info("Processed NicknameChangeEvent for memberId: {}", memberId);
-    }
-
-    public void closeCurrentSpan() {
-        Span span = currentSpan.get();
-        if (span != null) {
-            span.finish(); // Span을 닫는 메소드
-            currentSpan.remove(); // ThreadLocal에서 제거
-        }
     }
 }

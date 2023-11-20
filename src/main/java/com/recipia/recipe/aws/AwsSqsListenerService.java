@@ -36,8 +36,10 @@ public class AwsSqsListenerService {
         JsonNode message = objectMapper.readTree(messageContent);
         String traceId = extractTraceIdFromMessage(message);
 
+        // 이전 서버에서 보낸 traceId를 사용하여 새로운 TraceContext를 생성한다.
         TraceContext context = buildTraceContext(traceId);
 
+        // 이 Span은 이전 서버에서 생성된 traceId를 사용하고, 새로운 spanId를 갖게 된다.
         Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context))
                 .name("[RECIPE] nickname-change SQS Received") // Span 이름 지정
                 .start();
@@ -54,12 +56,16 @@ public class AwsSqsListenerService {
     }
 
     private String extractTraceIdFromMessage(JsonNode message) {
+        // 메시지로부터 traceId를 추출합니다.
         return message.get("traceId").asText();
     }
 
     private TraceContext buildTraceContext(String traceId) {
-
+        // 여기서 contextBuilder를 만들고 이 builder안에 멤버 서버에서 받은 traceId를 세팅해 준다.
         TraceContext.Builder contextBuilder = TraceContext.newBuilder();
+
+        // traceId의 길이에 따라 처리
+        // 32자리인 경우 128비트 traceId로 처리하고, 그렇지 않은 경우 64비트 traceId로 처리
         if (traceId.length() == 32) {
             long traceIdHigh = Long.parseUnsignedLong(traceId.substring(0, 16), 16);
             long traceIdLow = Long.parseUnsignedLong(traceId.substring(16), 16);
@@ -68,11 +74,12 @@ public class AwsSqsListenerService {
             long traceIdLow = Long.parseUnsignedLong(traceId, 16);
             contextBuilder.traceId(traceIdLow);
         }
-        // 새로운 Span ID 생성 (tracer 인스턴스를 사용)
+
+        // 새로운 Span ID를 생성
         contextBuilder.spanId(tracer.nextSpan().context().spanId());
 
+        // TraceContext 객체를 빌드하고 반환
         return contextBuilder.build();
-
     }
 
     private void processNicknameMessage(JsonNode message) throws JsonProcessingException {

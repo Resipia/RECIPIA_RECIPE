@@ -16,12 +16,6 @@ public class RecipeController {
 
     private final RecipeService recipeService;
 
-    @GetMapping("/test")
-    public String pingTest() {
-        return "recipe connect success";
-    }
-
-
     @PostMapping("/nicknameChange")
     public String nicknameChange() {
 

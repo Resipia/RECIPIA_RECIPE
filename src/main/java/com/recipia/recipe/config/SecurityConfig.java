@@ -44,11 +44,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 new AntPathRequestMatcher("/resources/**"),
-                                new AntPathRequestMatcher("/recipe/test")
+                                new AntPathRequestMatcher("/health") // ALB에서 상태 검사용으로 들어온 '/health' 경로에 대한 접근을 허용
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

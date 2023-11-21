@@ -3,7 +3,6 @@ package com.recipia.recipe.event.sqseventlistener;
 
 import brave.Span;
 import brave.Tracer;
-import com.recipia.recipe.aws.AwsSqsListenerService;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.event.springevent.NicknameChangeEvent;
 import com.recipia.recipe.feign.MemberFeignClient;
@@ -35,9 +34,9 @@ public class RequestFeignListener {
         Span feignRequestSpan = tracer.nextSpan().name("[RECIPE] /feign/member/getNickname request").start();
         Long memberId = event.memberId();
 
-        NicknameDto nicknameDto;
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(feignRequestSpan)) {
-            nicknameDto = memberFeignClient.getNickname(memberId);
+            NicknameDto nicknameDto = memberFeignClient.getNickname(memberId);
+
             // Feign 요청 후 응답 처리
             if (nicknameDto != null) {
                 // NicknameDto 처리 로직

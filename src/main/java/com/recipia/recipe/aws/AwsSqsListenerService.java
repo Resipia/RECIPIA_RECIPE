@@ -15,6 +15,10 @@ import brave.Span;
 import brave.Tracer;
 import brave.propagation.TraceContext;
 import brave.propagation.TraceContextOrSamplingFlags;
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
+
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,18 +39,19 @@ public class AwsSqsListenerService {
      * 그럼 배치서버에서는 이 메시지의 발행여부가 false여서 다시 이벤트를 발행한다. (이때 traceId를 만들어서 넣어준다.)
      */
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
-    public void receiveMessage(String messageJson) throws JsonProcessingException {
+    public void receiveMessage(String messageJson, Map<String, MessageAttributeValue> messageAttributes) throws JsonProcessingException {
+        String traceId = Optional.ofNullable(messageAttributes.get("traceId"))
+                .map(MessageAttributeValue::stringValue)
+                .orElseGet(() -> {
+                    log.error("No traceId found in the message attributes.");
+                    return null;
+                });
 
         SnsInformationDto snsInformationDto = objectMapper.readValue(messageJson, SnsInformationDto.class);
         SnsMessageDto snsMessageDto = objectMapper.readValue(snsInformationDto.Message(), SnsMessageDto.class);
 
-        if (snsMessageDto.traceId() == null) {
-//            log.error("No traceId found in the message. memberId: {}, skipping processing.", snsMessageDto.memberId());
-            return;
-        }
-
         // 이전 서버에서 보낸 traceId를 사용하여 새로운 TraceContext를 생성
-        TraceContext context = buildTraceContext(snsMessageDto.traceId());
+        TraceContext context = buildTraceContext(traceId);
         Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context))
                 .name("[RECIPE] nickname-change SQS Received")
                 .start();
@@ -68,6 +73,13 @@ public class AwsSqsListenerService {
      * 멤버 서버에서 받은 traceId를 TraceContext안에 세팅해 준다.
      */
     private TraceContext buildTraceContext(String traceId) {
+        if (traceId == null) {
+            // 새로운 Span 생성
+            Span newSpan = tracer.newTrace();
+            // 새로운 traceId 추출
+            traceId = newSpan.context().traceIdString();
+        }
+
         TraceContext.Builder contextBuilder = TraceContext.newBuilder();
 
         // traceId의 길이가 32자리인 경우 128비트 traceId로 처리하고, 그렇지 않은 경우 64비트 traceId로 처리

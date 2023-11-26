@@ -1,24 +1,18 @@
 package com.recipia.recipe.aws;
 
+import brave.Span;
+import brave.Tracer;
+import brave.propagation.TraceContext;
+import brave.propagation.TraceContextOrSamplingFlags;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recipia.recipe.dto.SnsInformationDto;
-import com.recipia.recipe.dto.SnsMessageDto;
+import com.recipia.recipe.dto.message.*;
 import com.recipia.recipe.event.springevent.NicknameChangeEvent;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import brave.Span;
-import brave.Tracer;
-import brave.propagation.TraceContext;
-import brave.propagation.TraceContextOrSamplingFlags;
-import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
-
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,22 +27,17 @@ public class AwsSqsListenerService {
     /**
      * 아래의 Sqs리스너는 멤버 서버로 FeignClient 요청을 하는 스프링 이벤트를 발행한다.
      *
-     * @apiNote
-     * 만약 traceId가 들어있지 않은 메시지를 받았다면 여기서는 error에 대한 로깅만 하고 메서드를 바로 return시킨다.
-     * SQS메시지 안에 traceId가 없으면 이 메시지를 동시에 받아 동작하는 멤버 서버의 SQS리스너에서는 이벤트 발행여부를 false로 둘 것이다.
-     * 그럼 배치서버에서는 이 메시지의 발행여부가 false여서 다시 이벤트를 발행한다. (이때 traceId를 만들어서 넣어준다.)
      */
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
-    public void receiveMessage(String messageJson, Map<String, MessageAttributeValue> messageAttributes) throws JsonProcessingException {
-        String traceId = Optional.ofNullable(messageAttributes.get("traceId"))
-                .map(MessageAttributeValue::stringValue)
-                .orElseGet(() -> {
-                    log.error("No traceId found in the message attributes.");
-                    return null;
-                });
+    public void receiveMessage(String messageJson) throws JsonProcessingException {
 
-        SnsInformationDto snsInformationDto = objectMapper.readValue(messageJson, SnsInformationDto.class);
-        SnsMessageDto snsMessageDto = objectMapper.readValue(snsInformationDto.Message(), SnsMessageDto.class);
+        SnsNotificationDto snsNotificationDto = objectMapper.readValue(messageJson, SnsNotificationDto.class);
+
+        TraceIdDto traceIdDto = snsNotificationDto.MessageAttributes().traceId();
+        String traceId = traceIdDto.Value();
+        MessageMemberIdDto snsMessageDto = objectMapper.readValue(snsNotificationDto.Message(), MessageMemberIdDto.class);
+
+
 
         // 이전 서버에서 보낸 traceId를 사용하여 새로운 TraceContext를 생성
         TraceContext context = buildTraceContext(traceId);

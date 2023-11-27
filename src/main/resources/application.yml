@@ -41,10 +41,8 @@ spring:
         static: ${REGION}
       sns:
         topics:
-          nickname-change: arn:aws:sns:${REGION}:${ACCOUNT_ID}:sns-test
-      #          topic1: arn:aws:sns:${REGION}:${ACCOUNT_ID}:topic1
       sqs:
-        nickname-sqs-name: sqs-recipe-test
+        nickname-sqs-name: nickname-change-sqs
 
   sleuth:
     web:

@@ -22,7 +22,7 @@ public class AwsSnsConfig {
     @Value("${spring.cloud.aws.region.static}")
     private String awsRegion;
 
-    @Value("${spring.cloud.aws.sns.topics.nickname-change}")
+    @Value("temp")
     private String snsTopicNicknameChangeARN;
 
 //    @Value("${spring.cloud.aws.sns.topics.topic1}")

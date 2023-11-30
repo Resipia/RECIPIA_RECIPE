@@ -6,7 +6,6 @@ spring:
   profiles:
     active: prod
 
-spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${RECIPE_DB_URL}

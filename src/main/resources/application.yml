@@ -28,11 +28,13 @@ spring:
     name: recipe
 
   sleuth:
-    web:
-      client:
-        enabled: false # HTTP 클라이언트에 대한 추적 비활성화
-      servlet:
-        skip-pattern: /health
+    http:
+      ignore-patterns=/health
+#    web:
+#      client:
+#        enabled: false # HTTP 클라이언트에 대한 추적 비활성화
+#      servlet:
+#        skip-pattern: /health
 
 server:
   port: 8082

@@ -40,6 +40,14 @@ server:
   port: 8082
 
 management:
+  metrics:
+    web:
+      server:
+        auto-time-requests: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'  # 이 부분을 수정
   tracing:
     sampling:
       probability: 1.0
@@ -49,7 +57,5 @@ management:
   zipkin:
     tracing:
       endpoint: http://${EC2_PUBLIC_DNS}:9411/api/v2/spans
-
-
 
 

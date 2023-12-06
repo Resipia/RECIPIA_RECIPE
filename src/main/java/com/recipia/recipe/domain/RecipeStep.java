@@ -2,6 +2,7 @@ package com.recipia.recipe.domain;
 
 
 import com.recipia.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class RecipeStep extends CreateDateTime {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
-    private Recipe recipe;
+    private RecipeEntity recipeEntity;
 
     @Column(name = "step", nullable = false)
     private Integer step;
@@ -40,14 +41,14 @@ public class RecipeStep extends CreateDateTime {
     @OneToMany(mappedBy = "recipeStep")
     private List<RecipeFile> recipeFileList = new ArrayList<>();
 
-    private RecipeStep(Recipe recipe, Integer step, String stepDescription, String delYn) {
-        this.recipe = recipe;
+    private RecipeStep(RecipeEntity recipeEntity, Integer step, String stepDescription, String delYn) {
+        this.recipeEntity = recipeEntity;
         this.step = step;
         this.stepDescription = stepDescription;
         this.delYn = delYn;
     }
 
-    public static RecipeStep of(Recipe recipe, Integer step, String stepDescription, String delYn) {
-        return new RecipeStep(recipe, step, stepDescription, delYn);
+    public static RecipeStep of(RecipeEntity recipeEntity, Integer step, String stepDescription, String delYn) {
+        return new RecipeStep(recipeEntity, step, stepDescription, delYn);
     }
 }

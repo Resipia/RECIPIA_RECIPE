@@ -19,7 +19,7 @@ public record IngredientRecipeMapDto(
                 entity.getId(),
                 IngredientDto.fromEntity(entity.getIngredient()),
                 CustomIngredientDto.fromEntity(entity.getCustomIngredient()),
-                RecipeDto.fromEntity(entity.getRecipe())
+                RecipeDto.fromEntity(entity.getRecipeEntity())
         );
     }
 

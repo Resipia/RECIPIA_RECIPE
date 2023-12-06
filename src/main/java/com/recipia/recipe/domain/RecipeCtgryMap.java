@@ -1,6 +1,7 @@
 package com.recipia.recipe.domain;
 
 import com.recipia.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,19 +22,19 @@ public class RecipeCtgryMap extends CreateDateTime {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
-    private Recipe recipe;
+    private RecipeEntity recipeEntity;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ctgry_id", nullable = false)
     private Ctgry ctgry;
 
-    private RecipeCtgryMap(Recipe recipe, Ctgry ctgry) {
-        this.recipe = recipe;
+    private RecipeCtgryMap(RecipeEntity recipeEntity, Ctgry ctgry) {
+        this.recipeEntity = recipeEntity;
         this.ctgry = ctgry;
     }
 
-    public static RecipeCtgryMap of(Recipe recipe, Ctgry ctgry) {
-        return new RecipeCtgryMap(recipe, ctgry);
+    public static RecipeCtgryMap of(RecipeEntity recipeEntity, Ctgry ctgry) {
+        return new RecipeCtgryMap(recipeEntity, ctgry);
     }
 }

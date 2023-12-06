@@ -2,6 +2,7 @@ package com.recipia.recipe.domain;
 
 
 import com.recipia.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,19 +26,19 @@ public class StarRate extends CreateDateTime {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
-    private Recipe recipe;
+    private RecipeEntity recipeEntity;
 
     @Column(name = "star_rate_value", nullable = false)
     private Double starRateValue;
 
-    private StarRate(Long memberId, Recipe recipe, Double starRateValue) {
+    private StarRate(Long memberId, RecipeEntity recipeEntity, Double starRateValue) {
         this.memberId = memberId;
-        this.recipe = recipe;
+        this.recipeEntity = recipeEntity;
         this.starRateValue = starRateValue;
     }
 
-    public static StarRate of(Long memberId, Recipe recipe, Double starRateValue) {
-        return new StarRate(memberId, recipe, starRateValue);
+    public static StarRate of(Long memberId, RecipeEntity recipeEntity, Double starRateValue) {
+        return new StarRate(memberId, recipeEntity, starRateValue);
     }
 
 }

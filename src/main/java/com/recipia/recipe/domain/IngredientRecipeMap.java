@@ -1,6 +1,7 @@
 package com.recipia.recipe.domain;
 
 import com.recipia.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,19 +29,19 @@ public class IngredientRecipeMap extends CreateDateTime {
     @ToString.Exclude
     @JoinColumn(name = "recipe_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private Recipe recipe;
+    private RecipeEntity recipeEntity;
 
     // 생성자 factory method
     @Builder
-    private IngredientRecipeMap(Ingredient ingredient, CustomIngredient customIngredient, Recipe recipe) {
+    private IngredientRecipeMap(Ingredient ingredient, CustomIngredient customIngredient, RecipeEntity recipeEntity) {
         this.ingredient = ingredient;
         this.customIngredient = customIngredient;
-        this.recipe = recipe;
+        this.recipeEntity = recipeEntity;
     }
 
     // static method 생성
-    public static IngredientRecipeMap of(Ingredient ingredient, CustomIngredient customIngredient, Recipe recipe) {
-        return new IngredientRecipeMap(ingredient, customIngredient, recipe);
+    public static IngredientRecipeMap of(Ingredient ingredient, CustomIngredient customIngredient, RecipeEntity recipeEntity) {
+        return new IngredientRecipeMap(ingredient, customIngredient, recipeEntity);
     }
 
 

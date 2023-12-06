@@ -1,5 +1,6 @@
-package com.recipia.recipe.domain;
+package com.recipia.recipe.hexagonal.adapter.out.persistence;
 
+import com.recipia.recipe.domain.*;
 import com.recipia.recipe.domain.auditingfield.UpdateDateTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Recipe extends UpdateDateTime {
+public class RecipeEntity extends UpdateDateTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,31 +39,31 @@ public class Recipe extends UpdateDateTime {
     private String delYn;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(mappedBy = "recipeEntity")
     private List<RecipeStep> recipeStepList = new ArrayList<>();
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(mappedBy = "recipeEntity")
     private List<RecipeCtgryMap> recipeCtgryMapList = new ArrayList<>();
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(mappedBy = "recipeEntity")
     private List<StarRate> starRateList = new ArrayList<>();
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(mappedBy = "recipeEntity")
     private List<RecipeHistLog> recipeHistLogList = new ArrayList<>();
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(mappedBy = "recipeEntity")
     private List<IngredientRecipeMap> ingredientList = new ArrayList<>();
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "recipe")
+    @OneToMany(mappedBy = "recipeEntity")
     private List<RecipeViewCnt> recipeViewCntList = new ArrayList<>();
 
     @Builder
-    private Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn) {
+    private RecipeEntity(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn) {
         this.id = id;
         this.memberId = memberId;
         this.recipeName = recipeName;
@@ -72,8 +73,8 @@ public class Recipe extends UpdateDateTime {
         this.delYn = delYn;
     }
 
-    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn) {
-        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, nickname, delYn);
+    public static RecipeEntity of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn) {
+        return new RecipeEntity(id, memberId, recipeName, recipeDesc, timeTaken, nickname, delYn);
     }
 
 
@@ -81,8 +82,8 @@ public class Recipe extends UpdateDateTime {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Recipe recipe)) return false;
-        return this.id != null && Objects.equals(getId(), recipe.getId());
+        if (!(o instanceof RecipeEntity recipeEntity)) return false;
+        return this.id != null && Objects.equals(getId(), recipeEntity.getId());
     }
 
     @Override

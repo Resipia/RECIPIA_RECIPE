@@ -1,6 +1,7 @@
 package com.recipia.recipe.domain;
 
 import com.recipia.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,15 +28,15 @@ public class Ingredient extends CreateDateTime {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
-    private Recipe recipe;
+    private RecipeEntity recipeEntity;
 
-    private Ingredient(String ingredientName, String delYn, Recipe recipe) {
+    private Ingredient(String ingredientName, String delYn, RecipeEntity recipeEntity) {
         this.ingredientName = ingredientName;
         this.delYn = delYn;
-        this.recipe = recipe;
+        this.recipeEntity = recipeEntity;
     }
 
-    public static Ingredient of(String ingredientName, String delYn, Recipe recipe) {
-        return new Ingredient(ingredientName, delYn, recipe);
+    public static Ingredient of(String ingredientName, String delYn, RecipeEntity recipeEntity) {
+        return new Ingredient(ingredientName, delYn, recipeEntity);
     }
 }

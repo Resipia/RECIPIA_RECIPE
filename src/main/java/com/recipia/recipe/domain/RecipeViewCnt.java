@@ -1,6 +1,7 @@
 package com.recipia.recipe.domain;
 
 import com.recipia.recipe.domain.auditingfield.UpdateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,17 +22,17 @@ public class RecipeViewCnt extends UpdateDateTime {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
-    private Recipe recipe;
+    private RecipeEntity recipeEntity;
 
     @Column(name = "recipe_view_cnt_value", nullable = false)
     private Long recipeViewCountValue;
 
-    private RecipeViewCnt(Recipe recipe, Long recipeViewCountValue) {
-        this.recipe = recipe;
+    private RecipeViewCnt(RecipeEntity recipeEntity, Long recipeViewCountValue) {
+        this.recipeEntity = recipeEntity;
         this.recipeViewCountValue = recipeViewCountValue;
     }
 
-    public static RecipeViewCnt of(Recipe recipe, Long recipeViewCountValue) {
-        return new RecipeViewCnt(recipe, recipeViewCountValue);
+    public static RecipeViewCnt of(RecipeEntity recipeEntity, Long recipeViewCountValue) {
+        return new RecipeViewCnt(recipeEntity, recipeViewCountValue);
     }
 }

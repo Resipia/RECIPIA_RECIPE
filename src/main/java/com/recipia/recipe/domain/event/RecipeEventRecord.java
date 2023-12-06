@@ -1,6 +1,6 @@
 package com.recipia.recipe.domain.event;
 
-import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import com.recipia.recipe.domain.auditingfield.CreateDateTime;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -27,7 +27,7 @@ public class RecipeEventRecord extends CreateDateTime {
     @ToString.Exclude
     @JoinColumn(name = "recipe_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
-    private Recipe recipe;
+    private RecipeEntity recipeEntity;
 
     // sns topic 명
     @Column(name = "sns_topic", nullable = false)
@@ -49,8 +49,8 @@ public class RecipeEventRecord extends CreateDateTime {
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
-    private RecipeEventRecord(Recipe recipe, String snsTopic, String eventType, String attribute, boolean published, LocalDateTime publishedAt) {
-        this.recipe = recipe;
+    private RecipeEventRecord(RecipeEntity recipeEntity, String snsTopic, String eventType, String attribute, boolean published, LocalDateTime publishedAt) {
+        this.recipeEntity = recipeEntity;
         this.snsTopic = snsTopic;
         this.eventType = eventType;
         this.attribute = attribute;
@@ -59,8 +59,8 @@ public class RecipeEventRecord extends CreateDateTime {
     }
 
     // 생성자 factory method of 선언
-    public static RecipeEventRecord of(Recipe recipe, String snsTopic, String eventType, String attribute, boolean published, LocalDateTime publishedAt) {
-        return new RecipeEventRecord(recipe, snsTopic, eventType, attribute, published, publishedAt);
+    public static RecipeEventRecord of(RecipeEntity recipeEntity, String snsTopic, String eventType, String attribute, boolean published, LocalDateTime publishedAt) {
+        return new RecipeEventRecord(recipeEntity, snsTopic, eventType, attribute, published, publishedAt);
     }
 
 

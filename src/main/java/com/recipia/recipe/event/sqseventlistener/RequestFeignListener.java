@@ -3,11 +3,11 @@ package com.recipia.recipe.event.sqseventlistener;
 
 import brave.Span;
 import brave.Tracer;
-import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import com.recipia.recipe.event.springevent.NicknameChangeEvent;
 import com.recipia.recipe.feign.MemberFeignClient;
 import com.recipia.recipe.feign.dto.NicknameDto;
-import com.recipia.recipe.repository.RecipeRepository;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -40,9 +40,9 @@ public class RequestFeignListener {
             // Feign 요청 후 응답 처리
             if (nicknameDto != null) {
                 // NicknameDto 처리 로직
-                List<Recipe> recipeList = recipeRepository.findRecipeByMemberIdAndDelYn(memberId, "N");
-                if (!recipeList.isEmpty()) {
-                    recipeList.forEach(recipe -> recipe.changeNickname(nicknameDto.nickname()));
+                List<RecipeEntity> recipeEntityList = recipeRepository.findRecipeByMemberIdAndDelYn(memberId, "N");
+                if (!recipeEntityList.isEmpty()) {
+                    recipeEntityList.forEach(recipe -> recipe.changeNickname(nicknameDto.nickname()));
                 }
             }
         } catch (Exception e) {

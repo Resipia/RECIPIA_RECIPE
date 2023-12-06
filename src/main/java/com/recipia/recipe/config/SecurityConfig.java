@@ -47,7 +47,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 new AntPathRequestMatcher("/resources/**"),
-                                new AntPathRequestMatcher("/health") // ALB에서 상태 검사용으로 들어온 '/health' 경로에 대한 접근을 허용
+                                new AntPathRequestMatcher("/health"),        // ALB에서 상태 검사용으로 들어온 '/health' 경로에 대한 접근을 허용
+                                new AntPathRequestMatcher("/actuator/*"),    // actuator 하위의 prometheus 접속 경로
+                                new AntPathRequestMatcher("/actuator")       // spring actuator 수집 경로
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

@@ -1,4 +1,8 @@
 package com.recipia.recipe.hexagonal.application.service;
 
-public class RecipeService {
+import com.recipia.recipe.hexagonal.application.port.in.RecipeUseCase;
+
+public class RecipeService implements RecipeUseCase {
+
+
 }

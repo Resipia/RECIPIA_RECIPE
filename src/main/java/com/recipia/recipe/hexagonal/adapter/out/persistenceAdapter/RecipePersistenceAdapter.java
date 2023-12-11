@@ -1,4 +1,4 @@
-package com.recipia.recipe.hexagonal.adapter.out.persistence;
+package com.recipia.recipe.hexagonal.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.hexagonal.application.port.out.RecipePersistencePort;
 import lombok.RequiredArgsConstructor;

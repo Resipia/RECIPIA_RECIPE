@@ -3,11 +3,11 @@ package com.recipia.recipe.event.sqseventlistener;
 
 import brave.Span;
 import brave.Tracer;
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import com.recipia.recipe.event.springevent.NicknameChangeEvent;
 import com.recipia.recipe.feign.MemberFeignClient;
 import com.recipia.recipe.feign.dto.NicknameDto;
-import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeRepository;
+import com.recipia.recipe.hexagonal.adapter.out.persistenceAdapter.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

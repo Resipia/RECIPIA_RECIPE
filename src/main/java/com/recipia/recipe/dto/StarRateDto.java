@@ -1,6 +1,6 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.StarRateEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.StarRateEntity;
 
 import java.time.LocalDateTime;
 

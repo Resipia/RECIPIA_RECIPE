@@ -1,6 +1,6 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeCtgryMapEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeCtgryMapEntity;
 
 import java.time.LocalDateTime;
 

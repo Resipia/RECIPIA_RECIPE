@@ -1,7 +1,7 @@
 package com.recipia.recipe.domain.event;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.CreateDateTimeForEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.auditingfield.CreateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

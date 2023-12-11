@@ -1,7 +1,7 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.CustomIngredientEntity;
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.IngredientEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.CustomIngredientEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.IngredientEntity;
 
 import java.time.LocalDateTime;
 

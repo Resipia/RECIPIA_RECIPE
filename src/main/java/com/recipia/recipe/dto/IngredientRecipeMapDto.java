@@ -1,6 +1,6 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.IngredientRecipeMapEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.IngredientRecipeMapEntity;
 
 public record IngredientRecipeMapDto(
         Long id,

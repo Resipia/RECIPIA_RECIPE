@@ -1,6 +1,6 @@
-package com.recipia.recipe.hexagonal.adapter.out.persistence;
+package com.recipia.recipe.hexagonal.adapter.out.persistenceAdapter;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

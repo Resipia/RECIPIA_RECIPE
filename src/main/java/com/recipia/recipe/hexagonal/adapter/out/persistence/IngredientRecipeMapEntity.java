@@ -1,6 +1,6 @@
-package com.recipia.recipe.hexagonal.adapter.out.persistence.entity;
+package com.recipia.recipe.hexagonal.adapter.out.persistence;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.CreateDateTimeForEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.auditingfield.CreateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

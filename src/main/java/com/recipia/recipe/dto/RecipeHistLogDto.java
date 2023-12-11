@@ -1,13 +1,11 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.domain.RecipeFile;
-import com.recipia.recipe.domain.RecipeHistLog;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeHistLogEntity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link com.recipia.recipe.domain.RecipeHistLog}
+ * DTO for {@link RecipeHistLogEntity}
  */
 public record RecipeHistLogDto(
         Long id,
@@ -25,7 +23,7 @@ public record RecipeHistLogDto(
     /**
      * entity를 dto로 변환하는 factory method 선언
      */
-    public static RecipeHistLogDto fromEntity(RecipeHistLog entity) {
+    public static RecipeHistLogDto fromEntity(RecipeHistLogEntity entity) {
         return of(
                 entity.getId(),
                 entity.getMemberId(),

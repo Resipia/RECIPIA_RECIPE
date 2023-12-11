@@ -1,12 +1,11 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.domain.StarRate;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.StarRateEntity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link com.recipia.recipe.domain.StarRate}
+ * DTO for {@link StarRateEntity}
  */
 public record StarRateDto(
         Long id,
@@ -25,7 +24,7 @@ public record StarRateDto(
     /**
      * entity를 dto로 변환하는 factory method 선언
      */
-    public static StarRateDto fromEntity(StarRate entity) {
+    public static StarRateDto fromEntity(StarRateEntity entity) {
         return of(
                 entity.getId(),
                 entity.getMemberId(),

@@ -1,6 +1,6 @@
-package com.recipia.recipe.domain;
+package com.recipia.recipe.hexagonal.adapter.out.persistence.entity;
 
-import com.recipia.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.CreateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class CustomIngredient extends CreateDateTime {
+public class CustomIngredientEntity extends CreateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,12 +18,12 @@ public class CustomIngredient extends CreateDateTime {
     @Column(name = "ingredient_nm", nullable = false)
     private String ingredientName;
 
-    private CustomIngredient(String ingredientName) {
+    private CustomIngredientEntity(String ingredientName) {
         this.ingredientName = ingredientName;
     }
 
-    public static CustomIngredient of(String ingredientName) {
-        return new CustomIngredient(ingredientName);
+    public static CustomIngredientEntity of(String ingredientName) {
+        return new CustomIngredientEntity(ingredientName);
     }
 
 }

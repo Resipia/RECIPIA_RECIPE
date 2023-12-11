@@ -1,6 +1,6 @@
-package com.recipia.recipe.domain;
+package com.recipia.recipe.hexagonal.adapter.out.persistence.entity;
 
-import com.recipia.recipe.domain.auditingfield.UpdateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.UpdateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class RecipeFile extends UpdateDateTime {
+public class RecipeFileEntity extends UpdateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class RecipeFile extends UpdateDateTime {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_step_id", nullable = false)
-    private RecipeStep recipeStep;
+    private RecipeStepEntity recipeStepEntity;
 
     @Column(name = "file_order", nullable = false)
     private Integer fileOrder;
@@ -44,8 +44,8 @@ public class RecipeFile extends UpdateDateTime {
     @Column(name = "del_yn", nullable = false)
     private String delYn;
 
-    private RecipeFile(RecipeStep recipeStep, Integer fileOrder, String filePath, String originFileName, String storedFileName, String fileExtension, Integer fileSize, String delYn) {
-        this.recipeStep = recipeStep;
+    private RecipeFileEntity(RecipeStepEntity recipeStepEntity, Integer fileOrder, String filePath, String originFileName, String storedFileName, String fileExtension, Integer fileSize, String delYn) {
+        this.recipeStepEntity = recipeStepEntity;
         this.fileOrder = fileOrder;
         this.filePath = filePath;
         this.originFileName = originFileName;
@@ -55,7 +55,7 @@ public class RecipeFile extends UpdateDateTime {
         this.delYn = delYn;
     }
 
-    public static RecipeFile of(RecipeStep recipeStep, Integer fileOrder, String filePath, String originFileName, String storedFileName, String fileExtension, Integer fileSize, String delYn) {
-        return new RecipeFile(recipeStep, fileOrder, filePath, originFileName, storedFileName, fileExtension, fileSize, delYn);
+    public static RecipeFileEntity of(RecipeStepEntity recipeStepEntity, Integer fileOrder, String filePath, String originFileName, String storedFileName, String fileExtension, Integer fileSize, String delYn) {
+        return new RecipeFileEntity(recipeStepEntity, fileOrder, filePath, originFileName, storedFileName, fileExtension, fileSize, delYn);
     }
 }

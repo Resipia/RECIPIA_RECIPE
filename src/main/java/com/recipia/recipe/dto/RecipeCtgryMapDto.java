@@ -1,12 +1,11 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.domain.RecipeCtgryMap;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeCtgryMapEntity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link com.recipia.recipe.domain.RecipeCtgryMap}
+ * DTO for {@link RecipeCtgryMapEntity}
  */
 public record RecipeCtgryMapDto(
         Long id,
@@ -23,7 +22,7 @@ public record RecipeCtgryMapDto(
     /**
      * entity를 dto로 변환하는 factory method 선언
      */
-    public static RecipeCtgryMapDto fromEntity(RecipeCtgryMap entity) {
+    public static RecipeCtgryMapDto fromEntity(RecipeCtgryMapEntity entity) {
         return of(entity.getId(), entity.getCreateDateTime());
     }
 }

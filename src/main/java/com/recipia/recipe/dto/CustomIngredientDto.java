@@ -1,12 +1,12 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.domain.CustomIngredient;
-import com.recipia.recipe.domain.Ingredient;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.CustomIngredientEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.IngredientEntity;
 
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link Ingredient}
+ * DTO for {@link IngredientEntity}
  */
 public record CustomIngredientDto(
         Long id,
@@ -24,7 +24,7 @@ public record CustomIngredientDto(
     /**
      * entity를 dto로 변환하는 factory method 선언
      */
-    public static CustomIngredientDto fromEntity(CustomIngredient entity) {
+    public static CustomIngredientDto fromEntity(CustomIngredientEntity entity) {
         return of(
                 entity.getId(),
                 entity.getIngredientName(),

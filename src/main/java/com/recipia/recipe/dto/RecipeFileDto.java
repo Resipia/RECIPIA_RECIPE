@@ -1,12 +1,11 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.domain.RecipeFile;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeFileEntity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link com.recipia.recipe.domain.RecipeFile}
+ * DTO for {@link RecipeFileEntity}
  */
 public record RecipeFileDto(
         Long id,
@@ -31,7 +30,7 @@ public record RecipeFileDto(
     /**
      * entity를 dto로 변환하는 factory method 선언
      */
-    public RecipeFileDto fromEntity(RecipeFile entity) {
+    public RecipeFileDto fromEntity(RecipeFileEntity entity) {
         return of(
                 entity.getId(),
                 entity.getFileOrder(),

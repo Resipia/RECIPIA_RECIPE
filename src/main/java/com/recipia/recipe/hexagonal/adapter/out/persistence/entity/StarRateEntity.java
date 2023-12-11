@@ -1,8 +1,7 @@
-package com.recipia.recipe.domain;
+package com.recipia.recipe.hexagonal.adapter.out.persistence.entity;
 
 
-import com.recipia.recipe.domain.auditingfield.CreateDateTime;
-import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.CreateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class StarRate extends CreateDateTime {
+public class StarRateEntity extends CreateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,14 +30,14 @@ public class StarRate extends CreateDateTime {
     @Column(name = "star_rate_value", nullable = false)
     private Double starRateValue;
 
-    private StarRate(Long memberId, RecipeEntity recipeEntity, Double starRateValue) {
+    private StarRateEntity(Long memberId, RecipeEntity recipeEntity, Double starRateValue) {
         this.memberId = memberId;
         this.recipeEntity = recipeEntity;
         this.starRateValue = starRateValue;
     }
 
-    public static StarRate of(Long memberId, RecipeEntity recipeEntity, Double starRateValue) {
-        return new StarRate(memberId, recipeEntity, starRateValue);
+    public static StarRateEntity of(Long memberId, RecipeEntity recipeEntity, Double starRateValue) {
+        return new StarRateEntity(memberId, recipeEntity, starRateValue);
     }
 
 }

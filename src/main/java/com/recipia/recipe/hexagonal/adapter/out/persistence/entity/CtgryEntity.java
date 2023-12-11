@@ -1,7 +1,7 @@
-package com.recipia.recipe.domain;
+package com.recipia.recipe.hexagonal.adapter.out.persistence.entity;
 
 
-import com.recipia.recipe.domain.auditingfield.UpdateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.UpdateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Ctgry extends UpdateDateTime {
+public class CtgryEntity extends UpdateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,10 +38,10 @@ public class Ctgry extends UpdateDateTime {
     private String delYn;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "ctgry")
-    private List<RecipeCtgryMap> recipeCtgryMapList = new ArrayList<>();
+    @OneToMany(mappedBy = "ctgryEntity")
+    private List<RecipeCtgryMapEntity> recipeCtgryMapEntityList = new ArrayList<>();
 
-    private Ctgry(Long uppCtgryId, String ctgryName, Integer levelNo, Integer sortNo, String delYn) {
+    private CtgryEntity(Long uppCtgryId, String ctgryName, Integer levelNo, Integer sortNo, String delYn) {
         this.uppCtgryId = uppCtgryId;
         this.ctgryName = ctgryName;
         this.levelNo = levelNo;
@@ -49,7 +49,7 @@ public class Ctgry extends UpdateDateTime {
         this.delYn = delYn;
     }
 
-    public static Ctgry of(Long uppCtgryId, String ctgryName, Integer levelNo, Integer sortNo, String delYn) {
-        return new Ctgry(uppCtgryId, ctgryName, levelNo, sortNo, delYn);
+    public static CtgryEntity of(Long uppCtgryId, String ctgryName, Integer levelNo, Integer sortNo, String delYn) {
+        return new CtgryEntity(uppCtgryId, ctgryName, levelNo, sortNo, delYn);
     }
 }

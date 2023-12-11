@@ -1,7 +1,6 @@
-package com.recipia.recipe.hexagonal.adapter.out.persistence;
+package com.recipia.recipe.hexagonal.adapter.out.persistence.entity;
 
-import com.recipia.recipe.domain.*;
-import com.recipia.recipe.domain.auditingfield.UpdateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.UpdateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +12,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class RecipeEntity extends UpdateDateTime {
+public class RecipeEntity extends UpdateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,27 +39,27 @@ public class RecipeEntity extends UpdateDateTime {
 
     @ToString.Exclude
     @OneToMany(mappedBy = "recipeEntity")
-    private List<RecipeStep> recipeStepList = new ArrayList<>();
+    private List<RecipeStepEntity> recipeStepEntityList = new ArrayList<>();
 
     @ToString.Exclude
     @OneToMany(mappedBy = "recipeEntity")
-    private List<RecipeCtgryMap> recipeCtgryMapList = new ArrayList<>();
+    private List<RecipeCtgryMapEntity> recipeCtgryMapEntityList = new ArrayList<>();
 
     @ToString.Exclude
     @OneToMany(mappedBy = "recipeEntity")
-    private List<StarRate> starRateList = new ArrayList<>();
+    private List<StarRateEntity> starRateEntityList = new ArrayList<>();
 
     @ToString.Exclude
     @OneToMany(mappedBy = "recipeEntity")
-    private List<RecipeHistLog> recipeHistLogList = new ArrayList<>();
+    private List<RecipeHistLogEntity> recipeHistLogEntityList = new ArrayList<>();
 
     @ToString.Exclude
     @OneToMany(mappedBy = "recipeEntity")
-    private List<IngredientRecipeMap> ingredientList = new ArrayList<>();
+    private List<IngredientRecipeMapEntity> ingredientList = new ArrayList<>();
 
     @ToString.Exclude
     @OneToMany(mappedBy = "recipeEntity")
-    private List<RecipeViewCnt> recipeViewCntList = new ArrayList<>();
+    private List<RecipeViewCntEntity> recipeViewCntEntityList = new ArrayList<>();
 
     @Builder
     private RecipeEntity(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn) {

@@ -1,7 +1,7 @@
 package com.recipia.recipe.domain.event;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
-import com.recipia.recipe.domain.auditingfield.CreateDateTime;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.CreateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class RecipeEventRecord extends CreateDateTime {
+public class RecipeEventRecord extends CreateDateTimeForEntity {
 
     // 회원 이벤트 기록 Pk
     @Id

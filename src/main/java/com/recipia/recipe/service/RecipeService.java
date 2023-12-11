@@ -1,6 +1,6 @@
 package com.recipia.recipe.service;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeRepository;
 import com.recipia.recipe.event.springevent.NicknameChangeEvent;
 import com.recipia.recipe.exception.ApiErrorCodeEnum;

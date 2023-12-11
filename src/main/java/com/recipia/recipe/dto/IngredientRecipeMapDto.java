@@ -1,6 +1,6 @@
 package com.recipia.recipe.dto;
 
-import com.recipia.recipe.domain.IngredientRecipeMap;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.IngredientRecipeMapEntity;
 
 public record IngredientRecipeMapDto(
         Long id,
@@ -14,11 +14,11 @@ public record IngredientRecipeMapDto(
     }
 
     // entity -> dto 변환 메서드
-    public static IngredientRecipeMapDto fromEntity(IngredientRecipeMap entity) {
+    public static IngredientRecipeMapDto fromEntity(IngredientRecipeMapEntity entity) {
         return of(
                 entity.getId(),
-                IngredientDto.fromEntity(entity.getIngredient()),
-                CustomIngredientDto.fromEntity(entity.getCustomIngredient()),
+                IngredientDto.fromEntity(entity.getIngredientEntity()),
+                CustomIngredientDto.fromEntity(entity.getCustomIngredientEntity()),
                 RecipeDto.fromEntity(entity.getRecipeEntity())
         );
     }

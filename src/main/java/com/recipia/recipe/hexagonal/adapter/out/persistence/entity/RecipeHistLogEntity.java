@@ -1,7 +1,6 @@
-package com.recipia.recipe.domain;
+package com.recipia.recipe.hexagonal.adapter.out.persistence.entity;
 
-import com.recipia.recipe.domain.auditingfield.CreateDateTime;
-import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.CreateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class RecipeHistLog extends CreateDateTime {
+public class RecipeHistLogEntity extends CreateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,12 +26,12 @@ public class RecipeHistLog extends CreateDateTime {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
-    private RecipeHistLog(RecipeEntity recipeEntity, Long memberId) {
+    private RecipeHistLogEntity(RecipeEntity recipeEntity, Long memberId) {
         this.recipeEntity = recipeEntity;
         this.memberId = memberId;
     }
 
-    public static RecipeHistLog of(RecipeEntity recipeEntity, Long memberId) {
-        return new RecipeHistLog(recipeEntity, memberId);
+    public static RecipeHistLogEntity of(RecipeEntity recipeEntity, Long memberId) {
+        return new RecipeHistLogEntity(recipeEntity, memberId);
     }
 }

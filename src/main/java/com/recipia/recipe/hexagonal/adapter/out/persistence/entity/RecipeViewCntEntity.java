@@ -1,7 +1,6 @@
-package com.recipia.recipe.domain;
+package com.recipia.recipe.hexagonal.adapter.out.persistence.entity;
 
-import com.recipia.recipe.domain.auditingfield.UpdateDateTime;
-import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.entity.auditingfield.UpdateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +11,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class RecipeViewCnt extends UpdateDateTime {
+public class RecipeViewCntEntity extends UpdateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,12 +26,12 @@ public class RecipeViewCnt extends UpdateDateTime {
     @Column(name = "recipe_view_cnt_value", nullable = false)
     private Long recipeViewCountValue;
 
-    private RecipeViewCnt(RecipeEntity recipeEntity, Long recipeViewCountValue) {
+    private RecipeViewCntEntity(RecipeEntity recipeEntity, Long recipeViewCountValue) {
         this.recipeEntity = recipeEntity;
         this.recipeViewCountValue = recipeViewCountValue;
     }
 
-    public static RecipeViewCnt of(RecipeEntity recipeEntity, Long recipeViewCountValue) {
-        return new RecipeViewCnt(recipeEntity, recipeViewCountValue);
+    public static RecipeViewCntEntity of(RecipeEntity recipeEntity, Long recipeViewCountValue) {
+        return new RecipeViewCntEntity(recipeEntity, recipeViewCountValue);
     }
 }

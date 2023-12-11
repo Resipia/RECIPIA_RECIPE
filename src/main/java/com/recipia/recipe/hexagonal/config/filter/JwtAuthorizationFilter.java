@@ -1,7 +1,7 @@
-package com.recipia.recipe.config.filter;
+package com.recipia.recipe.hexagonal.config.filter;
 
-import com.recipia.recipe.config.jwt.TokenUtils;
-import com.recipia.recipe.config.jwt.TokenValidator;
+import com.recipia.recipe.hexagonal.config.jwt.TokenUtils;
+import com.recipia.recipe.hexagonal.config.jwt.TokenValidator;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

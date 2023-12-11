@@ -1,4 +1,4 @@
-package com.recipia.recipe.config.aws;
+package com.recipia.recipe.hexagonal.config.aws;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package com.recipia.recipe.config.jwt;
+package com.recipia.recipe.hexagonal.config.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

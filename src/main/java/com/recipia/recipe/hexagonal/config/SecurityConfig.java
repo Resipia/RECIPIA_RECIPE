@@ -1,7 +1,7 @@
-package com.recipia.recipe.config;
+package com.recipia.recipe.hexagonal.config;
 
-import com.recipia.recipe.config.filter.JwtAuthorizationFilter;
-import com.recipia.recipe.config.jwt.TokenValidator;
+import com.recipia.recipe.hexagonal.config.filter.JwtAuthorizationFilter;
+import com.recipia.recipe.hexagonal.config.jwt.TokenValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

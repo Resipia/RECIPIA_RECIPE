@@ -1,4 +1,4 @@
-package com.recipia.recipe.health;
+package com.recipia.recipe.hexagonal.health;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

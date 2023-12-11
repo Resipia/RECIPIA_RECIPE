@@ -1,4 +1,4 @@
-package com.recipia.recipe.config.aop;
+package com.recipia.recipe.hexagonal.config.aop;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;

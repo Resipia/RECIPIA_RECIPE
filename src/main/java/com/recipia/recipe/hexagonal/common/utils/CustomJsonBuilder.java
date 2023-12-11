@@ -1,4 +1,4 @@
-package com.recipia.recipe.utils;
+package com.recipia.recipe.hexagonal.common.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

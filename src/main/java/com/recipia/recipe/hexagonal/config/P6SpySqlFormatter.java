@@ -1,4 +1,4 @@
-package com.recipia.recipe.config;
+package com.recipia.recipe.hexagonal.config;
 
 import com.p6spy.engine.logging.Category;
 import com.p6spy.engine.spy.P6SpyOptions;

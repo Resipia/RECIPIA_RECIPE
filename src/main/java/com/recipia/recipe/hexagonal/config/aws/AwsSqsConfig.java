@@ -1,4 +1,4 @@
-package com.recipia.recipe.config.aws;
+package com.recipia.recipe.hexagonal.config.aws;
 
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import lombok.Getter;

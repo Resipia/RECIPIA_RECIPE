@@ -1,4 +1,4 @@
-package com.recipia.recipe.config;
+package com.recipia.recipe.hexagonal.config;
 
 import brave.Span;
 import feign.RequestInterceptor;

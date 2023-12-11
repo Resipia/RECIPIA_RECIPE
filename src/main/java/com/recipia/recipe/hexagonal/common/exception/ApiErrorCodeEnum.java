@@ -1,4 +1,4 @@
-package com.recipia.recipe.exception;
+package com.recipia.recipe.hexagonal.common.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

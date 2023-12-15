@@ -76,6 +76,9 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
         return new RecipeEntity(id, memberId, recipeName, recipeDesc, timeTaken, nickname, delYn);
     }
 
+    public static RecipeEntity of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String nickname, String delYn) {
+        return new RecipeEntity(null, memberId, recipeName, recipeDesc, timeTaken, nickname, delYn);
+    }
 
 
     @Override

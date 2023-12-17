@@ -1,4 +1,4 @@
-package com.recipia.recipe.hexagonal.config.jwt;
+package com.recipia.recipe.hexagonal.config.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -22,31 +22,14 @@ public class TokenUtils {
     private static final String jwtSecretKey = "thisIsASecretKeyUsedForJwtTokenGenerationAndItIsLongEnoughToMeetTheRequirementOf256Bits";
     private static final Key key = Keys.hmacShaKeyFor(jwtSecretKey.getBytes(StandardCharsets.UTF_8));
 
-    // JWT에 저장될 사용자 정보의 키
-    private static final String USERNAME = "username";
-    private static final String NICKNAME = "nickname";
-    private static final String ROLE = "role";
 
     // 액세스 토큰 유형 상수
     public static final String ACCESS_TOKEN_TYPE = "access";
 
-
-    // 토큰에서 사용자 이름을 가져오는 메서드
-    public static String getUsernameFromToken(String token) {
-        Claims claims = getClaimsFromToken(token);
-        return claims.get(USERNAME, String.class);
-    }
-
-    // 토큰에서 닉네임을 가져오는 메서드
-    public static String getNicknameFromToken(String token) {
-        Claims claims = getClaimsFromToken(token);
-        return claims.get(NICKNAME, String.class);
-    }
-
     // 토큰에서 역할(role)을 가져오는 메서드
     public static String getRoleFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        return claims.get(ROLE, String.class);
+        return claims.get("role", String.class);
     }
 
     // 토큰에서 Claims 정보를 추출하는 메서드
@@ -71,11 +54,22 @@ public class TokenUtils {
         return claims.get("exp", Date.class).toInstant();
     }
 
-    // 토큰의 "memberId" 클레임을 Long 타입으로 가져오는 메서드
+    // 토큰의 클레임에서 "memberId"를 꺼내는 메서드
     public static Long getMemberIdFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        Object memberIdObj = claims.get("memberId");
-        return Long.parseLong(memberIdObj.toString());
+        return Long.parseLong(claims.get("memberId").toString());
+    }
+
+    // 토큰의 클레임에서 "nickname"을 꺼내는 메서드
+    public static String getNicknameFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("nickname").toString();
+    }
+
+    // 토큰에서 사용자 이름을 가져오는 메서드
+    public static String getUsernameFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("username", String.class);
     }
 
 }

@@ -1,7 +1,7 @@
-package com.recipia.recipe.hexagonal.config.filter;
+package com.recipia.recipe.hexagonal.config.security.filter;
 
-import com.recipia.recipe.hexagonal.config.jwt.TokenUtils;
-import com.recipia.recipe.hexagonal.config.jwt.TokenValidator;
+import com.recipia.recipe.hexagonal.config.security.jwt.TokenUtils;
+import com.recipia.recipe.hexagonal.config.security.jwt.TokenValidator;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,20 +43,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 // 토큰에서 클레임 추출
                 Map<String, Object> claimsMap = TokenUtils.getClaimsMapFromToken(token);  // Replace this with your token extraction logic
                 Instant expiration = TokenUtils.getExpirationFromToken(token);
-                Long memberId = TokenUtils.getMemberIdFromToken(token);
+                Long memberIdFromToken = TokenUtils.getMemberIdFromToken(token);
+                String nicknameFromToken = TokenUtils.getNicknameFromToken(token);
 
-                // Jwt 객체 생성
+                // 인증 객체에서 사용할 Jwt 객체 생성하기
                 Jwt jwt = Jwt.withTokenValue(token)
                         .header("typ", "JWT")
                         .claims(claims -> claims.putAll(claimsMap))
                         .claim("exp", expiration)
-                        .claim("memberId", memberId)
+                        .claim("memberId", memberIdFromToken)
+                        .claim("nickname", nicknameFromToken)
                         .build();
 
                 // 인증 객체 생성
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwt, null, extractAuthorities(token));
 
-                // SecurityContext에 인증 객체 설정
+                // SecurityContext에 인증 객체 넣어주기 (이렇게 하면 꺼내다 쓸 수 있다.)
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }

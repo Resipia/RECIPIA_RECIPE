@@ -2,7 +2,7 @@ package com.recipia.recipe.service;
 
 import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
 import com.recipia.recipe.hexagonal.adapter.out.persistenceAdapter.RecipeRepository;
-import com.recipia.recipe.event.springevent.NicknameChangeEvent;
+import com.recipia.recipe.hexagonal.common.event.NicknameChangeEvent;
 import com.recipia.recipe.hexagonal.common.exception.ApiErrorCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

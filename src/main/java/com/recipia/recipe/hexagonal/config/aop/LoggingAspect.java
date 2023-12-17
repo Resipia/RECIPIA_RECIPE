@@ -17,7 +17,7 @@ public class LoggingAspect {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-    @Around("execution(* com.recipia.recipe.controller..*.*(..))")
+    @Around("execution(* com.recipia.recipe.adapter.in.web..*.*(..))")
     public Object logMethodExecution(ProceedingJoinPoint joinPoint) {
         long startTime = System.currentTimeMillis();
 

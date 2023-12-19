@@ -1,9 +1,9 @@
 package com.recipia.recipe.service;
 
-import com.recipia.recipe.domain.Recipe;
-import com.recipia.recipe.repository.RecipeRepository;
-import com.recipia.recipe.event.springevent.NicknameChangeEvent;
-import com.recipia.recipe.exception.ApiErrorCodeEnum;
+import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.persistenceAdapter.RecipeRepository;
+import com.recipia.recipe.hexagonal.common.event.NicknameChangeEvent;
+import com.recipia.recipe.hexagonal.common.exception.ApiErrorCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -21,11 +21,11 @@ public class RecipeService {
 
     @Transactional
     public void nicknameChange() {
-        Recipe recipe = recipeRepository.findById(2L).orElseThrow(() -> new RuntimeException(ApiErrorCodeEnum.DB_ERROR.getMessage()));
-        recipe.changeNickname("NEW-Recipe-NICKNAME-222");
+        RecipeEntity recipeEntity = recipeRepository.findById(2L).orElseThrow(() -> new RuntimeException(ApiErrorCodeEnum.DB_ERROR.getMessage()));
+        recipeEntity.changeNickname("NEW-Recipe-NICKNAME-222");
 
-        log.info("레시피 이름 변경 Service [레시피 pk : {}]", recipe.getId());
-        eventPublisher.publishEvent(new NicknameChangeEvent(recipe.getId()));
+        log.info("레시피 이름 변경 Service [레시피 pk : {}]", recipeEntity.getId());
+        eventPublisher.publishEvent(new NicknameChangeEvent(recipeEntity.getId()));
     }
 
 }

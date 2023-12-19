@@ -20,9 +20,12 @@ public class RecipeConverter {
             entity.getRecipeName(),
             entity.getRecipeDesc(),
             entity.getTimeTaken(),
+            entity.getIngredient(),
+            entity.getHashtag(),
+            entity.getNutritionalInfo(),
             entity.getNickname(),
-            entity.getDelYn(
-            ));
+            entity.getDelYn()
+        );
     }
 
     /**
@@ -36,9 +39,12 @@ public class RecipeConverter {
             domain.getRecipeName(),
             domain.getRecipeDesc(),
             domain.getTimeTaken(),
+            domain.getIngredient(),
+            domain.getHashtag(),
+            domain.getNutritionalInfo(),
             domain.getNickname(),
-            domain.getDelYn(
-        ));
+            domain.getDelYn()
+        );
     }
 
 }

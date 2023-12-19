@@ -20,7 +20,7 @@ public class BookmarkEntity extends CreateDateTimeForEntity {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
-    private RecipeEntity recipe;
+    private RecipeEntity recipeEntity;
 
 
     @Column(name = "member_id", nullable = false)
@@ -29,7 +29,7 @@ public class BookmarkEntity extends CreateDateTimeForEntity {
     @Builder
     private BookmarkEntity(Long id, RecipeEntity recipe, Long memberId) {
         this.id = id;
-        this.recipe = recipe;
+        this.recipeEntity = recipe;
         this.memberId = memberId;
     }
 

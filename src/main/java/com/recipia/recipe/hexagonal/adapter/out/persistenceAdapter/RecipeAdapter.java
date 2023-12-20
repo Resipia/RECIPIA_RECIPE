@@ -24,7 +24,6 @@ public class RecipeAdapter implements RecipePort {
     private final RecipeRepository recipeRepository;
     private final RecipeQueryRepository recipeQueryRepository;
 
-
     @Override
     public List<Recipe> findRecipeByMemberIdAndDelYn(Long memberId, String delYn) {
 

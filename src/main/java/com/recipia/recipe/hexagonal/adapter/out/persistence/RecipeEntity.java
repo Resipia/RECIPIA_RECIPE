@@ -12,6 +12,7 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(name = "recipe")
 public class RecipeEntity extends UpdateDateTimeForEntity {
 
     @Id
@@ -79,5 +80,9 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
+    }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

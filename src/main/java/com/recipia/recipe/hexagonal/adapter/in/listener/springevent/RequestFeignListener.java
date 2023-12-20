@@ -45,10 +45,9 @@ public class RequestFeignListener {
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(feignRequestSpan)) {
             NicknameDto nicknameDto = memberFeignClient.getNickname(memberId);
 
-            // Feign 요청 후 응답 처리
+            // Feign 요청으로 받은 dto가 존재하면 레시피 엔티티 내부의 유저 닉네임 변경
             if (nicknameDto != null) {
-                // 닉네임 변경로직 호출
-                memberChangedNicknameService.nicknameChange(nicknameDto, memberId);
+                memberChangedNicknameService.updateRecipesNicknamesForMemberId(nicknameDto);
             }
 
         } catch (Exception e) {

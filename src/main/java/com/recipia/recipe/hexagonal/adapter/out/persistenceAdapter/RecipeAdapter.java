@@ -1,15 +1,11 @@
 package com.recipia.recipe.hexagonal.adapter.out.persistenceAdapter;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.hexagonal.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.hexagonal.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
 import com.recipia.recipe.hexagonal.application.port.out.RecipePort;
-import com.recipia.recipe.hexagonal.domain.Recipe;
-import com.recipia.recipe.hexagonal.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * Adapter 클래스는 port 인터페이스를 구현한다.
@@ -20,21 +16,15 @@ import java.util.List;
 @Component
 public class RecipeAdapter implements RecipePort {
 
-    // repository 주입
-    private final RecipeRepository recipeRepository;
     private final RecipeQueryRepository recipeQueryRepository;
 
+    /**
+     * memberId로 유저가 작성한 모든 레시피를 조회한 다음 그 레시피 엔티티가 가진 유저의 닉네임 컬럼을 변경
+     */
     @Override
-    public List<Recipe> findRecipeByMemberIdAndDelYn(Long memberId, String delYn) {
-
-        List<Recipe> data = recipeRepository.findRecipeByMemberIdAndDelYn(memberId, delYn)
-                .stream().map(RecipeConverter::entityToDomain)
-                .toList();
-
-        RecipeEntity querydslData = recipeQueryRepository.findById(1L);
-
-
-        return null;
+    public void updateRecipesNicknamesForMemberId(NicknameDto nicknameDto) {
+        long updateCount = recipeQueryRepository.updateRecipesNicknamesForMemberId(nicknameDto);
+        log.info("Updated {} recipe(s) with new nickname '{}' for memberId {}", updateCount, nicknameDto.nickname(), nicknameDto.memberId());
     }
 
 }

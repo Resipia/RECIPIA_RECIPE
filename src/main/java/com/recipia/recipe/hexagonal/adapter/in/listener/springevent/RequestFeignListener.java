@@ -4,10 +4,14 @@ package com.recipia.recipe.hexagonal.adapter.in.listener.springevent;
 import brave.Span;
 import brave.Tracer;
 import com.recipia.recipe.hexagonal.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.hexagonal.application.port.out.RecipePort;
+import com.recipia.recipe.hexagonal.application.service.feign.MemberChangedNicknameService;
 import com.recipia.recipe.hexagonal.common.event.NicknameChangeEvent;
 import com.recipia.recipe.hexagonal.adapter.out.feign.MemberFeignClient;
 import com.recipia.recipe.hexagonal.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.hexagonal.adapter.out.persistenceAdapter.RecipeRepository;
+import com.recipia.recipe.hexagonal.domain.Recipe;
+import com.recipia.recipe.hexagonal.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * SqsListenerService에서 Feign 요청을 보내는 이벤트를 발행하면 동작
@@ -25,7 +30,7 @@ import java.util.List;
 public class RequestFeignListener {
 
     private final MemberFeignClient memberFeignClient;
-    private final RecipeRepository recipeRepository;
+    private final MemberChangedNicknameService memberChangedNicknameService;
     private final Tracer tracer;
 
     /**
@@ -40,14 +45,11 @@ public class RequestFeignListener {
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(feignRequestSpan)) {
             NicknameDto nicknameDto = memberFeignClient.getNickname(memberId);
 
-            // Feign 요청 후 응답 처리
+            // Feign 요청으로 받은 dto가 존재하면 레시피 엔티티 내부의 유저 닉네임 변경
             if (nicknameDto != null) {
-                // NicknameDto 처리 로직
-                List<RecipeEntity> recipeEntityList = recipeRepository.findRecipeByMemberIdAndDelYn(memberId, "N");
-                if (!recipeEntityList.isEmpty()) {
-                    recipeEntityList.forEach(recipe -> recipe.changeNickname(nicknameDto.nickname()));
-                }
+                memberChangedNicknameService.updateRecipesNicknamesForMemberId(nicknameDto);
             }
+
         } catch (Exception e) {
             // 에러 태그 추가
             feignRequestSpan.tag("error", e.toString());

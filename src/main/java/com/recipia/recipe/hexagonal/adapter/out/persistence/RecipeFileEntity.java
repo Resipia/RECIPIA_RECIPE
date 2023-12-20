@@ -1,17 +1,15 @@
 package com.recipia.recipe.hexagonal.adapter.out.persistence;
 
-import com.recipia.recipe.hexagonal.adapter.out.persistence.auditingfield.UpdateDateTimeForEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+
+import java.util.Objects;
 
 @ToString(callSuper = true)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class RecipeFileEntity extends UpdateDateTimeForEntity {
+public class RecipeFileEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,23 +18,23 @@ public class RecipeFileEntity extends UpdateDateTimeForEntity {
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipe_step_id", nullable = false)
-    private RecipeStepEntity recipeStepEntity;
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private RecipeEntity recipeEntity;
 
     @Column(name = "file_order", nullable = false)
-    private Integer fileOrder;
+    private Integer file_order;
 
     @Column(name = "flpth", nullable = false)
-    private String filePath;
+    private String flpth;
 
     @Column(name = "origin_file_nm", nullable = false)
-    private String originFileName;
+    private String originFileNm;
 
     @Column(name = "strd_file_nm", nullable = false)
-    private String storedFileName;
+    private String strdFileNm;
 
     @Column(name = "file_extsn", nullable = false)
-    private String fileExtension;
+    private String fileExtsn;
 
     @Column(name = "file_size", nullable = false)
     private Integer fileSize;
@@ -44,18 +42,37 @@ public class RecipeFileEntity extends UpdateDateTimeForEntity {
     @Column(name = "del_yn", nullable = false)
     private String delYn;
 
-    private RecipeFileEntity(RecipeStepEntity recipeStepEntity, Integer fileOrder, String filePath, String originFileName, String storedFileName, String fileExtension, Integer fileSize, String delYn) {
-        this.recipeStepEntity = recipeStepEntity;
-        this.fileOrder = fileOrder;
-        this.filePath = filePath;
-        this.originFileName = originFileName;
-        this.storedFileName = storedFileName;
-        this.fileExtension = fileExtension;
+    @Builder
+    private RecipeFileEntity(Long id, RecipeEntity recipeEntity, Integer file_order, String flpth, String originFileNm, String strdFileNm, String fileExtsn, Integer fileSize, String delYn) {
+        this.id = id;
+        this.recipeEntity = recipeEntity;
+        this.file_order = file_order;
+        this.flpth = flpth;
+        this.originFileNm = originFileNm;
+        this.strdFileNm = strdFileNm;
+        this.fileExtsn = fileExtsn;
         this.fileSize = fileSize;
         this.delYn = delYn;
     }
 
-    public static RecipeFileEntity of(RecipeStepEntity recipeStepEntity, Integer fileOrder, String filePath, String originFileName, String storedFileName, String fileExtension, Integer fileSize, String delYn) {
-        return new RecipeFileEntity(recipeStepEntity, fileOrder, filePath, originFileName, storedFileName, fileExtension, fileSize, delYn);
+    public static RecipeFileEntity of(Long id, RecipeEntity recipeEntity, Integer file_order, String flpth, String originFileNm, String strdFileNm, String fileExtsn, Integer fileSize, String delYn) {
+        return new RecipeFileEntity(id, recipeEntity, file_order, flpth, originFileNm, strdFileNm, fileExtsn, fileSize, delYn);
     }
+
+    public static RecipeFileEntity of(RecipeEntity recipeEntity, Integer file_order, String flpth, String originFileNm, String strdFileNm, String fileExtsn, Integer fileSize, String delYn) {
+        return new RecipeFileEntity(null, recipeEntity, file_order, flpth, originFileNm, strdFileNm, fileExtsn, fileSize, delYn);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RecipeFileEntity that)) return false;
+        return this.id != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
 }

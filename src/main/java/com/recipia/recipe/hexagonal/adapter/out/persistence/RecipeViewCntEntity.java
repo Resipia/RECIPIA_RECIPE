@@ -2,10 +2,9 @@ package com.recipia.recipe.hexagonal.adapter.out.persistence;
 
 import com.recipia.recipe.hexagonal.adapter.out.persistence.auditingfield.UpdateDateTimeForEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+
+import java.util.Objects;
 
 @ToString(callSuper = true)
 @Getter
@@ -24,14 +23,33 @@ public class RecipeViewCntEntity extends UpdateDateTimeForEntity {
     private RecipeEntity recipeEntity;
 
     @Column(name = "recipe_view_cnt_value", nullable = false)
-    private Long recipeViewCountValue;
+    private Long recipeViewCntValue;
 
-    private RecipeViewCntEntity(RecipeEntity recipeEntity, Long recipeViewCountValue) {
+    @Builder
+    private RecipeViewCntEntity(Long id, RecipeEntity recipeEntity, Long recipeViewCntValue) {
+        this.id = id;
         this.recipeEntity = recipeEntity;
-        this.recipeViewCountValue = recipeViewCountValue;
+        this.recipeViewCntValue = recipeViewCntValue;
     }
 
-    public static RecipeViewCntEntity of(RecipeEntity recipeEntity, Long recipeViewCountValue) {
-        return new RecipeViewCntEntity(recipeEntity, recipeViewCountValue);
+    public static RecipeViewCntEntity of(Long id, RecipeEntity recipeEntity, Long recipeViewCntValue) {
+        return new RecipeViewCntEntity(id, recipeEntity, recipeViewCntValue);
     }
+
+    public static RecipeViewCntEntity of(RecipeEntity recipeEntity, Long recipeViewCntValue) {
+        return new RecipeViewCntEntity(null, recipeEntity, recipeViewCntValue);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RecipeViewCntEntity that)) return false;
+        return this.id != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
 }

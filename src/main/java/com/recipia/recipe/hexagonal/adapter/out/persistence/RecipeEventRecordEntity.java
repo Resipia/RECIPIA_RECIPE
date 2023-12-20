@@ -2,64 +2,75 @@ package com.recipia.recipe.hexagonal.adapter.out.persistence;
 
 import com.recipia.recipe.hexagonal.adapter.out.persistence.auditingfield.CreateDateTimeForEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-/** 회원 이벤트 기록 */
 @ToString(callSuper = true)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class RecipeEventRecordEntity extends CreateDateTimeForEntity {
 
-    // 회원 이벤트 기록 Pk
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "recipe_event_record_id", nullable = false)
     private Long id;
 
-    // 회원 pk
     @ToString.Exclude
-    @JoinColumn(name = "recipe_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipe_id", nullable = false)
     private RecipeEntity recipeEntity;
 
-    // sns topic 명
     @Column(name = "sns_topic", nullable = false)
-    private String snsTopic;
+    private String sns_topic;
 
-    // Spring event 이벤트 객체
     @Column(name = "event_type", nullable = false)
-    private String eventType;
+    private String event_type;
 
-    // sns 메시지 내용 (json 형태)
     @Column(name = "attribute", nullable = false)
     private String attribute;
 
-    // sns 발행 여부
+    @Column(name = "trace_id", nullable = false)
+    private String trace_id;
+
     @Column(name = "published", nullable = false)
-    private boolean published;
+    private Boolean published;
 
-    // sqs 에서 메시지 받은 시점
-    @Column(name = "published_at")
-    private LocalDateTime publishedAt;
+    @Column(name = "published_at", nullable = false)
+    private LocalDateTime published_at;
 
-    private RecipeEventRecordEntity(RecipeEntity recipeEntity, String snsTopic, String eventType, String attribute, boolean published, LocalDateTime publishedAt) {
+    @Builder
+    private RecipeEventRecordEntity(Long id, RecipeEntity recipeEntity, String sns_topic, String event_type, String attribute, String trace_id, Boolean published, LocalDateTime published_at) {
+        this.id = id;
         this.recipeEntity = recipeEntity;
-        this.snsTopic = snsTopic;
-        this.eventType = eventType;
+        this.sns_topic = sns_topic;
+        this.event_type = event_type;
         this.attribute = attribute;
+        this.trace_id = trace_id;
         this.published = published;
-        this.publishedAt = publishedAt;
+        this.published_at = published_at;
     }
 
-    // 생성자 factory method of 선언
-    public static RecipeEventRecordEntity of(RecipeEntity recipeEntity, String snsTopic, String eventType, String attribute, boolean published, LocalDateTime publishedAt) {
-        return new RecipeEventRecordEntity(recipeEntity, snsTopic, eventType, attribute, published, publishedAt);
+    public static RecipeEventRecordEntity of(Long id, RecipeEntity recipeEntity, String sns_topic, String event_type, String attribute, String trace_id, Boolean published, LocalDateTime published_at) {
+        return new RecipeEventRecordEntity(id, recipeEntity, sns_topic, event_type, attribute, trace_id, published, published_at);
+    }
+
+    public static RecipeEventRecordEntity of(RecipeEntity recipeEntity, String sns_topic, String event_type, String attribute, String trace_id, Boolean published, LocalDateTime published_at) {
+        return new RecipeEventRecordEntity(null, recipeEntity, sns_topic, event_type, attribute, trace_id, published, published_at);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RecipeEventRecordEntity that)) return false;
+        return this.id != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 
 

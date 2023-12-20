@@ -7,4 +7,9 @@ public record NicknameDto(
         Long memberId,
         String nickname
 ) {
+
+    public static NicknameDto of(Long memberId, String nickname) {
+        return new NicknameDto(memberId, nickname);
+    }
+
 }

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * SqsListenerService에서 Feign 요청을 보내는 이벤트를 발행하면 동작
+ * SqsListenerService에서 Feign 요청을 보내는 스프링 이벤트가 발행되면 동작한다.
  */
 @Slf4j
 @RequiredArgsConstructor

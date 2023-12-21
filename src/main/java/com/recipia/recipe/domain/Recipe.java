@@ -1,5 +1,7 @@
 package com.recipia.recipe.domain;
 
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +41,10 @@ public class Recipe {
     // factory method 선언
     public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String nickname, String delYn) {
         return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
+    }
+
+    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String nickname, String delYn) {
+        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
     }
 
 

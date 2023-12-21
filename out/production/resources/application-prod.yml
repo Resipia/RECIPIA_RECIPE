@@ -1,0 +1,21 @@
+logging:
+  level:
+    com.recipia.recipe: debug
+    org.springframework.web.servlet: debug
+    org.hibernate.orm.jdbc.bind: debug
+    org.springframework.cloud.sleuth: debug
+
+spring:
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      region:
+        static: ${REGION}
+      sqs:
+        nickname-sqs-name: nickname-change-sqs
+
+
+feign:
+  member_url: ${MEMBER_URL}

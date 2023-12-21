@@ -10,6 +10,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("레시피 저장/업데이트에 사용되는 RequestDto 테스트")
 class RecipeRequestDtoTest {
 
     // Java의 Bean Validation API를 사용해 유효성 검증을 수행하기 위한 Validator 객체를 생성

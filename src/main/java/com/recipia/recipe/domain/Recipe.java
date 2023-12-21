@@ -47,33 +47,5 @@ public class Recipe {
         return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
     }
 
-    /**
-     * Create 테스트를 위한 펙토리 메서드
-     */
-    public static Recipe createTest(Long memberId, String recipeName, String recipeDesc, String nickname, String delYn) {
-        return new Recipe(null, memberId, recipeName, recipeDesc, null, null, null, null, nickname, delYn);
-    }
-
-    /**
-     * RequestDto로 들어온 데이터를 검증하는 비즈니스 로직
-     */
-    public void validateBasicInfo() {
-        if (this.memberId == null) {
-            throw new RecipeApplicationException(ErrorCode.REQUIRED_MEMBER_ID);
-        }
-        if (this.recipeName == null || this.recipeName.trim().isEmpty()) {
-            throw new RecipeApplicationException(ErrorCode.REQUIRED_RECIPE_NAME);
-        }
-        if (this.recipeDesc == null || this.recipeDesc.trim().isEmpty()) {
-            throw new RecipeApplicationException(ErrorCode.REQUIRED_RECIPE_DESCRIPTION);
-        }
-        if (this.nickname == null || this.nickname.trim().isEmpty()) {
-            throw new RecipeApplicationException(ErrorCode.REQUIRED_MEMBER_NICKNAME);
-        }
-        if (this.delYn == null || this.delYn.trim().isEmpty()) {
-            throw new RecipeApplicationException(ErrorCode.REQUIRED_RECIPE_DELETE_YN);
-        }
-
-    }
 
 }

@@ -45,5 +45,9 @@ public class Recipe {
         return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
     }
 
+    public void change(Long memberId, String nickname) {
+        this.memberId = memberId;
+        this.nickname = nickname;
+    }
 
 }

@@ -24,6 +24,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     // 레시피 생성
     @Override
     public Long createRecipe(Recipe recipe) {
+
         Long savedRecipeId = recipePort.createRecipe(recipe);
         eventPublisher.publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
 

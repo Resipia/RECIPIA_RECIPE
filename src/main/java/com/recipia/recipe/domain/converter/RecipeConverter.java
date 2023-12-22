@@ -1,5 +1,6 @@
 package com.recipia.recipe.domain.converter;
 
+import com.recipia.recipe.adapter.in.web.dto.request.RecipeRequestDto;
 import com.recipia.recipe.adapter.out.persistence.RecipeEntity;
 import com.recipia.recipe.domain.Recipe;
 
@@ -44,6 +45,25 @@ public class RecipeConverter {
             domain.getNutritionalInfo(),
             domain.getNickname(),
             domain.getDelYn()
+        );
+    }
+
+    /**
+     * RequestDto를 도메인으로 반환
+     */
+    // entity to domain
+    public static Recipe dtoToDomain(RecipeRequestDto dto) {
+        return Recipe.of(
+                dto.getId(),
+                null,
+                dto.getRecipeName(),
+                dto.getRecipeDesc(),
+                dto.getTimeTaken(),
+                dto.getIngredient(),
+                dto.getHashtag(),
+                dto.getNutritionalInfo(),
+                null,
+                dto.getDelYn()
         );
     }
 

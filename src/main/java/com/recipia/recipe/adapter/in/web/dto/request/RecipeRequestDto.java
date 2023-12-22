@@ -4,8 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class RecipeRequestDto {
 
     private Long id;             // recipe pk
@@ -38,6 +40,10 @@ public class RecipeRequestDto {
 
     public static RecipeRequestDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
         return new RecipeRequestDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, delYn);
+    }
+
+    public static RecipeRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
+        return new RecipeRequestDto(null, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, delYn);
     }
 
     /**

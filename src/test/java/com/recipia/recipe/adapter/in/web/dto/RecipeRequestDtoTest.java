@@ -29,9 +29,20 @@ class RecipeRequestDtoTest {
     }
 
     @Test
-    @DisplayName("Bad Path - 유효성 검사에 실패하는 경우")
-    void whenInvalidRequest_thenValidationErrors() {
+    @DisplayName("Bad Path - 유효성 검사에 실패하는 경우 (blank) ")
+    void whenInvalidRequest_thenValidationErrorsBlank() {
         RecipeRequestDto dto = RecipeRequestDto.of("", "");
+
+        Set<ConstraintViolation<RecipeRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(2); // 두 필드 모두 유효성 검사에 실패했으므로
+    }
+
+    @Test
+    @DisplayName("Bad Path - 유효성 검사에 실패하는 경우 (null) ")
+    void whenInvalidRequest_thenValidationErrorsNull() {
+        RecipeRequestDto dto = RecipeRequestDto.of(null, null);
 
         Set<ConstraintViolation<RecipeRequestDto>> violations = validator.validate(dto);
 

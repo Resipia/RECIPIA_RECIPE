@@ -12,6 +12,10 @@ spring:
     username: ${DB_MASTER_USERNAME}
     password: ${DB_MASTER_PASSWORD}
 
+  data:
+    mongodb:
+      uri: ${MONGO_DB_URL}
+
   jpa:
     defer-datasource-initialization: true
     hibernate:

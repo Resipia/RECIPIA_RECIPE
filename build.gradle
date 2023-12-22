@@ -17,6 +17,10 @@ configurations {
 	}
 }
 
+ext {
+	set('solaceSpringBootVersion', "2.0.0")
+}
+
 repositories {
 	mavenCentral()
 }
@@ -38,6 +42,7 @@ dependencies {
 	// database
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	runtimeOnly 'org.postgresql:postgresql'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 
 	// dev + code + P6spy
 	compileOnly 'org.projectlombok:lombok'
@@ -49,6 +54,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	runtimeOnly 'com.h2database:h2'
+	testImplementation 'io.projectreactor:reactor-test'
 
 	// queryDsl
 	implementation 'com.querydsl:querydsl-core:5.0.0'
@@ -87,6 +93,7 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2022.0.3"
+		mavenBom "com.solace.spring.boot:solace-spring-boot-bom:${solaceSpringBootVersion}"
 	}
 }
 

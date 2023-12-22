@@ -18,7 +18,7 @@ import java.util.Map;
 public class GlobalControllerAdvice {
 
     /**
-     * MemberApplicationException 처리
+     * RecipeApplicationException 처리
      */
     @ExceptionHandler(RecipeApplicationException.class)
     public ResponseEntity<?> handleRecipeApplicationException(RecipeApplicationException e) {

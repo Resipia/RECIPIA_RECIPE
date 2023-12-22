@@ -1,7 +1,5 @@
 package com.recipia.recipe.domain;
 
-import com.recipia.recipe.common.exception.ErrorCode;
-import com.recipia.recipe.common.exception.RecipeApplicationException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

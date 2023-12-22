@@ -1,7 +1,9 @@
 package com.recipia.recipe.adapter.in.web;
 
-import com.recipia.recipe.adapter.in.web.dto.RecipeRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.RecipeRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,10 +16,9 @@ public class RecipeController {
 
 
     @PostMapping("/createRecipe")
-    public String createRecipe(@Valid @RequestBody RecipeRequestDto recipeRequestDto) {
-        //1 .
+    public ResponseEntity<ResponseDto<Void>> createRecipe(@Valid @RequestBody RecipeRequestDto recipeRequestDto) {
 
-        return "성공";
+        return ResponseEntity.ok(ResponseDto.success());
     }
 
 }

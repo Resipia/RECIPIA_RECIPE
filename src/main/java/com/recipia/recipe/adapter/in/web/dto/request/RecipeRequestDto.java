@@ -1,4 +1,4 @@
-package com.recipia.recipe.adapter.in.web.dto;
+package com.recipia.recipe.adapter.in.web.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

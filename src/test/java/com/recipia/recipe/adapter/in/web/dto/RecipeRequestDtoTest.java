@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.in.web.dto;
 
+import com.recipia.recipe.adapter.in.web.dto.request.RecipeRequestDto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

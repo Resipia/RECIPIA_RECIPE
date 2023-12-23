@@ -4,6 +4,8 @@ import com.recipia.recipe.adapter.in.web.dto.request.RecipeRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.service.RecipeService;
+import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.converter.RecipeConverter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,10 @@ public class RecipeController {
 
     @PostMapping("/createRecipe")
     public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @RequestBody RecipeRequestDto recipeRequestDto) {
+        Recipe recipe = RecipeConverter.dtoToDomain(recipeRequestDto);
+        Long savedRecipeId = createRecipeUseCase.createRecipe(recipe);
 
-
-        return ResponseEntity.ok(ResponseDto.success(1L));
+        return ResponseEntity.ok(ResponseDto.success(savedRecipeId));
     }
 
 }

@@ -1,7 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
-import com.recipia.recipe.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Recipe;
 import org.assertj.core.api.Assertions;

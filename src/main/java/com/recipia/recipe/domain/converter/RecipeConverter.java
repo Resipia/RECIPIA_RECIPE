@@ -1,7 +1,7 @@
 package com.recipia.recipe.domain.converter;
 
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeRequestDto;
-import com.recipia.recipe.adapter.out.persistence.RecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.domain.Recipe;
 
 /**

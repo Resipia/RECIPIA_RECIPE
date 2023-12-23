@@ -5,7 +5,7 @@ import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import static com.recipia.recipe.adapter.out.persistence.QRecipeEntity.recipeEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
 
 
 @RequiredArgsConstructor

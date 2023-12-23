@@ -19,9 +19,10 @@ public class MemberChangedNicknameService implements FeignClientUseCase {
      * nicknameDto는 Feign에서 받아온 응답이다.
      */
     @Override
-    public void updateRecipesNicknames(NicknameDto nicknameDto) {
-        recipePort.updateRecipesNicknames(nicknameDto);
+    public Long updateRecipesNicknames(NicknameDto nicknameDto) {
+        return recipePort.updateRecipesNicknames(nicknameDto);
     }
+
 
 
 }

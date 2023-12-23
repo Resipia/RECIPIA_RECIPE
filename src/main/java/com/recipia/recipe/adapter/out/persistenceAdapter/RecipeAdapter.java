@@ -26,9 +26,10 @@ public class RecipeAdapter implements RecipePort {
      * memberId로 유저가 작성한 모든 레시피를 조회한 다음 그 레시피 엔티티가 가진 유저의 닉네임 컬럼을 변경
      */
     @Override
-    public void updateRecipesNicknames(NicknameDto nicknameDto) {
+    public Long updateRecipesNicknames(NicknameDto nicknameDto) {
         long updateCount = recipeQueryRepository.updateRecipesNicknames(nicknameDto);
         log.info("Updated {} recipe(s) with new nickname '{}' for memberId {}", updateCount, nicknameDto.nickname(), nicknameDto.memberId());
+        return updateCount;
     }
 
     /**

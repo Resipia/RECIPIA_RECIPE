@@ -9,7 +9,7 @@ import com.recipia.recipe.domain.Recipe;
  */
 public interface RecipePort {
 
-    void updateRecipesNicknames(NicknameDto nicknameDto);
+    Long updateRecipesNicknames(NicknameDto nicknameDto);
 
     Long createRecipe(Recipe recipe);
 

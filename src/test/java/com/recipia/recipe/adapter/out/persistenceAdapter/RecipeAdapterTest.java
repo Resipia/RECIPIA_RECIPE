@@ -2,26 +2,19 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
+import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Recipe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@DisplayName("레시피 어뎁터 클래스 테스트")
-@ActiveProfiles(value = "test")
-@SpringBootTest
-class RecipeAdapterTest {
+@DisplayName("[통합] 레시피 Adapter 테스트")
+class RecipeAdapterTest extends TotalTestSupport {
 
     @Autowired
-    private RecipeQueryRepository queryRepository;
+    private RecipeAdapter sut;
 
     @Autowired
     private RecipeRepository recipeRepository;
@@ -38,11 +31,12 @@ class RecipeAdapterTest {
         NicknameDto mockDto = NicknameDto.of(memberId, changedNickname);
 
         //when
-        queryRepository.updateRecipesNicknames(mockDto);
+        Long updatedCount = sut.updateRecipesNicknames(mockDto);
         String nickname = recipeRepository.findById(memberId).get().getNickname();
 
         //then
         Assertions.assertThat(nickname).isEqualTo(changedNickname);
+        Assertions.assertThat(updatedCount).isNotNull();
     }
 
     @DisplayName("[happy] - 유저가 레시피 저장에 성공하면 생성된 레시피의 id가 반환된다.")
@@ -51,18 +45,21 @@ class RecipeAdapterTest {
     public void createRecipeSuccessReturnRecipeId() {
 
         //given
-        RecipeEntity entity = createRecipe();
+        Recipe domain = createRecipeDomain();
 
         //when
-        RecipeEntity savedEntity = recipeRepository.save(entity);
+        Long sutRecipe = sut.createRecipe(domain);
 
         //then
-        Assertions.assertThat(savedEntity).isEqualTo(entity);
-        Assertions.assertThat(savedEntity.getId()).isEqualTo(entity.getId());
+        Assertions.assertThat(sutRecipe).isEqualTo(10L);
     }
 
-    private RecipeEntity createRecipe() {
+    private RecipeEntity createRecipeEntity() {
         return RecipeEntity.of(1L, "레시피", "레시피 설명", 20, "닭", "#닭발", "{당류: 많음}", "진안", "N");
+    }
+
+    private Recipe createRecipeDomain() {
+        return Recipe.of(10L, 1L, "레시피", "레시피 설명", 20, "닭", "#닭발", "{당류: 많음}", "진안", "N");
     }
 
 

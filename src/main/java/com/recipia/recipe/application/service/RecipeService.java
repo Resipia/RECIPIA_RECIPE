@@ -31,5 +31,10 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         return savedRecipeId;
     }
 
+    @Override
+    public void saveIngredientsIntoMongo() {
+
+    }
+
 
 }

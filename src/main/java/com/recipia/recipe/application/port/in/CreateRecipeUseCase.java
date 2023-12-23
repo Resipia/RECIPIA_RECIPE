@@ -6,4 +6,5 @@ public interface CreateRecipeUseCase {
 
     Long createRecipe(Recipe recipe);
 
+    void saveIngredientsIntoMongo();
 }

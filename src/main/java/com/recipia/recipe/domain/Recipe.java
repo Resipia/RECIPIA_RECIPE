@@ -41,5 +41,13 @@ public class Recipe {
         return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
     }
 
+    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String nickname, String delYn) {
+        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
+    }
+
+    public void change(Long memberId, String nickname) {
+        this.memberId = memberId;
+        this.nickname = nickname;
+    }
 
 }

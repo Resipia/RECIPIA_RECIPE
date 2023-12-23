@@ -18,10 +18,12 @@ public enum ErrorCode {
     EXPIRED_JWT(401, "EXPIRED_JWT", "JWT 토큰이 만료되었습니다."),
     MISSING_JWT(401, "MISSING_JWT", "JWT 토큰이 누락되었습니다."),
 
-    // 회원가입 관련 에러
-    EMAIL_ALREADY_EXISTS(400, "EMAIL_ALREADY_EXISTS", "이미 존재하는 이메일입니다."),
-    USERNAME_ALREADY_EXISTS(400, "USERNAME_ALREADY_EXISTS", "이미 존재하는 사용자 아이디입니다."),
-    ACCOUNT_LOCKED(401, "ACCOUNT_LOCKED", "계정이 잠겼습니다."),
+    // RECIPE Create 에러
+    REQUIRED_MEMBER_ID(404, "MISSING_MEMBER_ID", "회원 ID는 필수 항목입니다."),
+    REQUIRED_RECIPE_NAME(404, "REQUIRED_RECIPE_NAME", "레시피 이름은 필수 항목입니다."),
+    REQUIRED_RECIPE_DESCRIPTION(404, "REQUIRED_RECIPE_NAME", "레시피 설명은 필수 항목입니다."),
+    REQUIRED_MEMBER_NICKNAME(404, "REQUIRED_RECIPE_NAME", "닉네임은 필수 항목입니다."),
+    REQUIRED_RECIPE_DELETE_YN(404, "RECIPE_TIME_SET_ERROR", "삭제 여부는 필수 항목입니다."),
 
     // DB 관련 에러
     REQUIRED_FIELD_NULL(404, "REQUIRED_FIELD_NULL", "필수 컬럼값이 존재하지 않습니다."),

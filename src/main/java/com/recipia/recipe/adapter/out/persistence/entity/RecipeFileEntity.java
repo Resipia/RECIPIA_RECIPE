@@ -1,4 +1,4 @@
-package com.recipia.recipe.adapter.out.persistence;
+package com.recipia.recipe.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

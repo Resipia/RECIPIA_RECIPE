@@ -1,6 +1,6 @@
-package com.recipia.recipe.adapter.out.persistence;
+package com.recipia.recipe.adapter.out.persistence.entity;
 
-import com.recipia.recipe.adapter.out.persistence.auditingfield.CreateDateTimeForEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.auditingfield.CreateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,12 +10,12 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "recipe_like")
-public class RecipeLikeEntity extends CreateDateTimeForEntity {
+@Table(name = "bookmark")
+public class BookmarkEntity extends CreateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "recipe_like_id", nullable = false)
+    @Column(name = "bookmark_id", nullable = false)
     private Long id;
 
     @ToString.Exclude
@@ -23,28 +23,31 @@ public class RecipeLikeEntity extends CreateDateTimeForEntity {
     @JoinColumn(name = "recipe_id", nullable = false)
     private RecipeEntity recipeEntity;
 
+
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     @Builder
-    private RecipeLikeEntity(Long id, RecipeEntity recipeEntity, Long memberId) {
+    private BookmarkEntity(Long id, RecipeEntity recipe, Long memberId) {
         this.id = id;
-        this.recipeEntity = recipeEntity;
+        this.recipeEntity = recipe;
         this.memberId = memberId;
     }
 
-    public static RecipeLikeEntity of(Long id, RecipeEntity recipeEntity, Long memberId) {
-        return new RecipeLikeEntity(id, recipeEntity, memberId);
+    // id를 가진 생성자 factory method
+    public static BookmarkEntity of(Long id, RecipeEntity recipe, Long memberId) {
+        return new BookmarkEntity(id, recipe, memberId);
     }
 
-    public static RecipeLikeEntity of(RecipeEntity recipeEntity, Long memberId) {
-        return new RecipeLikeEntity(null, recipeEntity, memberId);
+    // id가 null인 생성자 factory method
+    public static BookmarkEntity of(RecipeEntity recipe, Long memberId) {
+        return new BookmarkEntity(null, recipe, memberId);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RecipeLikeEntity that)) return false;
+        if (!(o instanceof BookmarkEntity that)) return false;
         return this.id != null && Objects.equals(getId(), that.getId());
     }
 
@@ -52,5 +55,4 @@ public class RecipeLikeEntity extends CreateDateTimeForEntity {
     public int hashCode() {
         return Objects.hash(getId());
     }
-
 }

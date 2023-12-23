@@ -14,7 +14,13 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGO_DB_URL}
+      host: ${MONGODB_HOST}
+      port: ${MONGODB_PORT:27017}
+      authentication-database: ${MONGODB_AUTH_DB:admin}
+      database: ${MONGODB_DATABASE}
+      username: ${MONGODB_USERNAME}
+      password: ${MONGODB_PASSWORD}
+
 
   jpa:
     defer-datasource-initialization: true

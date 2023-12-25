@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
+import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.mongo.RecipeMongoRepository;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
@@ -9,7 +10,15 @@ import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Adapter 클래스는 port 인터페이스를 구현한다.
@@ -22,7 +31,10 @@ public class RecipeAdapter implements RecipePort {
 
     private final RecipeQueryRepository querydslRepository;
     private final RecipeRepository recipeRepository;
+
     private final RecipeMongoRepository mongoRepository; // 몽고DB
+    private final ReactiveMongoTemplate mongoTemplate;
+
 
     /**
      * memberId로 유저가 작성한 모든 레시피를 조회한 다음 그 레시피 엔티티가 가진 유저의 닉네임 컬럼을 변경
@@ -43,6 +55,23 @@ public class RecipeAdapter implements RecipePort {
         RecipeEntity recipeEntity = RecipeConverter.domainToEntity(recipe);
         recipeRepository.save(recipeEntity);
         return recipeEntity.getId();
+    }
+
+    /**
+     * 유저가 레시피를 저장하면 스프링 이벤트가 발행되고 리스너 메서드 내부에서는 이 메서드를 호출한다.
+     * 새 재료가 중복되지 않게 MongoDB 문서에 추가되며, 스프링 이벤트 리스너 메서드에서 이 메서드를 호출하여 재료 정보를 업데이트할 수 있다.
+     */
+    @Override
+    public Mono<Void> saveIngredientsIntoMongo(String documentId, List<String> newIngredients) {
+
+        // 1. documentId로 지정된 IngredientDocument를 찾는다.
+        Query query = new Query(Criteria.where("id").is(documentId));
+
+        // 2. $addToSet 연산자를 사용하여 중복을 방지하고 재료를 추가한다.
+        Update update = new Update().addToSet("ingredients").each(newIngredients.toArray());
+
+        // 3. updateFirst는 쿼리 조건과 일치하는 첫 번째 문서를 업데이트한다.
+        return mongoTemplate.updateFirst(query, update, IngredientDocument.class).then();
     }
 
 

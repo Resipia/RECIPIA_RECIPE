@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,9 +32,13 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         return savedRecipeId;
     }
 
+    // mongoDB에 재료를 저장한다.
     @Override
-    public void saveIngredientsIntoMongo() {
+    public Mono<Void> saveIngredientsIntoMongo() {
 
+//        recipePort.saveIngredientsIntoMongo();
+
+        return  null;
     }
 
 

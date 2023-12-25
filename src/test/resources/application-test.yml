@@ -12,7 +12,7 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     open-in-view: false
     #    show-sql: true
     properties:
@@ -38,7 +38,6 @@ spring:
 
 # application-test.yml
 some.configuration.for.tracer: false
-
 
 
 feign:

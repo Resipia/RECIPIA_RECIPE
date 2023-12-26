@@ -2,59 +2,63 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
 import com.recipia.recipe.config.TotalTestSupport;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DirtiesContext
 @Rollback
-class RecipeAdapterMongoInsertTest extends TotalTestSupport{
+class RecipeAdapterMongoInsertTest extends TotalTestSupport {
 
     @Autowired
     private RecipeAdapter sut;
 
     @Autowired
-    private ReactiveMongoTemplate mongoTemplate;
+    private MongoTemplate mongoTemplate;
+
+    @Value("${mongo.test.documentId}")
+    private String documentId;
+
+    @AfterEach
+    void tearDown() {
+        List<String> newIngredients = Arrays.asList("감자", "양상추", "진안", "최진안"); // 삭제할 재료 목록
+
+        Query query = new Query(Criteria.where("id").is(documentId));
+        Update update = new Update().pullAll("ingredients", newIngredients.toArray());
+        mongoTemplate.updateFirst(query, update, IngredientDocument.class);
+    }
+
 
     @DisplayName("[happy] 재료를 저장하는 어댑터 메서드가 동작하면 MongoDB에 재료를 저장한다.")
     @Test
     void testSaveIngredientsIntoMongo() {
 
         // given
-        String documentId = "65892a7c0ea2136585038542";
         List<String> newIngredients = Arrays.asList("진안", "최진안");
 
         // when
-        StepVerifier.create(sut.saveIngredientsIntoMongo(documentId, newIngredients))
-                .verifyComplete();
+        sut.saveIngredientsIntoMongo(documentId, newIngredients);
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        StepVerifier.create(mongoTemplate.findOne(query, IngredientDocument.class))
-                .assertNext(ingredientDocument -> {
-                    // 1. 저장된 재료 출력하기
-                    System.out.println("저장된 재료: " + ingredientDocument.getIngredients());
+        IngredientDocument ingredientDocument = mongoTemplate.findOne(query, IngredientDocument.class);
 
-                    // 2. 저장된 문서가 null이 아님을 확인한다.
-                    assertNotNull(ingredientDocument);
-
-                    // 3. 저장된 재료 목록에 새로운 재료(newIngredients)가 모두 포함되어 있는지 확인한다.
-                    assertTrue(ingredientDocument.getIngredients().containsAll(newIngredients));
-                })
-                .verifyComplete();
+        assertNotNull(ingredientDocument);
+        assertTrue(ingredientDocument.getIngredients().containsAll(newIngredients));
+        System.out.println("저장된 재료: " + ingredientDocument.getIngredients());
     }
 
     @DisplayName("[happy] 재료 중복 저장 테스트")
@@ -62,49 +66,29 @@ class RecipeAdapterMongoInsertTest extends TotalTestSupport{
     void testSaveDuplicateIngredientsIntoMongo() {
 
         // given
-        String documentId = "65892a7c0ea2136585038542";
-        Query query = new Query(Criteria.where("id").is(documentId));
-        IngredientDocument document = mongoTemplate.findOne(query, IngredientDocument.class).block();
-        int size = document.getIngredients().size();
+        Query query = new Query(Criteria.where("id").is(documentId)); // 해당 ID로 문서를 찾기 위한 쿼리 생성
+        IngredientDocument document = mongoTemplate.findOne(query, IngredientDocument.class); // 쿼리를 사용하여 문서를 찾음
+        System.out.println("저장전 재료: " + document.getIngredients());
 
+        int originalSize = document.getIngredients().size(); // 테스트 시작 전, 원래 문서에 저장된 재료의 개수
 
-        List<String> newIngredients = Arrays.asList("감자", "양상추");
+        List<String> newIngredients = Arrays.asList("감자", "양상추"); // 저장하려는 새로운 재료 목록
 
         // when (중복 저장)
-        int duplicateCount = 2; // 중복 저장 횟수
-
+        int duplicateCount = 2; // 중복 저장을 위한 횟수 설정
         for (int i = 0; i < duplicateCount; i++) {
-            StepVerifier.create(sut.saveIngredientsIntoMongo(documentId, newIngredients))
-                    .verifyComplete();
+            sut.saveIngredientsIntoMongo(documentId, newIngredients); // 지정된 횟수만큼 재료를 저장하는 메소드 호출
         }
 
         // then
-        StepVerifier.create(mongoTemplate.findOne(query, IngredientDocument.class))
-                .assertNext(ingredientDocument -> {
-                    // 1. 저장된 재료 출력하고 저장된 문서가 null이 아님을 확인한다.
-                    System.out.println("저장된 재료: " + ingredientDocument.getIngredients());
-                    assertNotNull(ingredientDocument);
+        IngredientDocument updatedDocument = mongoTemplate.findOne(query, IngredientDocument.class); // 업데이트된 문서를 다시 조회
+        System.out.println("저장후 재료: " + updatedDocument.getIngredients());
+        int updatedSize = updatedDocument.getIngredients().size(); // 업데이트 후의 재료 개수 측정
+        int expectedSize = originalSize + (newIngredients.stream().anyMatch(ingredient -> !document.getIngredients().contains(ingredient)) ? newIngredients.size() : 0);
 
-                    // todo: 만약 리스트의 값이 이미 db에 존재하면 그 값만큼 개수는 빼야함
-
-                    // list의 첫번째 요소값의 count를 가져와서
-
-
-                    // 2. 중복 재료가 추가되지 않았음을 확인
-                    assertTrue(ingredientDocument.getIngredients().containsAll(newIngredients));
-                    System.out.println("ingredientDocument: " + ingredientDocument.getIngredients());
-                    System.out.println("newIngredients: " + newIngredients);
-
-                    // 3. 중복 저장된 재료 수를 확인 (원본 재료 수와 같아야 함)
-                    int savedIngredientsCount = ingredientDocument.getIngredients().size();
-                    int addIngredientsCount = newIngredients.size();
-
-
-//                    10 = 기존 + 새로운거 추가
-                    assertTrue(savedIngredientsCount == size + addIngredientsCount);
-
-                })
-                .verifyComplete();
+        assertNotNull(updatedDocument); // 문서가 실제로 존재하는지 확인
+        assertTrue(updatedDocument.getIngredients().containsAll(newIngredients)); // 업데이트된 문서에 새로운 재료가 포함되었는지 확인
+        assertEquals(expectedSize, updatedSize);
     }
 
 }

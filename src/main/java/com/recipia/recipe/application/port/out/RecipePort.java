@@ -3,7 +3,6 @@ package com.recipia.recipe.application.port.out;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.domain.Recipe;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -16,5 +15,5 @@ public interface RecipePort {
 
     Long createRecipe(Recipe recipe);
 
-    Mono<Void> saveIngredientsIntoMongo(String documentId, List<String> newIngredients);
+    void saveIngredientsIntoMongo(String documentId, List<String> newIngredients);
 }

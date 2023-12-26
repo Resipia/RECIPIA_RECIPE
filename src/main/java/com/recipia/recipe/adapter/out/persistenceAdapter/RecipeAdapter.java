@@ -10,15 +10,13 @@ import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * Adapter 클래스는 port 인터페이스를 구현한다.
@@ -33,7 +31,7 @@ public class RecipeAdapter implements RecipePort {
     private final RecipeRepository recipeRepository;
 
     private final RecipeMongoRepository mongoRepository; // 몽고DB
-    private final ReactiveMongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
 
     /**
@@ -62,8 +60,7 @@ public class RecipeAdapter implements RecipePort {
      * 새 재료가 중복되지 않게 MongoDB 문서에 추가되며, 스프링 이벤트 리스너 메서드에서 이 메서드를 호출하여 재료 정보를 업데이트할 수 있다.
      */
     @Override
-    public Mono<Void> saveIngredientsIntoMongo(String documentId, List<String> newIngredients) {
-
+    public void saveIngredientsIntoMongo(String documentId, List<String> newIngredients) {
         // 1. documentId로 지정된 IngredientDocument를 찾는다.
         Query query = new Query(Criteria.where("id").is(documentId));
 
@@ -71,8 +68,9 @@ public class RecipeAdapter implements RecipePort {
         Update update = new Update().addToSet("ingredients").each(newIngredients.toArray());
 
         // 3. updateFirst는 쿼리 조건과 일치하는 첫 번째 문서를 업데이트한다.
-        return mongoTemplate.updateFirst(query, update, IngredientDocument.class).then();
+        mongoTemplate.updateFirst(query, update, IngredientDocument.class);
     }
+
 
 
 }

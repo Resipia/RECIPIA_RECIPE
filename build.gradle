@@ -43,7 +43,7 @@ dependencies {
 	// database
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	runtimeOnly 'org.postgresql:postgresql'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
 	// dev + code + P6spy
 	compileOnly 'org.projectlombok:lombok'

@@ -11,8 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@Document(collection = "ingredient")
-@Document(collection = "test")
+@Document(collection = "ingredient")
 public class IngredientDocument {
 
     @Id

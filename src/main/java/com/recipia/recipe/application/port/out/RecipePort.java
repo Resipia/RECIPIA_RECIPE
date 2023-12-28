@@ -15,5 +15,5 @@ public interface RecipePort {
 
     Long createRecipe(Recipe recipe);
 
-    void saveIngredientsIntoMongo(String documentId, List<String> newIngredients);
+    Long saveIngredientsIntoMongo(String documentId, List<String> newIngredients);
 }

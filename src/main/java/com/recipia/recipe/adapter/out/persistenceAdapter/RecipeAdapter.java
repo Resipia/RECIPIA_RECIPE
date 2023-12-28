@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
+import com.mongodb.client.result.UpdateResult;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
@@ -56,11 +57,11 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * 유저가 레시피를 저장하면 스프링 이벤트가 발행되고 리스너 메서드 내부에서는 이 메서드를 호출한다.
      * 새 재료가 중복되지 않게 MongoDB 문서에 추가되며, 스프링 이벤트 리스너 메서드에서 이 메서드를 호출하여 재료 정보를 업데이트할 수 있다.
+     * 실제로 업데이트된 '항목'(item)의 수를 반환하는 게 아니라, 업데이트된 '문서'(document)의 수를 반환한다. 성공하면 무조건 1을 반환한다.
      */
     @Override
-    public void saveIngredientsIntoMongo(String documentId, List<String> newIngredients) {
+    public Long saveIngredientsIntoMongo(String documentId, List<String> newIngredients) {
         // 1. documentId로 지정된 IngredientDocument를 찾는다.
         Query query = new Query(Criteria.where("id").is(documentId));
 
@@ -68,9 +69,9 @@ public class RecipeAdapter implements RecipePort {
         Update update = new Update().addToSet("ingredients").each(newIngredients.toArray());
 
         // 3. updateFirst는 쿼리 조건과 일치하는 첫 번째 문서를 업데이트한다.
-        mongoTemplate.updateFirst(query, update, IngredientDocument.class);
+        Long updateResult = mongoTemplate.updateFirst(query, update, IngredientDocument.class).getModifiedCount();
+
+        return updateResult;
     }
-
-
 
 }

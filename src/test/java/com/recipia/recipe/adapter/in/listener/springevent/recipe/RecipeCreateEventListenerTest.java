@@ -11,9 +11,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.ApplicationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 
 @DisplayName("[통합] RecipeCreate 스프링 이벤트 리스너 테스트")
@@ -47,12 +49,20 @@ class RecipeCreateEventListenerTest extends TotalTestSupport {
         // given
         RecipeCreationEvent event = createEvent();
 
+        // 실제 ArrayList<String> 인스턴스를 생성
+        List<String> ingredients = new ArrayList<>();
+        ingredients.add("김치");
+        ingredients.add("감자");
+        ingredients.add("고구마");
+
+        // event.ingredients()가 호출될 때 실제 ingredients 리스트를 반환하도록 스텁 설정
+        when(recipeCreateEventListener.splitIngredients(event.ingredients())).thenReturn(ingredients);
+
         // when
         applicationContext.publishEvent(event);
 
-
         // then
-        Mockito.verify(createRecipeUseCase).saveIngredientsIntoMongo();
+        Mockito.verify(createRecipeUseCase).saveIngredientsIntoMongo(ingredients);
     }
 
     @Test
@@ -60,18 +70,18 @@ class RecipeCreateEventListenerTest extends TotalTestSupport {
     void splitIngredientsTest() {
         // given
         RecipeCreateEventListener listener = new RecipeCreateEventListener(null);
-        String ingredientsStr = "김치, 감자, 고구마, 양파, 피망";
+        String ingredientsStr = "김치, 감자, 고구마";
 
         // when
         List<String> ingredients = listener.splitIngredients(ingredientsStr);
         System.out.println(ingredients);
 
         // then
-        assertThat(ingredients).containsExactly("김치", "감자", "고구마", "양파", "피망");
+        assertThat(ingredients).containsExactly("김치", "감자", "고구마");
     }
 
     private RecipeCreationEvent createEvent() {
-        return new RecipeCreationEvent("김치, 감자, 고구마, 양파, 피망", "해시태그");
+        return new RecipeCreationEvent("김치, 감자, 고구마", "해시태그");
     }
 
 }

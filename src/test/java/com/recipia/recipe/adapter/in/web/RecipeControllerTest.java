@@ -39,7 +39,15 @@ class RecipeControllerTest extends TotalTestSupport {
     @Test
     void ifUserCreateRecipeShouldComplete() throws Exception {
         // Given
-        RecipeRequestDto requestDto = createRecipeRequestDto();
+        RecipeRequestDto requestDto = createRecipeRequestDto(
+                "감자전",
+                "감자전을 만들어 봅시다.",
+                500,
+                "감자",
+                "감자전",
+                "{당: 조금}",
+                "N"
+        );
         Recipe recipe = RecipeConverter.dtoToDomain(requestDto);
 
         // fixme: 유저정보는 securityContextHolder에서 꺼내니까 이걸 잘 구분해라
@@ -56,8 +64,8 @@ class RecipeControllerTest extends TotalTestSupport {
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"));
     }
 
-    private RecipeRequestDto createRecipeRequestDto() {
-        return RecipeRequestDto.of("레시피", "레시피 설명", 20, "감자", "고구마", "{당: 많음}", "N");
+    private RecipeRequestDto createRecipeRequestDto(String recipeName, String recipeDesc, int timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
+        return RecipeRequestDto.of(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, delYn);
     }
 
 

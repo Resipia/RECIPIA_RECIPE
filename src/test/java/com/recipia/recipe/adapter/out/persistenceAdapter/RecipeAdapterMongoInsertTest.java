@@ -74,7 +74,7 @@ class RecipeAdapterMongoInsertTest extends TotalTestSupport {
         List<String> newIngredients = Arrays.asList("소고기", "돼지고기");
 
         // when
-        Long savedCount = sut.saveIngredientsIntoMongo(documentId, newIngredients);
+        Long savedCount = sut.saveIngredientsIntoMongo(newIngredients);
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
@@ -92,7 +92,7 @@ class RecipeAdapterMongoInsertTest extends TotalTestSupport {
         List<String> existingIngredients = Arrays.asList("김치", "파");
 
         // when
-        Long savedCount = sut.saveIngredientsIntoMongo(documentId, existingIngredients);// 같은 데이터로 다시 저장 시도
+        Long savedCount = sut.saveIngredientsIntoMongo(existingIngredients);// 같은 데이터로 다시 저장 시도
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
@@ -112,7 +112,7 @@ class RecipeAdapterMongoInsertTest extends TotalTestSupport {
         List<String> newIngIngredients = Arrays.asList("김치", "고구마");
 
         // when
-        Long savedCount = sut.saveIngredientsIntoMongo(documentId, newIngIngredients);
+        Long savedCount = sut.saveIngredientsIntoMongo(newIngIngredients);
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
@@ -131,7 +131,7 @@ class RecipeAdapterMongoInsertTest extends TotalTestSupport {
         List<String> newIngredients = Arrays.asList("김치", "파", "감자");
 
         //when
-        Long savedCount = sut.saveIngredientsIntoMongo(documentId, newIngredients);
+        Long savedCount = sut.saveIngredientsIntoMongo(newIngredients);
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
@@ -158,7 +158,7 @@ class RecipeAdapterMongoInsertTest extends TotalTestSupport {
         List<String> newIngredients = Arrays.asList("고구마", "고구마");
 
         //when
-        Long savedCount = sut.saveIngredientsIntoMongo(documentId, newIngredients);
+        Long savedCount = sut.saveIngredientsIntoMongo(newIngredients);
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
@@ -182,7 +182,7 @@ class RecipeAdapterMongoInsertTest extends TotalTestSupport {
         List<String> newIngredients = Arrays.asList("김치", "김치");
 
         //when
-        Long savedCount = sut.saveIngredientsIntoMongo(documentId, newIngredients);
+        Long savedCount = sut.saveIngredientsIntoMongo(newIngredients);
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
@@ -215,7 +215,7 @@ class RecipeAdapterMongoInsertTest extends TotalTestSupport {
         // when (중복 저장)
         int duplicateCount = 2; // 중복 저장을 위한 횟수 설정
         for (int i = 0; i < duplicateCount; i++) {
-            sut.saveIngredientsIntoMongo(documentId, newIngredients); // 지정된 횟수만큼 재료를 저장하는 메소드 호출
+            sut.saveIngredientsIntoMongo(newIngredients); // 지정된 횟수만큼 재료를 저장하는 메소드 호출
         }
 
         // then

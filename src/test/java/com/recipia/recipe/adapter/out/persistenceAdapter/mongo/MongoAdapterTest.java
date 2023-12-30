@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("mongo 재료저장 테스트 Transactional이 먹히지 않아 각 테스트별로 데이터를 insert하고 delete하는 작업을 한다.")
+@DisplayName("[통합] mongo 재료저장 테스트 Transactional이 먹히지 않아 각 테스트별로 데이터를 insert하고 delete하는 작업을 한다.")
 class MongoAdapterTest extends TotalTestSupport {
 
     @Autowired

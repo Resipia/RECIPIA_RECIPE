@@ -22,7 +22,11 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     private final RecipePort recipePort;
     private final ApplicationEventPublisher eventPublisher;
 
-    // 레시피 생성
+    /**
+     * 레시피 생성을 담당하는 메서드
+     * 주관심사: 레시피 생성 (엔티티 저장)
+     * 비관심사: 스프링 이벤트 발행 (재료, 해시태그 mongoDB에 저장)
+     */
     @Override
     public Long createRecipe(Recipe recipe) {
         Long savedRecipeId = recipePort.createRecipe(recipe);
@@ -30,14 +34,5 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
 
         return savedRecipeId;
     }
-
-    // mongoDB에 재료를 저장한다.
-    @Override
-    public void saveIngredientsIntoMongo(List<String> ingredients) {
-
-        recipePort.saveIngredientsIntoMongo(ingredients);
-
-    }
-
 
 }

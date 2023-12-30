@@ -15,5 +15,4 @@ public interface RecipePort {
 
     Long createRecipe(Recipe recipe);
 
-    Long saveIngredientsIntoMongo(List<String> newIngredients);
 }

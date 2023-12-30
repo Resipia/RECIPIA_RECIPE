@@ -1,7 +1,6 @@
-package com.recipia.recipe.adapter.out.persistenceAdapter;
+package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
 import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
-import com.recipia.recipe.adapter.out.persistenceAdapter.mongo.RecipeMongoRepository;
 import com.recipia.recipe.config.TotalTestSupport;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -14,22 +13,20 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("mongo 재료저장 테스트 - 최초db에는 test1, test2, test3이라는 데이터가 들어있고 테스트 종료시 클랜징 메서드가 동작해서 테스트에서 추가된 데이터는 삭제된다.")
-class RecipeAdapterMongoInsertTest extends TotalTestSupport {
+@DisplayName("mongo 재료저장 테스트 Transactional이 먹히지 않아 각 테스트별로 데이터를 insert하고 delete하는 작업을 한다.")
+class MongoAdapterTest extends TotalTestSupport {
 
     @Autowired
-    private RecipeAdapter sut;
+    private MongoAdapter sut;
 
     @Autowired
     private MongoTemplate mongoTemplate;

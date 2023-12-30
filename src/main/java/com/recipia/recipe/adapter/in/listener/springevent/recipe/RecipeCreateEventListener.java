@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.in.listener.springevent.recipe;
 
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
+import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecipeCreateEventListener {
 
-    private final CreateRecipeUseCase createRecipeUseCase;
+    private final MongoUseCase mongoUseCase;
 
     /**
      * MongoDB에 재료들을 저장한다.
@@ -32,7 +33,7 @@ public class RecipeCreateEventListener {
         List<String> ingredients = splitIngredients(event.ingredients());
 
         // 2.  저장을 시도한다.
-        createRecipeUseCase.saveIngredientsIntoMongo(ingredients);
+        mongoUseCase.saveIngredientsIntoMongo(ingredients);
 
         log.info("데이터 저장 성공");
     }

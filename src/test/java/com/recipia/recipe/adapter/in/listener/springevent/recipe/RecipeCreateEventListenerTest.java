@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.in.listener.springevent.recipe;
 
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
+import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.config.TotalTestSupport;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +29,7 @@ class RecipeCreateEventListenerTest extends TotalTestSupport {
     private RecipeCreateEventListener recipeCreateEventListener;
 
     @MockBean
-    private CreateRecipeUseCase createRecipeUseCase;
+    private MongoUseCase mongoUseCase;
 
     @Test
     @DisplayName("레시피 생성 이벤트 발행시 리스너가 반응하여 동작하는지를 검증한다.")
@@ -62,7 +63,7 @@ class RecipeCreateEventListenerTest extends TotalTestSupport {
         applicationContext.publishEvent(event);
 
         // then
-        Mockito.verify(createRecipeUseCase).saveIngredientsIntoMongo(ingredients);
+        Mockito.verify(mongoUseCase).saveIngredientsIntoMongo(ingredients);
     }
 
     @Test

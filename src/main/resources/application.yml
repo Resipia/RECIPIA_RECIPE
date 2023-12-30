@@ -17,7 +17,7 @@ spring:
       host: ${MONGODB_HOST}
       port: ${MONGODB_PORT:27017}
       authentication-database: ${MONGODB_AUTH_DB:admin}
-      database: ${MONGODB_DATABASE}
+      database: ${MONGODB_DATABASE:recipia}
       username: ${MONGODB_USERNAME}
       password: ${MONGODB_PASSWORD}
 

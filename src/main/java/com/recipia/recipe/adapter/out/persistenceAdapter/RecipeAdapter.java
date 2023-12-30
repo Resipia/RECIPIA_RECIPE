@@ -2,7 +2,6 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistenceAdapter.mongo.RecipeMongoRepository;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.domain.Recipe;
@@ -22,7 +21,7 @@ public class RecipeAdapter implements RecipePort {
 
     private final RecipeQueryRepository querydslRepository;
     private final RecipeRepository recipeRepository;
-    private final RecipeMongoRepository mongoRepository; // 몽고DB
+
 
     /**
      * memberId로 유저가 작성한 모든 레시피를 조회한 다음 그 레시피 엔티티가 가진 유저의 닉네임 컬럼을 변경

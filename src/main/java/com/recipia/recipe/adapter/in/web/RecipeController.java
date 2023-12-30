@@ -22,6 +22,9 @@ public class RecipeController {
     private final CreateRecipeUseCase createRecipeUseCase;
 
 
+    /**
+     * 유저가 레시피 생성을 요청하는 컨트롤러
+     */
     @PostMapping("/createRecipe")
     public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @RequestBody RecipeRequestDto recipeRequestDto) {
         Recipe recipe = RecipeConverter.dtoToDomain(recipeRequestDto);

@@ -4,6 +4,8 @@ package com.recipia.recipe.application.port.out;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.domain.Recipe;
 
+import java.util.List;
+
 /**
  * adapter 클래스의 인터페이스
  */

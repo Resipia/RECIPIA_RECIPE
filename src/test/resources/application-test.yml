@@ -12,7 +12,7 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     open-in-view: false
     #    show-sql: true
     properties:
@@ -39,7 +39,10 @@ spring:
 # application-test.yml
 some.configuration.for.tracer: false
 
-
+# 몽고db test id값
+mongo:
+  test:
+    documentId: 658a766fd4751ba6ea28f1a9
 
 feign:
   member_url: http://127.0.0.1:8081

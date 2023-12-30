@@ -11,6 +11,7 @@ import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -33,6 +34,9 @@ public class RecipeAdapter implements RecipePort {
 
     private final RecipeMongoRepository mongoRepository; // 몽고DB
     private final MongoTemplate mongoTemplate;
+
+    @Value("${mongo.test.documentId}")
+    private String documentId;
 
 
     /**
@@ -61,12 +65,12 @@ public class RecipeAdapter implements RecipePort {
      * 실제로 업데이트된 '항목'(item)의 수를 반환하는 게 아니라, 업데이트된 '문서'(document)의 수를 반환한다. 성공하면 무조건 1을 반환한다.
      */
     @Override
-    public Long saveIngredientsIntoMongo(String documentId, List<String> newIngredients) {
+    public Long saveIngredientsIntoMongo(List<String> newIngredients) {
         // 1. documentId로 지정된 IngredientDocument를 찾는다.
         Query query = new Query(Criteria.where("id").is(documentId));
 
         // 2. $addToSet 연산자를 사용하여 중복을 방지하고 재료를 추가한다.
-        Update update = new Update().addToSet("ingredients").each(newIngredients.toArray());
+        Update update = new Update().addToSet("ingredients").each(newIngredients);
 
         // 3. updateFirst는 쿼리 조건과 일치하는 첫 번째 문서를 업데이트한다.
         Long updateResult = mongoTemplate.updateFirst(query, update, IngredientDocument.class).getModifiedCount();

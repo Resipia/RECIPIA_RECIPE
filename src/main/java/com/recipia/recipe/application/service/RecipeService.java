@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -31,9 +33,9 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
 
     // mongoDB에 재료를 저장한다.
     @Override
-    public void saveIngredientsIntoMongo() {
+    public void saveIngredientsIntoMongo(List<String> ingredients) {
 
-//        recipePort.saveIngredientsIntoMongo();
+        recipePort.saveIngredientsIntoMongo(ingredients);
 
     }
 

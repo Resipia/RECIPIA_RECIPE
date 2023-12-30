@@ -32,7 +32,7 @@ public class RecipeCreateEventListener {
         List<String> ingredients = splitIngredients(event.ingredients());
 
         // 2.  저장을 시도한다.
-        createRecipeUseCase.saveIngredientsIntoMongo();
+        createRecipeUseCase.saveIngredientsIntoMongo(ingredients);
 
         log.info("데이터 저장 성공");
     }
@@ -48,7 +48,7 @@ public class RecipeCreateEventListener {
     }
 
 
-    // 테스트를 용이하게 하기 위해 method로 분리
+    // 테스트를 용이하게 하기 위해 method로 분리 (모든 예외상황은 왠만하면 dto에서 valid로 처리)
     public List<String> splitIngredients(String ingredients) {
         return Arrays.stream(ingredients.split(","))
                 .map(String::trim)

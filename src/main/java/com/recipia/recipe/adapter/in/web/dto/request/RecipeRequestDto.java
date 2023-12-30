@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.in.web.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
@@ -21,8 +22,13 @@ public class RecipeRequestDto {
     private String recipeDesc;   // 레시피 설명
 
     private Integer timeTaken;   // 레시피 따라하는데 필요한 시간
+
+    @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "재료는 '재료1, 재료2, 재료3' 형식으로 입력해야 합니다.")
     private String ingredient;   // 재료
+
+    @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "해시태그는 '해시태그1, 해시태그2, 해시태그3' 형식으로 입력해야 합니다.")
     private String hashtag;      // 해시태그
+
     private String nutritionalInfo;   // 영양소 정보
     private String delYn;        // 레시피 삭제여부
 

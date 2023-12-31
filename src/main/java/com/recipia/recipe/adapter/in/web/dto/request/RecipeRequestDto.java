@@ -26,14 +26,13 @@ public class RecipeRequestDto {
     @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "재료는 '재료1, 재료2, 재료3' 형식으로 입력해야 합니다.")
     private String ingredient;   // 재료
 
-    @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "해시태그는 '해시태그1, 해시태그2, 해시태그3' 형식으로 입력해야 합니다.")
+    @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "해시태그는 '#해시태그1, #해시태그2, #해시태그3' 형식으로 입력해야 합니다.")
     private String hashtag;      // 해시태그
 
     private String nutritionalInfo;   // 영양소 정보
-    private String delYn;        // 레시피 삭제여부
 
     @Builder
-    private RecipeRequestDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
+    private RecipeRequestDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo) {
         this.id = id;
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
@@ -41,22 +40,21 @@ public class RecipeRequestDto {
         this.ingredient = ingredient;
         this.hashtag = hashtag;
         this.nutritionalInfo = nutritionalInfo;
-        this.delYn = delYn;
     }
 
-    public static RecipeRequestDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
-        return new RecipeRequestDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, delYn);
+    public static RecipeRequestDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo) {
+        return new RecipeRequestDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo);
     }
 
-    public static RecipeRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
-        return new RecipeRequestDto(null, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, delYn);
+    public static RecipeRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo) {
+        return new RecipeRequestDto(null, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo);
     }
 
     /**
      * 테스트용
      */
     public static RecipeRequestDto of(String recipeName, String recipeDesc) {
-        return new RecipeRequestDto(null, recipeName, recipeDesc, null, null, null, null, null);
+        return new RecipeRequestDto(null, recipeName, recipeDesc, null, null, null, null);
     }
 
 }

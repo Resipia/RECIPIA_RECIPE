@@ -9,12 +9,12 @@ import org.springframework.security.oauth2.jwt.Jwt;
  */
 public class SecurityUtil {
 
-    public static Long getCurrentUserId() {
+    public static Long getCurrentMemberId() {
         Jwt jwt = getCurrentJwt();
         return jwt != null ? jwt.getClaim("memberId") : null;
     }
 
-    public static String getCurrentUserNickname() {
+    public static String getCurrentMemberNickname() {
         Jwt jwt = getCurrentJwt();
         return jwt != null ? jwt.getClaim("nickname") : null;
     }
@@ -23,6 +23,7 @@ public class SecurityUtil {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
+            // todo: 만약 null인 경우에는 시큐리티에서 처리하는지 알아보기
             // 인증되지 않은 상태 처리
             return null;
         }

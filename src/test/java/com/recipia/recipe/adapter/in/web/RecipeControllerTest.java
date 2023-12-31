@@ -1,7 +1,8 @@
 package com.recipia.recipe.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recipia.recipe.adapter.in.web.dto.request.RecipeRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
+import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Recipe;
@@ -39,16 +40,16 @@ class RecipeControllerTest extends TotalTestSupport {
     @Test
     void ifUserCreateRecipeShouldComplete() throws Exception {
         // Given
-        RecipeRequestDto requestDto = createRecipeRequestDto(
+        RecipeCreateRequestDto requestDto = createRecipeCreateRequestDto(
                 "감자전",
                 "감자전을 만들어 봅시다.",
                 500,
                 "감자",
                 "감자전",
-                "{당: 조금}",
-                "N"
+                createNutritionalInfoDtoInteger(10, 10, 10, 10, 10)
         );
-        Recipe recipe = RecipeConverter.dtoToDomain(requestDto);
+
+        Recipe recipe = RecipeConverter.requestDtoToDomain(requestDto);
 
         // fixme: 유저정보는 securityContextHolder에서 꺼내니까 이걸 잘 구분해라
         recipe.change(1L, "진안");
@@ -64,9 +65,21 @@ class RecipeControllerTest extends TotalTestSupport {
                 .andExpect(jsonPath("$.resultCode").value("SUCCESS"));
     }
 
-    private RecipeRequestDto createRecipeRequestDto(String recipeName, String recipeDesc, int timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
-        return RecipeRequestDto.of(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, delYn);
+    /**
+     * 테스트를 위한 RecipeRequestDto 생성
+     */
+    private RecipeCreateRequestDto createRecipeCreateRequestDto(String recipeName, String recipeDesc, int timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo) {
+        return RecipeCreateRequestDto.of(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo);
     }
+
+    /**
+     * 테스트를 위한 영양소 dto 객체 생성
+     */
+    private NutritionalInfoDto createNutritionalInfoDtoInteger (Integer carbohydrates, Integer protein, Integer fat, Integer vitamins, Integer minerals) {
+        return NutritionalInfoDto.of(carbohydrates, protein, fat, vitamins, minerals);
+    }
+
+
 
 
 }

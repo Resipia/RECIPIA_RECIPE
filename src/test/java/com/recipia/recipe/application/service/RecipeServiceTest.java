@@ -5,6 +5,7 @@ import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.config.TestSecurityConfig;
 import com.recipia.recipe.config.TestZipkinConfig;
 import com.recipia.recipe.config.TotalTestSupport;
+import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +44,7 @@ class RecipeServiceTest {
     @Test
     void createRecipe_Success() {
         // given
-        Recipe recipe = createRecipe();
+        Recipe recipe = createRecipeDomain();
         Long savedRecipeId = 10L;  // 가정하는 저장된 ID
 
         // RecipePort의 동작을 정의
@@ -57,8 +58,18 @@ class RecipeServiceTest {
         then(eventPublisher).should().publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
     }
 
-    private Recipe createRecipe() {
-        return Recipe.of(10L, 1L, "레시피", "레시피 설명", 20, "닭", "#닭발", "{당류: 많음}", "진안", "N");
+    private Recipe createRecipeDomain() {
+        return Recipe.of(
+                10L,
+                "레시피",
+                "레시피 설명",
+                20,
+                "닭",
+                "#진안",
+                NutritionalInfo.of(10,10,10,10,10),
+                "진안",
+                "N"
+        );
     }
 
 }

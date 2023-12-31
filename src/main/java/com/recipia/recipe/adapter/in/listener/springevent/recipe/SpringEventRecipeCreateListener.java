@@ -19,9 +19,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RecipeCreateEventListener {
+public class SpringEventRecipeCreateListener {
 
     private final MongoUseCase mongoUseCase;
+    private final CreateRecipeUseCase createRecipeUseCase;
 
     /**
      * MongoDB에 재료들을 저장한다.
@@ -47,7 +48,6 @@ public class RecipeCreateEventListener {
 
 
     }
-
 
     // 테스트를 용이하게 하기 위해 method로 분리 (모든 예외상황은 왠만하면 dto에서 valid로 처리)
     public List<String> splitIngredients(String ingredients) {

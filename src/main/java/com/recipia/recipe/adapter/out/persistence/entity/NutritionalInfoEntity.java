@@ -20,26 +20,27 @@ public class NutritionalInfoEntity {
     private Long id;
 
     @Column(name = "carbohydrates")
-    private Double carbohydrates;  // 탄수화물 함량
+    private Integer carbohydrates;  // 탄수화물 함량
 
     @Column(name = "protein")
-    private Double protein; // 단백질 함량
+    private Integer protein; // 단백질 함량
 
     @Column(name = "fat")
-    private Double fat; // 지방 함량
+    private Integer fat; // 지방 함량
 
     @Column(name = "vitamins")
-    private Double vitamins; // 비타민 함량
+    private Integer vitamins; // 비타민 함량
 
     @Column(name = "minerals")
-    private Double minerals; // 미네랄 함량
+    private Integer minerals; // 미네랄 함량
 
     @OneToOne
     @JoinColumn(name = "recipe_id", nullable = false)
     private RecipeEntity recipe; // 해당 영양소 정보가 연결된 레시피. RecipeEntity와 1대1 관계
 
+
     @Builder
-    private NutritionalInfoEntity(Long id, Double carbohydrates, Double protein, Double fat, Double vitamins, Double minerals, RecipeEntity recipe) {
+    private NutritionalInfoEntity(Long id, Integer carbohydrates, Integer protein, Integer fat, Integer vitamins, Integer minerals, RecipeEntity recipe) {
         this.id = id;
         this.carbohydrates = carbohydrates;
         this.protein = protein;
@@ -49,8 +50,12 @@ public class NutritionalInfoEntity {
         this.recipe = recipe;
     }
 
-    public static NutritionalInfoEntity of(Long id, Double carbohydrates, Double protein, Double fat, Double vitamins, Double minerals, RecipeEntity recipe) {
+    public static NutritionalInfoEntity of(Long id, Integer carbohydrates, Integer protein, Integer fat, Integer vitamins, Integer minerals, RecipeEntity recipe) {
         return new NutritionalInfoEntity(id, carbohydrates, protein, fat, vitamins, minerals, recipe);
+    }
+
+    public static NutritionalInfoEntity of(Integer carbohydrates, Integer protein, Integer fat, Integer vitamins, Integer minerals, RecipeEntity recipe) {
+        return new NutritionalInfoEntity(null, carbohydrates, protein, fat, vitamins, minerals, recipe);
     }
 
     @Override

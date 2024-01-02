@@ -24,6 +24,7 @@ public enum ErrorCode {
     REQUIRED_RECIPE_DESCRIPTION(404, "REQUIRED_RECIPE_NAME", "레시피 설명은 필수 항목입니다."),
     REQUIRED_MEMBER_NICKNAME(404, "REQUIRED_RECIPE_NAME", "닉네임은 필수 항목입니다."),
     REQUIRED_RECIPE_DELETE_YN(404, "RECIPE_TIME_SET_ERROR", "삭제 여부는 필수 항목입니다."),
+    INVALID_INGREDIENTS(404, "INVALID_INGREDIENTS", "재료가 유효하지 않습니다."),
 
     // DB 관련 에러
     REQUIRED_FIELD_NULL(404, "REQUIRED_FIELD_NULL", "필수 컬럼값이 존재하지 않습니다."),
@@ -48,7 +49,10 @@ public enum ErrorCode {
     // 외부 서비스 에러
     RECIPE_SERVICE_ERROR(500, "RECIPE_SERVICE_ERROR", "RECIPE 서비스 에러"),
     WRIGGLE_SERVICE_ERROR(500, "WRIGGLE_SERVICE_ERROR", "WRIGGLE 서비스 에러"),
-    CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러");
+    CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러"),
+
+
+    ;
 
 
     private final int status;

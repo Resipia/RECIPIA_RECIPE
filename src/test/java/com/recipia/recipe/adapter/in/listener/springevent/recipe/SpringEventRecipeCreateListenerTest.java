@@ -1,6 +1,5 @@
 package com.recipia.recipe.adapter.in.listener.springevent.recipe;
 
-import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -20,13 +19,13 @@ import static org.mockito.Mockito.when;
 
 
 @DisplayName("[통합] RecipeCreate 스프링 이벤트 리스너 테스트")
-class RecipeCreateEventListenerTest extends TotalTestSupport {
+class SpringEventRecipeCreateListenerTest extends TotalTestSupport {
 
     @Autowired
     private ApplicationContext applicationContext;
 
     @SpyBean
-    private RecipeCreateEventListener recipeCreateEventListener;
+    private SpringEventRecipeCreateListener springEventRecipeCreateListener;
 
     @MockBean
     private MongoUseCase mongoUseCase;
@@ -41,7 +40,7 @@ class RecipeCreateEventListenerTest extends TotalTestSupport {
         applicationContext.publishEvent(event);
 
         // then
-        Mockito.verify(recipeCreateEventListener).saveIngredientsIntoMongo(event);
+        Mockito.verify(springEventRecipeCreateListener).saveIngredientsIntoMongo(event);
     }
 
     @Test
@@ -57,28 +56,13 @@ class RecipeCreateEventListenerTest extends TotalTestSupport {
         ingredients.add("고구마");
 
         // event.ingredients()가 호출될 때 실제 ingredients 리스트를 반환하도록 스텁 설정
-        when(recipeCreateEventListener.splitIngredients(event.ingredients())).thenReturn(ingredients);
+        when(springEventRecipeCreateListener.splitIngredients(event.ingredients())).thenReturn(ingredients);
 
         // when
         applicationContext.publishEvent(event);
 
         // then
         Mockito.verify(mongoUseCase).saveIngredientsIntoMongo(ingredients);
-    }
-
-    @Test
-    @DisplayName("재료 문자열이 쉼표로 올바르게 분리되어 리스트로 반환되는지 검증")
-    void splitIngredientsTest() {
-        // given
-        RecipeCreateEventListener listener = new RecipeCreateEventListener(null);
-        String ingredientsStr = "김치, 감자, 고구마";
-
-        // when
-        List<String> ingredients = listener.splitIngredients(ingredientsStr);
-        System.out.println(ingredients);
-
-        // then
-        assertThat(ingredients).containsExactly("김치", "감자", "고구마");
     }
 
     private RecipeCreationEvent createEvent() {

@@ -3,6 +3,8 @@ package com.recipia.recipe.adapter.in.listener.springevent.recipe;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -19,23 +22,31 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RecipeCreateEventListener {
+public class SpringEventRecipeCreateListener {
 
     private final MongoUseCase mongoUseCase;
+    private final CreateRecipeUseCase createRecipeUseCase;
 
     /**
-     * MongoDB에 재료들을 저장한다.
+     * MongoDB에 재료를 저장하도록 하는 스프링 이벤트 리스너
+     * Optional.ofNullable을 사용하여 ingredients가 null이 아닌 경우에만 처리
      */
     @EventListener
     public void saveIngredientsIntoMongo(RecipeCreationEvent event) {
+        Optional.ofNullable(event.ingredients())
+                .filter(ingredients -> !ingredients.isBlank()) // 공백이 아닌 문자열에 대해서만 처리
+                .ifPresent(this::processIngredients);
+    }
 
+    /**
+     * 이 메서드가 호출되면 mongoDB에 재료 저장을 시도한다.
+     */
+    private void processIngredients(String ingredients) {
         // 1. 저장하기 전에 재료를 , 단위로 분리한다.
-        List<String> ingredients = splitIngredients(event.ingredients());
+        List<String> splitIngredients = splitIngredients(ingredients);
 
-        // 2.  저장을 시도한다.
-        mongoUseCase.saveIngredientsIntoMongo(ingredients);
-
-        log.info("데이터 저장 성공");
+        // 2. 저장을 시도한다.
+        mongoUseCase.saveIngredientsIntoMongo(splitIngredients);
     }
 
     /**
@@ -48,8 +59,7 @@ public class RecipeCreateEventListener {
 
     }
 
-
-    // 테스트를 용이하게 하기 위해 method로 분리 (모든 예외상황은 왠만하면 dto에서 valid로 처리)
+    // String타입의 재료를 , 단위로 분리하여 리스트로 만들어주는 작업을 한다.
     public List<String> splitIngredients(String ingredients) {
         return Arrays.stream(ingredients.split(","))
                 .map(String::trim)

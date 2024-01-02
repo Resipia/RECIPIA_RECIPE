@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecipeController {
 
     private final CreateRecipeUseCase createRecipeUseCase;
-
+    private final RecipeConverter converter;
 
     /**
      * 유저가 레시피 생성을 요청하는 컨트롤러
@@ -27,10 +27,8 @@ public class RecipeController {
     @PostMapping("/createRecipe")
     public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @RequestBody RecipeCreateRequestDto recipeCreateRequestDto) {
 
-
-        // dto를 domain으로 변환
-        Recipe recipe = RecipeConverter.requestDtoToDomain(recipeCreateRequestDto);
-        // domain내부에 jwt 클레임에있는
+        // dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
+        Recipe recipe = converter.requestDtoToDomain(recipeCreateRequestDto);
 
         Long savedRecipeId = createRecipeUseCase.createRecipe(recipe);
 

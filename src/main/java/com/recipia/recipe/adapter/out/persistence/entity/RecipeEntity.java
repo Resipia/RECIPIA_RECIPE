@@ -37,9 +37,6 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
     @Column(name = "hashtag", nullable = false)
     private String hashtag;
 
-    @Column(name = "nutritional_info", nullable = false)
-    private String nutritionalInfo;
-
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
@@ -47,7 +44,7 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
     private String delYn;
 
     @Builder
-    private RecipeEntity(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String nickname, String delYn) {
+    private RecipeEntity(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn) {
         this.id = id;
         this.memberId = memberId;
         this.recipeName = recipeName;
@@ -55,17 +52,21 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
         this.timeTaken = timeTaken;
         this.ingredient = ingredient;
         this.hashtag = hashtag;
-        this.nutritionalInfo = nutritionalInfo;
         this.nickname = nickname;
         this.delYn = delYn;
     }
 
-    public static RecipeEntity of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String nickname, String delYn) {
-        return new RecipeEntity(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
+    public static RecipeEntity of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn) {
+        return new RecipeEntity(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, delYn);
     }
 
-    public static RecipeEntity of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String nickname, String delYn) {
-        return new RecipeEntity(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
+    public static RecipeEntity of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn) {
+        return new RecipeEntity(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, delYn);
+    }
+
+
+    public static RecipeEntity of(Long id) {
+        return new RecipeEntity(id, null, null, null, null, null, null, null, null);
     }
 
     @Override

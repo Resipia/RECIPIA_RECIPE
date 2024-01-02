@@ -2,6 +2,8 @@ package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.application.port.out.MongoPort;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,12 @@ public class MongoService implements MongoUseCase {
      */
     @Override
     public void saveIngredientsIntoMongo(List<String> ingredients) {
+        // List는 Optional보다는 if문으로 분기처리하는게 낫다. Optional은 단일 객체에 대한 null을 다룰때 주로 사용한다.
+        if (ingredients == null || ingredients.isEmpty()) {
+            throw new RecipeApplicationException(ErrorCode.INVALID_INGREDIENTS);
+        }
         mongoPort.saveIngredientsIntoMongo(ingredients);
     }
+
 
 }

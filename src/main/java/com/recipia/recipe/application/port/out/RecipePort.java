@@ -15,4 +15,6 @@ public interface RecipePort {
 
     Long createRecipe(Recipe recipe);
 
+    Long createNutritionalInfo(Recipe recipe, Long savedRecipeId);
+
 }

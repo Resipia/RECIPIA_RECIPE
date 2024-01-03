@@ -17,8 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("[단위] 몽고 서비스 테스트")
@@ -107,5 +106,37 @@ class MongoServiceTest {
         assertThrows(DataAccessException.class,
                 () -> sut.saveIngredientsIntoMongo(ingredients));
     }
+
+    @DisplayName("[happy] 접두사로 재료를 검색하면 올바른 결과를 반환한다.")
+    @Test
+    void findIngredientsByPrefixTest() {
+        //given
+        String prefix = "김치";
+        List<String> mockResponse = Arrays.asList("김치", "김치가루");
+        when(mongoPort.findIngredientsByPrefix(prefix)).thenReturn(mockResponse);
+
+        //when
+        List<String> result = sut.findIngredientsByPrefix(prefix);
+
+        //then
+        verify(mongoPort).findIngredientsByPrefix(prefix);
+        Assertions.assertThat(result).isEqualTo(mockResponse);
+    }
+
+    @DisplayName("[bad] 비어있는 접두사로 재료를 검색할 경우 빈 목록을 반환한다.")
+    @Test
+    void findIngredientsByEmptyPrefixTest() {
+        //given
+        String prefix = "";
+        when(mongoPort.findIngredientsByPrefix(prefix)).thenReturn(Collections.emptyList());
+
+        //when
+        List<String> result = sut.findIngredientsByPrefix(prefix);
+
+        //then
+        verify(mongoPort).findIngredientsByPrefix(prefix);
+        Assertions.assertThat(result).isEmpty();
+    }
+
 
 }

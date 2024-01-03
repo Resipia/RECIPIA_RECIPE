@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
+import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.adapter.out.persistence.document.HashtagDocument;
 import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -380,10 +381,10 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithKoreanPrefix() {
         // given
-        String koreanPrefix = "김치";
+        SearchRequestDto dto = SearchRequestDto.of("김치", 10);
 
         // when
-        List<String> result = sut.findIngredientsByPrefix(koreanPrefix);
+        List<String> result = sut.findIngredientsByPrefix(dto);
 
         // then
         assertNotNull(result);
@@ -398,25 +399,25 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithEnglishPrefix() {
         // given
-        String englishPrefix = "ca";
+        SearchRequestDto dto = SearchRequestDto.of("ca", 10);
 
         // when
-        List<String> result = sut.findIngredientsByPrefix(englishPrefix);
+        List<String> result = sut.findIngredientsByPrefix(dto);
 
         // then
         assertNotNull(result);
         assertFalse(result.isEmpty());
-        assertTrue(result.stream().allMatch(ingredient -> ingredient.toLowerCase().contains(englishPrefix.toLowerCase())));
+        assertTrue(result.stream().allMatch(ingredient -> ingredient.toLowerCase().contains(dto.getSearchWord().toLowerCase())));
     }
 
     @DisplayName("[happy] 존재하지 않는 접두사로 재료를 검색하면 빈 목록이 반환된다.")
     @Test
     void testFindIngredientsWithNonexistentPrefix() {
         // given
-        String nonexistentPrefix = "zzzk";
+        SearchRequestDto dto = SearchRequestDto.of("zzzk", 10);
 
         // when
-        List<String> result = sut.findIngredientsByPrefix(nonexistentPrefix);
+        List<String> result = sut.findIngredientsByPrefix(dto);
 
         // then
         assertNotNull(result);
@@ -427,10 +428,10 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithNoPrefix() {
         // given
-        String noPrefix = "";
+        SearchRequestDto dto = SearchRequestDto.of("", 10);
 
         // when
-        List<String> result = sut.findIngredientsByPrefix(noPrefix);
+        List<String> result = sut.findIngredientsByPrefix(dto);
 
         // then
         assertNotNull(result);

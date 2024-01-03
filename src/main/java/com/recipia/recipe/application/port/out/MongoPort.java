@@ -1,5 +1,7 @@
 package com.recipia.recipe.application.port.out;
 
+import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
+
 import java.util.List;
 
 public interface MongoPort {
@@ -8,5 +10,5 @@ public interface MongoPort {
 
     Long saveHashTagsIntoMongo(List<String> newHashtags);
 
-    List<String> findIngredientsByPrefix(String prefix);
+    List<String> findIngredientsByPrefix(SearchRequestDto searchRequestDto);
 }

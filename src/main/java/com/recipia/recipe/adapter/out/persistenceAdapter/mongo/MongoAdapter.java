@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
+import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.adapter.out.persistence.document.HashtagDocument;
 import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
 import com.recipia.recipe.application.port.out.MongoPort;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Adapter 클래스는 port 인터페이스를 구현한다.
@@ -79,13 +79,15 @@ public class MongoAdapter implements MongoPort {
     /**
      * 유저가 검색에 입력한 접두사를 기준으로 10개의 단어를 반환한다.
      */
-    public List<String> findIngredientsByPrefix(String prefix) {
+    public List<String> findIngredientsByPrefix(SearchRequestDto searchRequestDto) {
+
+        String searchWord = searchRequestDto.getSearchWord();
         // 접두사가 비어 있는 경우 빈 목록 반환
-        if (prefix == null || prefix.isEmpty()) {
+        if (searchWord == null || searchWord.isEmpty()) {
             return Collections.emptyList();
         }
 
-        String regexPattern = (containsKorean(prefix) ? "^" + prefix : "^" + prefix + "[A-Za-z]*");
+        String regexPattern = (containsKorean(searchWord) ? "^" + searchWord : "^" + searchWord + "[A-Za-z]*");
 
         // Aggregation pipeline 구성
         Aggregation aggregation = Aggregation.newAggregation(
@@ -93,7 +95,7 @@ public class MongoAdapter implements MongoPort {
                 Aggregation.unwind("ingredients"),
                 Aggregation.match(Criteria.where("ingredients").regex(regexPattern, "i")),
                 Aggregation.project("ingredients"),
-                Aggregation.limit(10)
+                Aggregation.limit(searchRequestDto.getResultSize())
         );
 
         // Aggregation 실행
@@ -104,15 +106,14 @@ public class MongoAdapter implements MongoPort {
     }
 
 
-
     /**
      * 만약 사용자가 입력한 문자열이 짧다면, 반복문의 비용은 무시할 수 있을 정도로 작으며,
      * 이는 MongoDB 검색 최적화를 통해 얻는 성능 이점에 비하면 미미한 수준이다.
      */
-    private boolean containsKorean(String text) {
+    private boolean containsKorean(String searchWord) {
         // 한글 문자 범위를 확인한다 (가-힣).
-        for (int i = 0; i < text.length(); i++) {
-            char ch = text.charAt(i);
+        for (int i = 0; i < searchWord.length(); i++) {
+            char ch = searchWord.charAt(i);
             if (ch >= '\uAC00' && ch <= '\uD7AF') {
                 return true;
             }

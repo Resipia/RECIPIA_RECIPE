@@ -31,8 +31,8 @@ class SpringEventRecipeCreateListenerTest extends TotalTestSupport {
     private MongoUseCase mongoUseCase;
 
     @Test
-    @DisplayName("레시피 생성 이벤트 발행시 리스너가 반응하여 동작하는지를 검증한다.")
-    void whenEventPublished_thenEventListenerIsTriggered() {
+    @DisplayName("레시피 생성 이벤트 발행시 재료 저장 스프링 리스너의 동작여부를 검증한다.")
+    void saveIngredientsIntoMongo() {
         // given
         RecipeCreationEvent event = createEvent();
 
@@ -44,8 +44,21 @@ class SpringEventRecipeCreateListenerTest extends TotalTestSupport {
     }
 
     @Test
+    @DisplayName("레시피 생성 이벤트 발행시 해시태그 저장 스프링 리스너의 동작여부를 검증한다.")
+    void saveHashtagsIntoMongo() {
+        // given
+        RecipeCreationEvent event = createEvent();
+
+        // when
+        applicationContext.publishEvent(event);
+
+        // then
+        Mockito.verify(springEventRecipeCreateListener).saveHashtagsIntoMongo(event);
+    }
+
+    @Test
     @DisplayName("레시피 생성 이벤트 발행시 리스너 메서드가 호출되고 그 내부의 재료를 저장하는 로직이 호출된다.")
-    void whenRecipeCreationEventPublished_thenTriggerEventListenerMethods() {
+    void saveIngredientsIntoMongoCalled() {
         // given
         RecipeCreationEvent event = createEvent();
 
@@ -56,7 +69,7 @@ class SpringEventRecipeCreateListenerTest extends TotalTestSupport {
         ingredients.add("고구마");
 
         // event.ingredients()가 호출될 때 실제 ingredients 리스트를 반환하도록 스텁 설정
-        when(springEventRecipeCreateListener.splitIngredients(event.ingredients())).thenReturn(ingredients);
+        when(springEventRecipeCreateListener.splitData(event.ingredients())).thenReturn(ingredients);
 
         // when
         applicationContext.publishEvent(event);
@@ -65,8 +78,30 @@ class SpringEventRecipeCreateListenerTest extends TotalTestSupport {
         Mockito.verify(mongoUseCase).saveIngredientsIntoMongo(ingredients);
     }
 
+    @Test
+    @DisplayName("레시피 생성 이벤트 발행시 리스너 메서드가 호출되고 그 내부의 해시태그를 저장하는 로직이 호출된다.")
+    void saveHashtagsIntoMongoCalled() {
+        // given
+        RecipeCreationEvent event = createEvent();
+
+        // 실제 ArrayList<String> 인스턴스를 생성
+        List<String> hashtags = new ArrayList<>();
+        hashtags.add("#해시태그1");
+        hashtags.add("#해시태그2");
+        hashtags.add("#해시태그3");
+
+        // event.hashtags()가 호출될 때 실제 hashtags 리스트를 반환하도록 스텁 설정
+        when(springEventRecipeCreateListener.splitData(event.hashtags())).thenReturn(hashtags);
+
+        // when
+        applicationContext.publishEvent(event);
+
+        // then
+        Mockito.verify(mongoUseCase).saveHashtagsIntoMongo(hashtags);
+    }
+
     private RecipeCreationEvent createEvent() {
-        return new RecipeCreationEvent("김치, 감자, 고구마", "해시태그");
+        return new RecipeCreationEvent("김치, 감자, 고구마", "#해시태그1, #해시태그2, #해시태그3");
     }
 
 }

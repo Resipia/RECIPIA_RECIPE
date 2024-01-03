@@ -6,4 +6,5 @@ public interface MongoPort {
 
     Long saveIngredientsIntoMongo(List<String> newIngredients);
 
+    Long saveHashTagsIntoMongo(List<String> newHashtags);
 }

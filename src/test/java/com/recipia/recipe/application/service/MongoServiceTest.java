@@ -43,7 +43,7 @@ class MongoServiceTest {
         verify(mongoPort).saveIngredientsIntoMongo(ingredients);
     }
 
-    @DisplayName("비어있는 재료 리스트 저장 시 예외가 발생한다.")
+    @DisplayName("비어있는 재료 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveEmptyIngredientsIntoMongo() {
         //given
@@ -56,7 +56,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_INGREDIENTS);
     }
 
-    @DisplayName("null 재료 리스트 저장 시 예외가 발생한다.")
+    @DisplayName("null인 재료 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveNullIngredientsIntoMongo() {
         //given
@@ -67,6 +67,32 @@ class MongoServiceTest {
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("재료가 유효하지 않습니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_INGREDIENTS);
+    }
+
+    @DisplayName("비어있는 해시태그 리스트를 저장할 시 예외가 발생한다.")
+    @Test
+    void saveEmptyHashtagsIntoMongo() {
+        //given
+        List<String> emptyHashtags = Collections.emptyList();
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.saveHashtagsIntoMongo(emptyHashtags))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("해시태그가 유효하지 않습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_HASHTAGS);
+    }
+
+    @DisplayName("null인 해시태그 리스트를 저장할 시 예외가 발생한다.")
+    @Test
+    void saveNullHashtagsIntoMongo() {
+        //given
+        List<String> emptyHashtags = null;
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.saveHashtagsIntoMongo(emptyHashtags))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("해시태그가 유효하지 않습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_HASHTAGS);
     }
 
     @DisplayName("MongoPort 호출 중 DataAccessException 발생 시, 예외가 적절히 처리되는지 확인")

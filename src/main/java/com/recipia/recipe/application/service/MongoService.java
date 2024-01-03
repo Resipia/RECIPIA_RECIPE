@@ -30,5 +30,14 @@ public class MongoService implements MongoUseCase {
         mongoPort.saveIngredientsIntoMongo(ingredients);
     }
 
+    @Override
+    public void saveHashtagsIntoMongo(List<String> hashtags) {
+        // List는 Optional보다는 if문으로 분기처리하는게 낫다. Optional은 단일 객체에 대한 null을 다룰때 주로 사용한다.
+        if (hashtags == null || hashtags.isEmpty()) {
+            throw new RecipeApplicationException(ErrorCode.INVALID_HASHTAGS);
+        }
+        mongoPort.saveHashTagsIntoMongo(hashtags);
+    }
+
 
 }

@@ -39,5 +39,13 @@ public class MongoService implements MongoUseCase {
         mongoPort.saveHashTagsIntoMongo(hashtags);
     }
 
+    /**
+     * mongoDB에서 재료 검색을 하는 기능
+     */
+    @Override
+    public List<String> findIngredientsByPrefix(String prefix) {
+        return mongoPort.findIngredientsByPrefix(prefix);
+    }
+
 
 }

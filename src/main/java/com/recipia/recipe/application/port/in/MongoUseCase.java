@@ -9,4 +9,6 @@ public interface MongoUseCase {
 
     void saveHashtagsIntoMongo(List<String> hashtags);
 
+    List<String> findIngredientsByPrefix(String prefix);
+
 }

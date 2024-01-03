@@ -7,8 +7,12 @@ import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.SubCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * domain, entity, dto 서로간의 의존성을 제거하기 위해 Converter 클래스를 작성
@@ -32,7 +36,8 @@ public class RecipeConverter {
                 entity.getTimeTaken(),
                 entity.getIngredient(),
                 entity.getHashtag(),
-                null, // fixme: 확인해보기
+                null, // fixme: 영양소
+                null, // subCategory
                 entity.getNickname(),
                 entity.getDelYn()
         );
@@ -92,6 +97,10 @@ public class RecipeConverter {
                         dto.getNutritionalInfo().getVitamins(),
                         dto.getNutritionalInfo().getMinerals()
                 ),
+                dto.getSubCategoryList()
+                        .stream()
+                        .map(SubCategory::of)
+                        .collect(Collectors.toList()),
                 securityUtil.getCurrentMemberNickname(),
                 "N" // todo: 하드코딩 맞는지 알아보기
         );

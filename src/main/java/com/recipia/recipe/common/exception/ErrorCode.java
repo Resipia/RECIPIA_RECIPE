@@ -25,6 +25,7 @@ public enum ErrorCode {
     REQUIRED_MEMBER_NICKNAME(404, "REQUIRED_RECIPE_NAME", "닉네임은 필수 항목입니다."),
     REQUIRED_RECIPE_DELETE_YN(404, "RECIPE_TIME_SET_ERROR", "삭제 여부는 필수 항목입니다."),
     INVALID_INGREDIENTS(404, "INVALID_INGREDIENTS", "재료가 유효하지 않습니다."),
+    INVALID_HASHTAGS(404, "INVALID_HASHTAGS", "해시태그가 유효하지 않습니다."),
 
     // DB 관련 에러
     REQUIRED_FIELD_NULL(404, "REQUIRED_FIELD_NULL", "필수 컬럼값이 존재하지 않습니다."),

@@ -2,6 +2,7 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -9,18 +10,17 @@ import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.SubCategory;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("[통합] 레시피 Adapter 테스트")
 class RecipeAdapterTest extends TotalTestSupport {
@@ -33,6 +33,9 @@ class RecipeAdapterTest extends TotalTestSupport {
 
     @Autowired
     private NutritionalInfoRepository nutritionalInfoRepository;
+
+    @Autowired
+    private RecipeCategoryMapRepository recipeCategoryMapRepository;
 
 
     @DisplayName("[happy] 유저가 닉네임을 변경하면 레시피 엔티티 내부의 유저 닉네임도 변경된다.")
@@ -59,7 +62,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         NicknameDto nicknameDto = NicknameDto.of(100L, "NotValidNickname");
 
         //when & then
-        Assertions.assertThatThrownBy(() -> sut.updateRecipesNicknames(nicknameDto))
+        assertThatThrownBy(() -> sut.updateRecipesNicknames(nicknameDto))
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("유저를 찾을 수 없습니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
@@ -70,7 +73,7 @@ class RecipeAdapterTest extends TotalTestSupport {
     @Test
     public void createRecipe() {
         //given
-        Recipe domain = createRecipeDomain(1L);
+        Recipe domain = createRecipeDomain(1L, List.of(SubCategory.of(1L), SubCategory.of(2L)));
 
         //when
         Long recipeId = sut.createRecipe(domain);
@@ -85,7 +88,7 @@ class RecipeAdapterTest extends TotalTestSupport {
     @Test
     public void createNutritionalInfo() {
         // given
-        Recipe domain = createRecipeDomain(1L);
+        Recipe domain = createRecipeDomain(1L, List.of(SubCategory.of(1L), SubCategory.of(2L)));
         Long recipeId = sut.createRecipe(domain);
 
         // when
@@ -95,6 +98,61 @@ class RecipeAdapterTest extends TotalTestSupport {
         assertThat(nutritionalInfoId).isNotNull();
         Optional<NutritionalInfoEntity> savedNutritionalInfo = nutritionalInfoRepository.findById(nutritionalInfoId);
         assertThat(savedNutritionalInfo.isPresent()).isTrue();
+    }
+
+    @DisplayName("[happy] 카테고리 저장을 시도하면 성공한다.")
+    @Test
+    void createRecipeCategoryMap() {
+        //given
+        Recipe domain = createRecipeDomain(1L, List.of(SubCategory.of(1L), SubCategory.of(2L)));
+        Long recipeId = sut.createRecipe(domain);
+
+        //when
+        sut.createRecipeCategoryMap(domain, recipeId);
+
+        //then
+        List<RecipeCategoryMapEntity> result = recipeCategoryMapRepository.findAll();
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @DisplayName("[bad] 카테고리 리스트가 null이라면 예외가 발생한다.")
+    @Test
+    void createRecipeCategoryMapExceptionNull() {
+        //given
+        Recipe domain = createRecipeDomain(1L, null);
+        Long recipeId = sut.createRecipe(domain);
+
+        //when & then
+        assertThatThrownBy(() -> sut.createRecipeCategoryMap(domain, recipeId))
+                .hasMessageContaining("카테고리는 null이거나 공백이어서는 안됩니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.CATEGORY_NOT_VALID);
+    }
+
+    @DisplayName("[bad] 카테고리 리스트가 비어있다면 비어있다면 예외가 발생한다.")
+    @Test
+    void createRecipeCategoryMapExceptionEmpty() {
+        //given
+        Recipe domain = createRecipeDomain(1L, Collections.EMPTY_LIST);
+        Long recipeId = sut.createRecipe(domain);
+
+        //when & then
+        assertThatThrownBy(() -> sut.createRecipeCategoryMap(domain, recipeId))
+                .hasMessageContaining("카테고리는 null이거나 공백이어서는 안됩니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.CATEGORY_NOT_VALID);
+    }
+
+    @DisplayName("[bad] 존재하지 않는 카테고리 저장을 시도하면 예외가 발생한다.")
+    @Test
+    void createRecipeCategoryMapException() {
+        //given
+        Recipe domain = createRecipeDomain(1L, List.of(SubCategory.of(50L)));
+        Long recipeId = sut.createRecipe(domain);
+
+        //when & then
+        assertThatThrownBy(() -> sut.createRecipeCategoryMap(domain, recipeId))
+                .hasMessageContaining("존재하지 않는 카테고리입니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.CATEGORY_NOT_FOUND);
     }
 
     private RecipeEntity createRecipeEntity() {
@@ -123,7 +181,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         );
     }
 
-    private Recipe createRecipeDomain(long memberId) {
+    private Recipe createRecipeDomain(long memberId, List<SubCategory> subCategory) {
         return Recipe.of(
                 memberId,
                 "레시피",
@@ -132,7 +190,7 @@ class RecipeAdapterTest extends TotalTestSupport {
                 "닭",
                 "#진안",
                 NutritionalInfo.of(10, 10, 10, 10, 10),
-                List.of(SubCategory.of(1L), SubCategory.of(2L)),
+                subCategory,
                 "진안",
                 "N"
         );

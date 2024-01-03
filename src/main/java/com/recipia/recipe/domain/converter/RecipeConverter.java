@@ -3,7 +3,9 @@ package com.recipia.recipe.domain.converter;
 import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.SubCategoryEntity;
 import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
@@ -74,6 +76,17 @@ public class RecipeConverter {
                 nutritionalInfo.getVitamins(),
                 nutritionalInfo.getMinerals(),
                 RecipeEntity.of(domain.getId())
+        );
+    }
+
+    /**
+     * Recipe 도메인 내부의 영양소 도메인을 엔티티로 변환하는 로직
+     * 레시피 엔티티에는 저장할때 꼭 필요한 pk값인 id만 필드로 하여 저장해 준다.(최적화)
+     */
+    public RecipeCategoryMapEntity domainToRecipeCategoryMapEntity(Recipe recipe, SubCategory subCategory) {
+        return RecipeCategoryMapEntity.of(
+                RecipeEntity.of(recipe.getId()),
+                SubCategoryEntity.of(subCategory.getId())
         );
     }
 

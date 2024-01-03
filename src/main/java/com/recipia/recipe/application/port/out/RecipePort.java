@@ -17,4 +17,5 @@ public interface RecipePort {
 
     Long createNutritionalInfo(Recipe recipe, Long savedRecipeId);
 
+    void createRecipeCategoryMap(Recipe recipe, Long savedRecipeId);
 }

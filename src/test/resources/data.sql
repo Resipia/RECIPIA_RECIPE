@@ -20,3 +20,44 @@ VALUES (1, '김치찌개', '매콤한 김치찌개 레시피', 30, '김치, 돼�
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'N'),
        (8, '죽', '몸에 좋은 죽 끓이기', 35, '쌀, 야채, 해산물', '#죽', '수아',
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'N');
+
+
+INSERT INTO category (category_nm, sort_no, del_yn, create_dttm, update_dttm)
+VALUES ('한식', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('중식', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('일식', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('양식', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+-- 한식 서브 카테고리 추가
+INSERT INTO sub_category (category_id, sub_category_nm, sort_no, del_yn, create_dttm, update_dttm)
+VALUES (1, '김치찌개', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (1, '된장찌개', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (1, '비빔밥', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (1, '불고기', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 추가적인 한식 서브 카테고리 ...
+
+-- 중식 서브 카테고리 추가
+INSERT INTO sub_category (category_id, sub_category_nm, sort_no, del_yn, create_dttm, update_dttm)
+VALUES (2, '짜장면', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (2, '짬뽕', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (2, '마파두부', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (2, '꿔바로우', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 추가적인 중식 서브 카테고리 ...
+
+-- 일식 서브 카테고리 추가
+INSERT INTO sub_category (category_id, sub_category_nm, sort_no, del_yn, create_dttm, update_dttm)
+VALUES (3, '초밥', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (3, '라멘', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (3, '돈부리', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (3, '우동', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 추가적인 일식 서브 카테고리 ...
+
+-- 양식 서브 카테고리 추가
+INSERT INTO sub_category (category_id, sub_category_nm, sort_no, del_yn, create_dttm, update_dttm)
+VALUES (4, '파스타', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (4, '스테이크', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (4, '피자', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (4, '샐러드', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- 추가적인 양식 서브 카테고리 ...
+

@@ -9,6 +9,7 @@ import com.recipia.recipe.config.TestJwtConfig;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.SubCategory;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -66,6 +69,7 @@ class RecipeControllerTest extends TotalTestSupport {
                 "닭",
                 "#진안",
                 NutritionalInfo.of(10,10,10,10,10),
+                List.of(SubCategory.of(1L), SubCategory.of(2L)),
                 "진안",
                 "N"
         );

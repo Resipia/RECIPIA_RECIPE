@@ -8,6 +8,7 @@ import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.SubCategory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -129,7 +131,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 20,
                 "닭",
                 "#진안",
-                NutritionalInfo.of(10,10,10,10,10),
+                NutritionalInfo.of(10, 10, 10, 10, 10),
+                List.of(SubCategory.of(1L), SubCategory.of(2L)),
                 "진안",
                 "N"
         );

@@ -57,7 +57,7 @@ public class RecipeCreateRequestDto {
      * 테스트용
      */
     public static RecipeCreateRequestDto of(String recipeName, String recipeDesc) {
-        return new RecipeCreateRequestDto(recipeName, recipeDesc, null, null, null, null, null);
+        return new RecipeCreateRequestDto(recipeName, recipeDesc, null, null, null, null, List.of(1L));
     }
 
 }

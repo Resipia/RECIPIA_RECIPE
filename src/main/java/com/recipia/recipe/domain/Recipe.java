@@ -1,10 +1,13 @@
 package com.recipia.recipe.domain;
 
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.SubCategoryEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * Recipe 엔티티에 대한 도메인 객체이다.
@@ -22,11 +25,12 @@ public class Recipe {
     private String ingredient;   // 재료
     private String hashtag;      // 해시태그
     private NutritionalInfo nutritionalInfo;   // 영양소 도메인
+    private List<SubCategory> subCategory; // 맵핑된 서브 카테고리 도메인
     private String nickname;     // 회원 닉네임
     private String delYn;        // 레시피 삭제여부
 
     @Builder
-    private Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, String nickname, String delYn) {
+    public Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn) {
         this.id = id;
         this.memberId = memberId;
         this.recipeName = recipeName;
@@ -35,17 +39,19 @@ public class Recipe {
         this.ingredient = ingredient;
         this.hashtag = hashtag;
         this.nutritionalInfo = nutritionalInfo;
+        this.subCategory = subCategory;
         this.nickname = nickname;
         this.delYn = delYn;
     }
 
+
     // factory method 선언
-    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, String nickname, String delYn) {
-        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
+    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn) {
+        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, delYn);
     }
 
-    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, String nickname, String delYn) {
-        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, nickname, delYn);
+    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn) {
+        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, delYn);
     }
 
     public void change(Long memberId, String nickname) {

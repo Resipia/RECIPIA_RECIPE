@@ -1,5 +1,6 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.application.port.out.MongoPort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -111,15 +112,15 @@ class MongoServiceTest {
     @Test
     void findIngredientsByPrefixTest() {
         //given
-        String prefix = "김치";
+        SearchRequestDto dto = SearchRequestDto.of("김치", 10);
         List<String> mockResponse = Arrays.asList("김치", "김치가루");
-        when(mongoPort.findIngredientsByPrefix(prefix)).thenReturn(mockResponse);
+        when(mongoPort.findIngredientsByPrefix(dto)).thenReturn(mockResponse);
 
         //when
-        List<String> result = sut.findIngredientsByPrefix(prefix);
+        List<String> result = sut.findIngredientsByPrefix(dto);
 
         //then
-        verify(mongoPort).findIngredientsByPrefix(prefix);
+        verify(mongoPort).findIngredientsByPrefix(dto);
         Assertions.assertThat(result).isEqualTo(mockResponse);
     }
 
@@ -127,14 +128,14 @@ class MongoServiceTest {
     @Test
     void findIngredientsByEmptyPrefixTest() {
         //given
-        String prefix = "";
-        when(mongoPort.findIngredientsByPrefix(prefix)).thenReturn(Collections.emptyList());
+        SearchRequestDto dto = SearchRequestDto.of("", 10);
+        when(mongoPort.findIngredientsByPrefix(dto)).thenReturn(Collections.emptyList());
 
         //when
-        List<String> result = sut.findIngredientsByPrefix(prefix);
+        List<String> result = sut.findIngredientsByPrefix(dto);
 
         //then
-        verify(mongoPort).findIngredientsByPrefix(prefix);
+        verify(mongoPort).findIngredientsByPrefix(dto);
         Assertions.assertThat(result).isEmpty();
     }
 

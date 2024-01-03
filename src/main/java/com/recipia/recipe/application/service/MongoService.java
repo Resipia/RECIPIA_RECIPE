@@ -1,5 +1,6 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.application.port.out.MongoPort;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -43,8 +44,21 @@ public class MongoService implements MongoUseCase {
      * mongoDB에서 재료 검색을 하는 기능
      */
     @Override
-    public List<String> findIngredientsByPrefix(String prefix) {
-        return mongoPort.findIngredientsByPrefix(prefix);
+    public List<String> findIngredientsByPrefix(SearchRequestDto searchRequestDto) {
+        String condition = searchRequestDto.getCondition();
+        if (condition == "all") {
+            // todo: 재료에서 5개 검색
+            return mongoPort.findIngredientsByPrefix(searchRequestDto);
+            // todo: 해시태그에서 5개 검색
+
+            // todo: 두개의 응답을 합치기
+        } else if (condition == "ingredients") {
+            // todo: 이걸 추후 재료 검색으로 변경
+            return mongoPort.findIngredientsByPrefix(searchRequestDto);
+        } else {
+            // todo: 이걸 추후 해시태그 검색으로 변경
+            return mongoPort.findIngredientsByPrefix(searchRequestDto);
+        }
     }
 
 

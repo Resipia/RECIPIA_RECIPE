@@ -27,7 +27,7 @@ public class RecipeCreateRequestDto {
     @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "재료는 '재료1, 재료2, 재료3' 형식으로 입력해야 합니다.")
     private String ingredient;   // 재료
 
-    @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "해시태그는 '#해시태그1, #해시태그2, #해시태그3' 형식으로 입력해야 합니다.")
+    @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "해시태그는 '해시태그1, 해시태그2, 해시태그3' 형식으로 입력해야 합니다.")
     private String hashtag;      // 해시태그
 
     private NutritionalInfoDto nutritionalInfo;   // 영양소 dto

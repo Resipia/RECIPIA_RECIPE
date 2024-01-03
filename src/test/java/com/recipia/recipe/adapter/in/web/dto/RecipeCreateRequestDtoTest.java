@@ -192,16 +192,102 @@ class RecipeCreateRequestDtoTest {
         assertThat(violations).hasSize(1);
     }
 
-//    @Test
-//    @DisplayName("[bad] 해시태그에 특수문자가 입력되어 들어오면 예외를 발생시킨다.")
-//    void notValidSpecialWordHashtag() {
-//        RecipeRequestDto dto = hashTagSpecialWord("닭갈비", "젤 맛난 닭갈비", "밥###");
-//
-//        Set<ConstraintViolation<RecipeRequestDto>> violations = validator.validate(dto);
-//
-//        assertThat(violations).isNotEmpty();
-//        assertThat(violations).hasSize(1); // 두 필드 모두 유효성 검사에 실패했으므로
-//    }
+    @Test
+    @DisplayName("[happy] [해시태그,(공백)] 구조로 데이터가 들어오면 사용 가능하다. ex(재료1, 재료2, 재료3)")
+    void multipleHashtagStruct() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", "해시태그1, 해시태그2, 해시태그3");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    @DisplayName("[happy] 해시태그는 한개만 입력해도 된다.")
+    void singleHashtags() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", "해시태그1");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    @DisplayName("[bad] 해시태그를 한개만 입력했지만 특수문자를 넣었다면 예외가 발생한다.")
+    void hashtagsWithSpecialChar() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", "해시태그1#");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("[bad] 재료를 한개만 입력했지만 뒤에 공백을 넣었다면 오류가 발생한다.")
+    void hashtagsWithTrailingSpace() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", "해시태그1 ");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("[bad] 재료를 한개만 입력했지만 앞에 공백을 넣었다면 오류가 발생한다.")
+    void hashtagsWithLeadingSpace() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", " 해시태그1");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("[bad] 재료가 [재료명,(공백)] 패턴을 어겼다면 예외가 발생한다.")
+    void incorrectHashtagsFormat() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", "해시태그1,  해시태그2   , 해시태그3");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("[bad] 재료에 특수문자가 들어있다면 예외를 발생시킨다.")
+    void hashtagsWithSpecialCharAll() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", "####해시태그1");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1); // 두 필드 모두 유효성 검사에 실패했으므로
+    }
+
+    @Test
+    @DisplayName("[bad] 재료 맨 마지막에 ,가 존재하면 예외가 발생한다.")
+    void hashtagsWithTrailingComma() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", "해시태그1, 해시태그2, 해시태그3,");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("[bad] 재료 맨 마지막에 공백이 존재하면 예외가 발생한다.")
+    void hashtagsWithTrailingSpaceAll() {
+        RecipeCreateRequestDto dto = createRecipeWithHashtag("닭갈비", "젤 맛난 닭갈비", "해시태그1, 해시태그2, 해시태그3 ");
+
+        Set<ConstraintViolation<RecipeCreateRequestDto>> violations = validator.validate(dto);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(1);
+    }
 
     @Test
     @DisplayName("[happy] 모든 유효성 검사를 통과하는 경우")

@@ -53,7 +53,7 @@ class MongoAdapterTest extends TotalTestSupport {
     void setUp() {
         Query query = new Query(Criteria.where("id").is(documentId));
 
-        List<String> initialIngredients = Arrays.asList("김치", "파", "감자");
+        List<String> initialIngredients = Arrays.asList("김치", "파", "김", "김가루", "김밥", "김빱", "감자", "ca", "zzz");
         Update update1 = new Update().addToSet("ingredients").each(initialIngredients.toArray());
         mongoTemplate.upsert(query, update1, IngredientDocument.class);
 
@@ -70,7 +70,7 @@ class MongoAdapterTest extends TotalTestSupport {
     void tearDown() {
         Query query = new Query(Criteria.where("id").is(documentId));
 
-        List<String> newIngredients = Arrays.asList("김치", "파", "감자", "소고기", "돼지고기", "고구마", "양상추", "호박");
+        List<String> newIngredients = Arrays.asList("김치", "파", "김", "김가루", "김밥", "김빱", "감자", "소고기", "돼지고기", "고구마", "양상추", "호박", "ca", "zzz");
         Update update1 = new Update().pullAll("ingredients", newIngredients.toArray());
         mongoTemplate.updateFirst(query, update1, IngredientDocument.class);
 
@@ -375,5 +375,68 @@ class MongoAdapterTest extends TotalTestSupport {
             sut.saveDataIntoMongo(dataType, newData);
         });
     }
+
+    @DisplayName("[happy] 한글 접두사로 재료를 검색하면 해당하는 재료가 반환된다.")
+    @Test
+    void testFindIngredientsWithKoreanPrefix() {
+        // given
+        String koreanPrefix = "김치";
+
+        // when
+        List<String> result = sut.findIngredientsByPrefix(koreanPrefix);
+
+        // then
+        assertNotNull(result);
+        List<String> validIngredients = Arrays.asList("김치", "김", "김가루", "김밥", "김빱");
+
+        assertTrue(result.stream().allMatch(ingredient ->
+                validIngredients.stream().anyMatch(ingredient::contains)));
+
+    }
+
+    @DisplayName("[happy] 영문 접두사로 재료를 검색하면 해당하는 재료가 반환된다.")
+    @Test
+    void testFindIngredientsWithEnglishPrefix() {
+        // given
+        String englishPrefix = "ca";
+
+        // when
+        List<String> result = sut.findIngredientsByPrefix(englishPrefix);
+
+        // then
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertTrue(result.stream().allMatch(ingredient -> ingredient.toLowerCase().contains(englishPrefix.toLowerCase())));
+    }
+
+    @DisplayName("[happy] 존재하지 않는 접두사로 재료를 검색하면 빈 목록이 반환된다.")
+    @Test
+    void testFindIngredientsWithNonexistentPrefix() {
+        // given
+        String nonexistentPrefix = "zzzk";
+
+        // when
+        List<String> result = sut.findIngredientsByPrefix(nonexistentPrefix);
+
+        // then
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @DisplayName("[bad] 접두사가 없는 경우 빈 목록이 반환된다.")
+    @Test
+    void testFindIngredientsWithNoPrefix() {
+        // given
+        String noPrefix = "";
+
+        // when
+        List<String> result = sut.findIngredientsByPrefix(noPrefix);
+
+        // then
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+
 
 }

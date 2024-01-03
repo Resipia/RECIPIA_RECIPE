@@ -9,12 +9,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Adapter 클래스는 port 인터페이스를 구현한다.
@@ -71,5 +75,50 @@ public class MongoAdapter implements MongoPort {
         // 적절한 dataType이 없는 경우
         throw new RecipeApplicationException(ErrorCode.MONGO_DB_UPDATED_FAIL);
     }
+
+    /**
+     * 유저가 검색에 입력한 접두사를 기준으로 10개의 단어를 반환한다.
+     */
+    public List<String> findIngredientsByPrefix(String prefix) {
+        // 접두사가 비어 있는 경우 빈 목록 반환
+        if (prefix == null || prefix.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String regexPattern = (containsKorean(prefix) ? "^" + prefix : "^" + prefix + "[A-Za-z]*");
+
+        // Aggregation pipeline 구성
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("id").is(documentId)),
+                Aggregation.unwind("ingredients"),
+                Aggregation.match(Criteria.where("ingredients").regex(regexPattern, "i")),
+                Aggregation.project("ingredients"),
+                Aggregation.limit(10)
+        );
+
+        // Aggregation 실행
+        AggregationResults<String> results = mongoTemplate.aggregate(aggregation, IngredientDocument.class, String.class);
+
+        // 결과 반환
+        return results.getMappedResults();
+    }
+
+
+
+    /**
+     * 만약 사용자가 입력한 문자열이 짧다면, 반복문의 비용은 무시할 수 있을 정도로 작으며,
+     * 이는 MongoDB 검색 최적화를 통해 얻는 성능 이점에 비하면 미미한 수준이다.
+     */
+    private boolean containsKorean(String text) {
+        // 한글 문자 범위를 확인한다 (가-힣).
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (ch >= '\uAC00' && ch <= '\uD7AF') {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

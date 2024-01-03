@@ -4,6 +4,7 @@ import com.recipia.recipe.adapter.out.persistence.entity.auditingfield.UpdateDat
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @ToString(callSuper = true)

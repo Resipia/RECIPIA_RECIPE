@@ -7,6 +7,7 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -307,6 +308,7 @@ class RecipeCreateRequestDtoTest {
                 .recipeName(recipe)
                 .recipeDesc(recipeDesc)
                 .ingredient(ingredients)
+                .subCategoryList(List.of(1L))
                 .build();
     }
 
@@ -316,6 +318,7 @@ class RecipeCreateRequestDtoTest {
                 .recipeName(recipe)
                 .recipeDesc(recipeDesc)
                 .hashtag(hashtag)
+                .subCategoryList(List.of(1L))
                 .build();
     }
 
@@ -326,6 +329,7 @@ class RecipeCreateRequestDtoTest {
                 .recipeDesc(recipeDesc)
                 .ingredient(ingredients)
                 .hashtag(hashtag)
+                .subCategoryList(List.of(1L))
                 .build();
     }
 

@@ -3,12 +3,18 @@ package com.recipia.recipe.domain.converter;
 import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.SubCategoryEntity;
 import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.SubCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * domain, entity, dto 서로간의 의존성을 제거하기 위해 Converter 클래스를 작성
@@ -32,7 +38,8 @@ public class RecipeConverter {
                 entity.getTimeTaken(),
                 entity.getIngredient(),
                 entity.getHashtag(),
-                null, // fixme: 확인해보기
+                null, // fixme: 영양소
+                null, // subCategory
                 entity.getNickname(),
                 entity.getDelYn()
         );
@@ -73,6 +80,17 @@ public class RecipeConverter {
     }
 
     /**
+     * Recipe 도메인 내부의 영양소 도메인을 엔티티로 변환하는 로직
+     * 레시피 엔티티에는 저장할때 꼭 필요한 pk값인 id만 필드로 하여 저장해 준다.(최적화)
+     */
+    public RecipeCategoryMapEntity domainToRecipeCategoryMapEntity(Recipe recipe, SubCategory subCategory) {
+        return RecipeCategoryMapEntity.of(
+                RecipeEntity.of(recipe.getId()),
+                SubCategoryEntity.of(subCategory.getId())
+        );
+    }
+
+    /**
      * 레시시 생성을 요청하는 RecipeCreateRequestDto객체를 도메인으로 변환
      * jwt 클레임으로부터 memberId, nickname을 꺼내서 주입한다.
      */
@@ -92,6 +110,10 @@ public class RecipeConverter {
                         dto.getNutritionalInfo().getVitamins(),
                         dto.getNutritionalInfo().getMinerals()
                 ),
+                dto.getSubCategoryList()
+                        .stream()
+                        .map(SubCategory::of)
+                        .collect(Collectors.toList()),
                 securityUtil.getCurrentMemberNickname(),
                 "N" // todo: 하드코딩 맞는지 알아보기
         );

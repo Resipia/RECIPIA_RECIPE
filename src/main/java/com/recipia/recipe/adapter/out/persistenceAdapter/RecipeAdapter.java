@@ -8,10 +8,13 @@ import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.SubCategory;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * Adapter 클래스는 port 인터페이스를 구현한다.
@@ -26,6 +29,8 @@ public class RecipeAdapter implements RecipePort {
     private final RecipeQueryRepository querydslRepository;
     private final RecipeRepository recipeRepository;
     private final NutritionalInfoRepository nutritionalInfoRepository;
+    private final SubCategoryEntityRepository subCategoryEntityRepository;
+    private final RecipeCategoryMapRepository recipeCategoryMapRepository;
 
 
     /**
@@ -69,6 +74,42 @@ public class RecipeAdapter implements RecipePort {
         NutritionalInfoEntity nutritionalInfoEntity = converter.domainToNutritionalInfoEntity(recipe);
         //3. 저장을 한다.
         return nutritionalInfoRepository.save(nutritionalInfoEntity).getId();
+    }
+
+    /**
+     * 카테고리를 저장하는 메서드
+     * 카테고리 Map 테이블에 저장한다.
+     */
+    @Override
+    public void createRecipeCategoryMap(Recipe recipe, Long savedRecipeId) {
+        recipe.setId(savedRecipeId);
+        List<SubCategory> subCategoryList = validSubCategory(recipe);
+
+        subCategoryList.stream()
+                .map(subCategory -> converter.domainToRecipeCategoryMapEntity(recipe, subCategory))
+                .forEach(recipeCategoryMapRepository::save);
+    }
+
+    /**
+     * 서브 카테고리를 검증한다.
+     */
+    private List<SubCategory> validSubCategory(Recipe recipe) {
+        List<SubCategory> subCategoryList = recipe.getSubCategory();
+
+        // subCategoryList가 null인 경우 커스텀 예외를 던짐
+        if (subCategoryList == null || subCategoryList.isEmpty()) {
+            throw new RecipeApplicationException(ErrorCode.CATEGORY_NOT_VALID);
+        }
+
+        subCategoryList.forEach(subCategory -> {
+            // subCategory가 데이터베이스에 존재하는지 확인
+            boolean exists = subCategoryEntityRepository.findById(subCategory.getId()).isPresent();
+            if (!exists) {
+                // 존재하지 않는 경우 예외 발생
+                throw new RecipeApplicationException(ErrorCode.CATEGORY_NOT_FOUND);
+            }
+        });
+        return subCategoryList;
     }
 
 

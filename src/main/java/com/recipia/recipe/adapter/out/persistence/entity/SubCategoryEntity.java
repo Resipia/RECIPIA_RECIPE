@@ -50,6 +50,10 @@ public class SubCategoryEntity extends UpdateDateTimeForEntity {
         return new SubCategoryEntity(null, categoryEntity, subCategoryNm, sortNo, delYn);
     }
 
+    public static SubCategoryEntity of(Long id) {
+        return new SubCategoryEntity(id, null, null, null, null);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

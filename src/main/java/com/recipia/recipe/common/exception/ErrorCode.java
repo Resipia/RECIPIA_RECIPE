@@ -32,6 +32,7 @@ public enum ErrorCode {
     FILE_NOT_FOUND(404, "FILE_NOT_FOUND", "파일 경로에 파일이 존재하지 않습니다."),
     FILE_DUPLICATED(404, "FILE_DUPLICATED", "중복된 파일입니다."),
     DB_ERROR(500, "DB_ERROR", "DB ERROR"),
+    MONGO_DB_UPDATED_FAIL(404, "MONGO_DB_UPDATED_FAIL", "몽고DB에 데이터 저장을 실패했습니다."),
 
     // Zipkin 관련 에러
     NO_TRACE_ID_IN_MESSAGE(404, "NO_TRACE_ID_IN_MESSAGE", "message에 traceid가 없습니다."),

@@ -27,6 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,14 +50,17 @@ class RecipeServiceTest {
         // given
         Recipe recipe = createRecipeDomain();
         Long savedRecipeId = 10L;  // 가정하는 저장된 ID
+        Long savedNutritionalInfoId = 1L;  // 가정하는 저장된 ID
 
         // RecipePort의 동작을 정의
         when(recipePort.createRecipe(recipe)).thenReturn(savedRecipeId);
+        when(recipePort.createNutritionalInfo(recipe, savedRecipeId)).thenReturn(savedNutritionalInfoId);
 
         // when
         Long result = sut.createRecipe(recipe);
 
         // then
+        verify(recipePort).createRecipeCategoryMap(recipe, savedRecipeId); // 카테고리 맵핑 저장 메서드는 실행되었는가
         assertThat(result).isEqualTo(savedRecipeId);
         then(eventPublisher).should().publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
     }

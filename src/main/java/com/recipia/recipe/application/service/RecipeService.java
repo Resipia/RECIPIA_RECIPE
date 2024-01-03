@@ -36,9 +36,10 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     @Override
     public Long createRecipe(Recipe recipe) {
 
-        // 주관심사: 레시피 저장, 영양소 저장
+        // 주관심사: 레시피 저장, 영양소 저장,
         Long savedRecipeId = recipePort.createRecipe(recipe);
         Long savedNutritionalInfoId = recipePort.createNutritionalInfo(recipe, savedRecipeId);
+        recipePort.createRecipeCategoryMap(recipe, savedRecipeId);
 
         // 비관심사: 스프링 이벤트 발행
         eventPublisher.publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));

@@ -1,17 +1,21 @@
 package com.recipia.recipe.adapter.in.web.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+/**
+ * 레시피 저장할때 사용하는 DTO
+ */
 @Data
 @NoArgsConstructor
-public class RecipeRequestDto {
-
-    private Long id;             // recipe pk
+public class RecipeCreateRequestDto {
 
     @NotBlank(message = "레시피 이름은 필수입니다.")
     @Size(max = 100, message = "레시피 이름은 100자를 초과할 수 없습니다.")
@@ -29,34 +33,31 @@ public class RecipeRequestDto {
     @Pattern(regexp = "^([가-힣a-zA-Z0-9]+)(, [가-힣a-zA-Z0-9]+)*$", message = "해시태그는 '해시태그1, 해시태그2, 해시태그3' 형식으로 입력해야 합니다.")
     private String hashtag;      // 해시태그
 
-    private String nutritionalInfo;   // 영양소 정보
-    private String delYn;        // 레시피 삭제여부
+    private NutritionalInfoDto nutritionalInfo;   // 영양소 dto
+
+    @NotNull
+    private List<Long> subCategoryList;   // 카테고리
 
     @Builder
-    private RecipeRequestDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
-        this.id = id;
+    private RecipeCreateRequestDto(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList) {
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
         this.timeTaken = timeTaken;
         this.ingredient = ingredient;
         this.hashtag = hashtag;
         this.nutritionalInfo = nutritionalInfo;
-        this.delYn = delYn;
+        this.subCategoryList = subCategoryList;
     }
 
-    public static RecipeRequestDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
-        return new RecipeRequestDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, delYn);
-    }
-
-    public static RecipeRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nutritionalInfo, String delYn) {
-        return new RecipeRequestDto(null, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, delYn);
+    public static RecipeCreateRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList) {
+        return new RecipeCreateRequestDto(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList);
     }
 
     /**
      * 테스트용
      */
-    public static RecipeRequestDto of(String recipeName, String recipeDesc) {
-        return new RecipeRequestDto(null, recipeName, recipeDesc, null, null, null, null, null);
+    public static RecipeCreateRequestDto of(String recipeName, String recipeDesc) {
+        return new RecipeCreateRequestDto(recipeName, recipeDesc, null, null, null, null, List.of(1L));
     }
 
 }

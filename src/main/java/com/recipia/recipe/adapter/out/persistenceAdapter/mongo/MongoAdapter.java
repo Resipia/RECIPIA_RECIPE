@@ -1,7 +1,10 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
+import com.recipia.recipe.adapter.out.persistence.document.HashtagDocument;
 import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
 import com.recipia.recipe.application.port.out.MongoPort;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,21 +30,46 @@ public class MongoAdapter implements MongoPort {
     @Value("${mongo.test.documentId}")
     private String documentId;
 
+
     /**
-     * 새 재료가 중복되지 않게 MongoDB 문서에 추가되며, 스프링 이벤트 리스너 메서드에서 이 메서드를 호출하여 재료 정보를 업데이트할 수 있다.
-     * 실제로 업데이트된 '항목'(item)의 수를 반환하는 게 아니라, 업데이트된 '문서'(document)의 수를 반환한다. 성공하면 무조건 1을 반환한다.
+     * 재료값을 몽고DB에 저장한다.
      */
     @Override
     public Long saveIngredientsIntoMongo(List<String> newIngredients) {
-        // 1. documentId로 지정된 IngredientDocument를 찾는다.
+        return saveDataIntoMongo("ingredients", newIngredients);
+    }
+
+    /**
+     * 해시태그를 몽고DB에 저장한다.
+     */
+    @Override
+    public Long saveHashTagsIntoMongo(List<String> newHashtags) {
+        return saveDataIntoMongo("hashtags", newHashtags);
+    }
+
+    /**
+     * [통합검색을 위한 데이터 저장]
+     * 사용자가 해시태그를 입력하면 중복된 데이터가 아니라면 MongoDB 문서에 추가된다.
+     * 업데이트에 성공하면 업데이트된 문서(documet)의 갯수인 1을 반환한다.
+     */
+    public Long saveDataIntoMongo(String dataType, List<String> newData) {
+        // 1. documentId로 지정된 문서를 찾는다.
         Query query = new Query(Criteria.where("id").is(documentId));
 
-        // 2. $addToSet 연산자를 사용하여 중복을 방지하고 재료를 추가한다.
-        Update update = new Update().addToSet("ingredients").each(newIngredients);
+        // 2. $addToSet 연산자를 사용하여 중복을 방지하고 데이터를 추가한다.
+        Update update = new Update().addToSet(dataType).each(newData);
 
-        // 3. updateFirst는 쿼리 조건과 일치하는 첫 번째 문서를 업데이트한다.
-        Long updateResult = mongoTemplate.updateFirst(query, update, IngredientDocument.class).getModifiedCount();
+        // 3. dataType에 따라 적절한 문서 클래스를 선택하여 업데이트한다.
+        if ("ingredients".equals(dataType)) {
+            // IngredientDocument에 대한 업데이트
+            return mongoTemplate.updateFirst(query, update, IngredientDocument.class).getModifiedCount();
+        } else if ("hashtags".equals(dataType)) {
+            // HashtagDocument에 대한 업데이트
+            return mongoTemplate.updateFirst(query, update, HashtagDocument.class).getModifiedCount();
+        }
 
-        return updateResult;
+        // 적절한 dataType이 없는 경우
+        throw new RecipeApplicationException(ErrorCode.MONGO_DB_UPDATED_FAIL);
     }
+
 }

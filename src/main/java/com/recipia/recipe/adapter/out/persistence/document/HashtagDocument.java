@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "hashtag")
+@Document(collection = "hashtags")
 public class HashtagDocument {
 
     @Id

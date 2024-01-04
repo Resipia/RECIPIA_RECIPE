@@ -1,7 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.persistence.entity.BookmarkEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.application.port.out.BookmarkPort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -28,13 +27,23 @@ public class BookmarkAdapter implements BookmarkPort {
     public Long addBookmark(Bookmark bookmark) {
 
         // 레시피 존재 여부 예외처리
-        recipeRepository.findById(bookmark.getRecipeId()).orElseThrow(
+        recipeRepository.findByIdAndDelYn(bookmark.getRecipeId(), "N").orElseThrow(
                 () -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND)
         );
 
-        // 컨버터 내부에서 멤버 존재에 따른 예외처리 동작
+        // 컨버터 내부에서 멤버 id 예외처리 실시
         BookmarkEntity bookmarkEntity = converter.domainToEntity(bookmark);
         return bookmarkRepository.save(bookmarkEntity).getId();
+    }
+
+    @Override
+    public void removeBookmark(Long bookmarkId) {
+
+        // 북마크 존재여부 확인
+        BookmarkEntity bookmarkEntity = bookmarkRepository.findById(bookmarkId)
+                .orElseThrow(() -> new RecipeApplicationException(ErrorCode.BOOKMARK_NOT_FOUND));
+
+        bookmarkRepository.delete(bookmarkEntity);
     }
 
 }

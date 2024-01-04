@@ -100,5 +100,47 @@ class BookmarkServiceTest{
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_INPUT);
     }
 
+    @DisplayName("[happy] 존재하는 북마크를 제거하면 BookmarkPort의 removeBookmark를 호출한다.")
+    @Test
+    void removeBookmark() {
+        //given
+        Long bookmarkId = 1L;
+
+        //when
+        sut.removeBookmark(bookmarkId);
+
+        //then
+        verify(bookmarkPort).removeBookmark(bookmarkId);
+    }
+
+    @DisplayName("[bad] 존재하지 않는 북마크를 제거하려고 하면 예외가 발생한다.")
+    @Test
+    void removeBookmarkException() {
+        //given
+        Long nonExistentBookmarkId = 100L;
+        Mockito.doThrow(new RecipeApplicationException(ErrorCode.BOOKMARK_NOT_FOUND))
+                .when(bookmarkPort).removeBookmark(nonExistentBookmarkId);
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.removeBookmark(nonExistentBookmarkId))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("북마크를 찾을 수 없습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.BOOKMARK_NOT_FOUND);
+    }
+
+    @DisplayName("[bad] 북마크 제거 중 데이터베이스 오류가 발생하면 예외가 발생한다.")
+    @Test
+    void removeBookmarkDatabaseError() {
+        //given
+        Long bookmarkId = 1L;
+        Mockito.doThrow(new DataAccessException("데이터베이스 오류 발생") {})
+                .when(bookmarkPort).removeBookmark(bookmarkId);
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.removeBookmark(bookmarkId))
+                .isInstanceOf(DataAccessException.class)
+                .hasMessageContaining("데이터베이스 오류 발생");
+    }
+
 
 }

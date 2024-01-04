@@ -32,6 +32,7 @@ public enum ErrorCode {
     // 북마크 관련 에러
     RECIPE_NOT_FOUND(404, "RECIPE_NOT_FOUND", "레시피가 존재하지 않습니다."),
     INVALID_INPUT(404, "INVALID_INPUT", "잘못된 입력입니다."),
+    BOOKMARK_NOT_FOUND(404, "BOOKMARK_NOT_FOUND", "북마크를 찾을 수 없습니다."),
 
     // 검색 관련 에러
     CONDITION_NOT_FOUND(404, "CONDITION_NOT_FOUND", "검색 조건을 찾을 수 없습니다."),

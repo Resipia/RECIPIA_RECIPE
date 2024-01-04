@@ -25,4 +25,9 @@ public class BookmarkService implements BookmarkUseCase {
         return bookmarkPort.addBookmark(bookmark);
     }
 
+    @Transactional
+    public void removeBookmark(Long bookmarkId) {
+        bookmarkPort.removeBookmark(bookmarkId);
+    }
+
 }

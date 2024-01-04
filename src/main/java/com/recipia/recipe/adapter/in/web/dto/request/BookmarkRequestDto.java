@@ -9,19 +9,17 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class BookmarkDto {
+public class BookmarkRequestDto {
 
     private Long recipeId;
-    private Long memberId;
 
     @Builder
-    private BookmarkDto(Long recipeId, Long memberId) {
+    private BookmarkRequestDto(Long recipeId) {
         this.recipeId = recipeId;
-        this.memberId = memberId;
     }
 
-    public static BookmarkDto of(Long recipeId, Long memberId) {
-        return new BookmarkDto(recipeId, memberId);
+    public static BookmarkRequestDto of(Long recipeId) {
+        return new BookmarkRequestDto(recipeId);
     }
 
 }

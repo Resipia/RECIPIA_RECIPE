@@ -55,6 +55,35 @@ class BookmarkAdapterTest extends TotalTestSupport {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
     }
 
+    @DisplayName("[happy] 존재하는 북마크를 제거하면 성공한다.")
+    @Test
+    void removeBookmarkSuccess() {
+        //given
+        RecipeEntity recipeEntity = createRecipeEntity();
+        RecipeEntity savedRecipe = recipeRepository.save(recipeEntity);
+        BookmarkEntity bookmarkEntity = BookmarkEntity.of(savedRecipe, 1L);
+        BookmarkEntity savedBookmark = bookmarkRepository.save(bookmarkEntity);
+
+        //when
+        sut.removeBookmark(savedBookmark.getId());
+
+        //then
+        Assertions.assertThat(bookmarkRepository.existsById(savedBookmark.getId())).isFalse();
+    }
+
+    @DisplayName("[bad] 존재하지 않는 북마크를 제거하려고 하면 예외가 발생한다.")
+    @Test
+    void removeBookmarkException() {
+        //given
+        Long nonExistentBookmarkId = 100L;
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.removeBookmark(nonExistentBookmarkId))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("북마크를 찾을 수 없습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.BOOKMARK_NOT_FOUND);
+    }
+
     private RecipeEntity createRecipeEntity() {
         return RecipeEntity.of(
                 1L,

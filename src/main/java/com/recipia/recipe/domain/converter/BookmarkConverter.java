@@ -1,6 +1,6 @@
 package com.recipia.recipe.domain.converter;
 
-import com.recipia.recipe.adapter.in.web.dto.request.BookmarkDto;
+import com.recipia.recipe.adapter.in.web.dto.request.BookmarkRequestDto;
 import com.recipia.recipe.adapter.out.persistence.entity.BookmarkEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.common.utils.SecurityUtil;
@@ -18,10 +18,10 @@ public class BookmarkConverter {
      * dto to domain
      * 서비스 레이어에 도메인을 보내기 위해서 dto 객체를 도메인으로 변환하는 메서드
      */
-    public Bookmark requestDtoToDomain(BookmarkDto bookmarkDto) {
+    public Bookmark requestDtoToDomain(BookmarkRequestDto bookmarkRequestDto) {
         return Bookmark.of(
                 securityUtil.getCurrentMemberId(),
-                bookmarkDto.getRecipeId()
+                bookmarkRequestDto.getRecipeId()
         );
     }
 

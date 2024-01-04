@@ -11,6 +11,6 @@ public interface MongoUseCase {
 
     void saveHashtagsIntoMongo(List<String> hashtags);
 
-    List<String> findIngredientsByPrefix(SearchRequestDto searchRequestDto);
+    List<String> searchWordByPrefix(SearchRequestDto searchRequestDto);
 
 }

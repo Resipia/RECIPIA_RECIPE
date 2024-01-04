@@ -48,35 +48,54 @@ public class MongoService implements MongoUseCase {
      * mongoDB에서 재료 검색을 하는 기능
      */
     @Override
-    public List<String> findIngredientsByPrefix(SearchRequestDto searchRequestDto) {
-
+    public List<String> searchWordByPrefix(SearchRequestDto searchRequestDto) {
+        // 1. 조건을 뽑아내고 null체크를 진행한다.
         SearchType condition = searchRequestDto.getCondition();
-        if (condition == null) {
-            throw new RecipeApplicationException(ErrorCode.CONDITION_NOT_FOUND);
-        }
+        validateSearchCondition(searchRequestDto);
 
+        // 2. 조건에 따라 다른 검색을 실행한다.
         return switch (condition) {
-//            case ALL -> {
-                // 전체 검색 로직 (5개씩 받으면 5개씩 가져옴)
-//                List<String> ingredientResults = mongoPort.findIngredientsByPrefix(searchRequestDto);
-//                List<String> hashtagResults = mongoPort.findHashtagsByPrefix(searchRequestDto);
-                // 두 결과 합치기
-//                yield Stream.concat(ingredientResults.stream(), hashtagResults.stream())
-//                        .collect(Collectors.toList());
-//            }
-            case INGREDIENTS ->
-                // 재료 검색 로직
-                    mongoPort.findIngredientsByPrefix(searchRequestDto);
-
-//            case HASHTAGS ->
-                // 해시태그 검색 로직
-//                    mongoPort.findHashtagsByPrefix(searchRequestDto);
-
-            default ->
-                // 정의되지 않은 조건에 대한 처리 로직 (예: 예외 처리)
-                    Collections.emptyList(); // 예시: 빈 목록 반환
+            case ALL -> combineSearchResults(searchRequestDto, 5);
+            case INGREDIENTS, HASHTAGS -> performSearch(searchRequestDto);
+            default -> throw new RecipeApplicationException(ErrorCode.INVALID_SEARCH_CONDITION);
         };
     }
+
+    // 검색 조건과 단어의 검증을 실시
+    private void validateSearchCondition(SearchRequestDto searchRequestDto) {
+        if (searchRequestDto.getSearchWord() == null || searchRequestDto.getSearchWord().isBlank()) {
+            throw new RecipeApplicationException(ErrorCode.SEARCH_WORD_NECESSARY);
+        }
+        if (searchRequestDto.getCondition() == null) {
+            throw new RecipeApplicationException(ErrorCode.CONDITION_NOT_FOUND);
+        }
+    }
+
+    /**
+     * 전체 검색일 경우에는 [재료 검색 결과 5개 + 해시태그 검색 결과 5개] 를 더한 10개의 결과 리스트를 만든다.
+     */
+    private List<String> combineSearchResults(SearchRequestDto searchRequestDto, int resultSizePerType) {
+        SearchRequestDto ingredientsDto = createSearchDto(searchRequestDto, SearchType.INGREDIENTS, resultSizePerType);
+        SearchRequestDto hashtagsDto = createSearchDto(searchRequestDto, SearchType.HASHTAGS, resultSizePerType);
+
+        List<String> ingredientResults = mongoPort.searchData(ingredientsDto);
+        List<String> hashtagResults = mongoPort.searchData(hashtagsDto);
+
+        // 검색결과 합치기
+        return Stream.concat(ingredientResults.stream(), hashtagResults.stream())
+                .collect(Collectors.toList());
+    }
+
+    // dto를 새롭게 생성
+    private SearchRequestDto createSearchDto(SearchRequestDto originalDto, SearchType type, int resultSize) {
+        return SearchRequestDto.of(type, originalDto.getSearchWord(), resultSize);
+    }
+
+    // 전체가 아닐때 조건에 따른 검색 실시
+    private List<String> performSearch(SearchRequestDto searchRequestDto) {
+        return mongoPort.searchData(searchRequestDto);
+    }
+
 
 
 

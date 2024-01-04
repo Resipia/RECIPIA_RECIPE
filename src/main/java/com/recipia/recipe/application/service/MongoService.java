@@ -1,5 +1,6 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.application.port.out.MongoPort;
@@ -9,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,21 +49,35 @@ public class MongoService implements MongoUseCase {
      */
     @Override
     public List<String> findIngredientsByPrefix(SearchRequestDto searchRequestDto) {
-        String condition = searchRequestDto.getCondition();
-        if (condition == "all") {
-            // todo: 재료에서 5개 검색
-            return mongoPort.findIngredientsByPrefix(searchRequestDto);
-            // todo: 해시태그에서 5개 검색
 
-            // todo: 두개의 응답을 합치기
-        } else if (condition == "ingredients") {
-            // todo: 이걸 추후 재료 검색으로 변경
-            return mongoPort.findIngredientsByPrefix(searchRequestDto);
-        } else {
-            // todo: 이걸 추후 해시태그 검색으로 변경
-            return mongoPort.findIngredientsByPrefix(searchRequestDto);
+        SearchType condition = searchRequestDto.getCondition();
+        if (condition == null) {
+            throw new RecipeApplicationException(ErrorCode.CONDITION_NOT_FOUND);
         }
+
+        return switch (condition) {
+//            case ALL -> {
+                // 전체 검색 로직 (5개씩 받으면 5개씩 가져옴)
+//                List<String> ingredientResults = mongoPort.findIngredientsByPrefix(searchRequestDto);
+//                List<String> hashtagResults = mongoPort.findHashtagsByPrefix(searchRequestDto);
+                // 두 결과 합치기
+//                yield Stream.concat(ingredientResults.stream(), hashtagResults.stream())
+//                        .collect(Collectors.toList());
+//            }
+            case INGREDIENTS ->
+                // 재료 검색 로직
+                    mongoPort.findIngredientsByPrefix(searchRequestDto);
+
+//            case HASHTAGS ->
+                // 해시태그 검색 로직
+//                    mongoPort.findHashtagsByPrefix(searchRequestDto);
+
+            default ->
+                // 정의되지 않은 조건에 대한 처리 로직 (예: 예외 처리)
+                    Collections.emptyList(); // 예시: 빈 목록 반환
+        };
     }
+
 
 
 }

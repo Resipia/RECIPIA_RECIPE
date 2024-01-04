@@ -33,7 +33,7 @@ class MongoServiceTest {
     @Mock
     MongoPort mongoPort;
 
-    @DisplayName("MongoDB에 재료 리스트 저장 시, MongoPort의 saveIngredientsIntoMongo를 호출한다.")
+    @DisplayName("[happy] MongoDB에 재료 리스트 저장 시, MongoPort의 saveIngredientsIntoMongo를 호출한다.")
     @Test
     void saveIngredientsIntoMongo() {
         //given
@@ -46,7 +46,7 @@ class MongoServiceTest {
         verify(mongoPort).saveIngredientsIntoMongo(ingredients);
     }
 
-    @DisplayName("비어있는 재료 리스트를 저장할 시 예외가 발생한다.")
+    @DisplayName("[bad] 비어있는 재료 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveEmptyIngredientsIntoMongo() {
         //given
@@ -59,7 +59,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_INGREDIENTS);
     }
 
-    @DisplayName("null인 재료 리스트를 저장할 시 예외가 발생한다.")
+    @DisplayName("[bad] null인 재료 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveNullIngredientsIntoMongo() {
         //given
@@ -72,7 +72,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_INGREDIENTS);
     }
 
-    @DisplayName("비어있는 해시태그 리스트를 저장할 시 예외가 발생한다.")
+    @DisplayName("[bad] 비어있는 해시태그 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveEmptyHashtagsIntoMongo() {
         //given
@@ -85,7 +85,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_HASHTAGS);
     }
 
-    @DisplayName("null인 해시태그 리스트를 저장할 시 예외가 발생한다.")
+    @DisplayName("[bad] null인 해시태그 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveNullHashtagsIntoMongo() {
         //given
@@ -98,7 +98,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_HASHTAGS);
     }
 
-    @DisplayName("MongoPort 호출 중 DataAccessException 발생 시, 예외가 적절히 처리되는지 확인")
+    @DisplayName("[bad] MongoPort 호출 중 DataAccessException 발생 시, 예외가 적절히 처리되는지 확인")
     @Test
     void testMongoPortExceptionHandling() {
         //given

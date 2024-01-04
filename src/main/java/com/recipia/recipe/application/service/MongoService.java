@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * 몽고 DB에 대한 트랜잭션은 지원하지 않기때문에 @Transactional 추가x
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Service

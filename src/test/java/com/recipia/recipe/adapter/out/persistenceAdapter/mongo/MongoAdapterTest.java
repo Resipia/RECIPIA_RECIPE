@@ -2,8 +2,7 @@ package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
 import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
-import com.recipia.recipe.adapter.out.persistence.document.HashtagDocument;
-import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
+import com.recipia.recipe.adapter.out.persistence.document.SearchDocument;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
 import org.assertj.core.api.Assertions;
@@ -39,10 +38,7 @@ class MongoAdapterTest extends TotalTestSupport {
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private IngredientsMongoRepository ingredientsMongoRepository;
-
-    @Autowired
-    private HashtagsMongoRepository hashtagsMongoRepository;
+    private MongoSearchRepository mongoSearchRepository;
 
     @Value("${mongo.test.documentId}")
     private String documentId;
@@ -57,11 +53,11 @@ class MongoAdapterTest extends TotalTestSupport {
 
         List<String> initialIngredients = Arrays.asList("김치", "파", "김", "김가루", "김밥", "김빱", "감자", "ca", "zzz");
         Update update1 = new Update().addToSet("ingredients").each(initialIngredients.toArray());
-        mongoTemplate.upsert(query, update1, IngredientDocument.class);
+        mongoTemplate.upsert(query, update1, SearchDocument.class);
 
         List<String> initialHashtags = Arrays.asList("해시태그1", "해시태그2", "해시태그3");
         Update update2 = new Update().addToSet("hashtags").each(initialHashtags.toArray());
-        mongoTemplate.upsert(query, update2, HashtagDocument.class);
+        mongoTemplate.upsert(query, update2, SearchDocument.class);
     }
 
     /**
@@ -74,11 +70,11 @@ class MongoAdapterTest extends TotalTestSupport {
 
         List<String> newIngredients = Arrays.asList("김치", "파", "김", "김가루", "김밥", "김빱", "감자", "소고기", "돼지고기", "고구마", "양상추", "호박", "ca", "zzz");
         Update update1 = new Update().pullAll("ingredients", newIngredients.toArray());
-        mongoTemplate.updateFirst(query, update1, IngredientDocument.class);
+        mongoTemplate.updateFirst(query, update1, SearchDocument.class);
 
         List<String> newHashtags = Arrays.asList("해시태그1", "해시태그2", "해시태그3", "해시태그4", "해시태그5", "해시태그6", "해시태그7", "해시태그8");
         Update update2 = new Update().pullAll("hashtags", newHashtags.toArray());
-        mongoTemplate.updateFirst(query, update2, HashtagDocument.class);
+        mongoTemplate.updateFirst(query, update2, SearchDocument.class);
     }
 
     @DisplayName("[happy] 저장된적 없는 재료를 저장 시도하면 mongoDB에 저장된다.")
@@ -93,11 +89,11 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        IngredientDocument ingredientDocument = mongoTemplate.findOne(query, IngredientDocument.class);
+        SearchDocument searchDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
-        assertNotNull(ingredientDocument); // null이 아님을 검증
+        assertNotNull(searchDocument); // null이 아님을 검증
         Assertions.assertThat(savedCount).isEqualTo(1); // 업데이트가 성공했는지 확인 1이면 성공
-        assertTrue(ingredientDocument.getIngredients().containsAll(newIngredients));
+        assertTrue(searchDocument.getIngredients().containsAll(newIngredients));
     }
 
 
@@ -112,7 +108,7 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        IngredientDocument updatedDocument = mongoTemplate.findOne(query, IngredientDocument.class);
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(updatedDocument); // null 체크
         Assertions.assertThat(savedCount).isEqualTo(1); // 업데이트가 성공했는지 확인 1이면 성공
@@ -131,13 +127,13 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        IngredientDocument updatedDocument = mongoTemplate.findOne(query, IngredientDocument.class);
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(updatedDocument); // null 체크
         Assertions.assertThat(savedCount).isEqualTo(0); // 업데이트는 진행되지 않는다.
 
         // 김치, 파, 감자가 각각 1개씩만 저장되어 있는지 검증한다.
-        ingredientsMongoRepository.findById(documentId).ifPresent(document -> {
+        mongoSearchRepository.findById(documentId).ifPresent(document -> {
             Map<String, Long> ingredientsCount = document.getIngredients().stream()
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
@@ -158,13 +154,13 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        IngredientDocument updatedDocument = mongoTemplate.findOne(query, IngredientDocument.class);
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(updatedDocument); // null 체크
         Assertions.assertThat(savedCount).isEqualTo(1); // 업데이트가 진행된다.
 
         // 김치, 파, 감자가 각각 1개씩만 저장되어 있는지 검증한다.
-        ingredientsMongoRepository.findById(documentId).ifPresent(document -> {
+        mongoSearchRepository.findById(documentId).ifPresent(document -> {
             Map<String, Long> ingredientsCount = document.getIngredients().stream()
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
             Assertions.assertThat(ingredientsCount).containsEntry("고구마", 1L);
@@ -182,13 +178,13 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        IngredientDocument updatedDocument = mongoTemplate.findOne(query, IngredientDocument.class);
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(updatedDocument); // null 체크
         Assertions.assertThat(savedCount).isEqualTo(0); // 업데이트가 진행된다.
 
         // 김치, 파, 감자가 각각 1개씩만 저장되어 있는지 검증한다.
-        ingredientsMongoRepository.findById(documentId).ifPresent(document -> {
+        mongoSearchRepository.findById(documentId).ifPresent(document -> {
             Map<String, Long> ingredientsCount = document.getIngredients().stream()
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
             Assertions.assertThat(ingredientsCount).containsEntry("김치", 1L);
@@ -201,7 +197,7 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // given
         Query query = new Query(Criteria.where("id").is(documentId)); // 해당 ID로 문서를 찾기 위한 쿼리 생성
-        IngredientDocument document = mongoTemplate.findOne(query, IngredientDocument.class); // 쿼리를 사용하여 문서를 찾음
+        SearchDocument document = mongoTemplate.findOne(query, SearchDocument.class); // 쿼리를 사용하여 문서를 찾음
         System.out.println("저장전 재료: " + document.getIngredients());
 
         int originalSize = document.getIngredients().size(); // 테스트 시작 전, 원래 문서에 저장된 재료의 개수
@@ -215,7 +211,7 @@ class MongoAdapterTest extends TotalTestSupport {
         }
 
         // then
-        IngredientDocument updatedDocument = mongoTemplate.findOne(query, IngredientDocument.class); // 업데이트된 문서를 다시 조회
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class); // 업데이트된 문서를 다시 조회
         System.out.println("저장후 재료: " + updatedDocument.getIngredients());
         int updatedSize = updatedDocument.getIngredients().size(); // 업데이트 후의 재료 개수 측정
         int expectedSize = originalSize + (newIngredients.stream().anyMatch(ingredient -> !document.getIngredients().contains(ingredient)) ? newIngredients.size() : 0);
@@ -237,7 +233,7 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        HashtagDocument hashtagDocument = mongoTemplate.findOne(query, HashtagDocument.class);
+        SearchDocument hashtagDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(hashtagDocument); // null이 아님을 검증
         Assertions.assertThat(savedCount).isEqualTo(1); // 업데이트가 성공했는지 확인 1이면 성공
@@ -256,7 +252,7 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        HashtagDocument updatedDocument = mongoTemplate.findOne(query, HashtagDocument.class);
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(updatedDocument); // null 체크
         Assertions.assertThat(savedCount).isEqualTo(1); // 업데이트가 성공했는지 확인 1이면 성공
@@ -275,13 +271,13 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        HashtagDocument updatedDocument = mongoTemplate.findOne(query, HashtagDocument.class);
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(updatedDocument); // null 체크
         Assertions.assertThat(savedCount).isEqualTo(0); // 업데이트는 진행되지 않는다.
 
         // 이미 저장된 해시태그가 중복저장되었는지 검증: 1L이면 정상이다.
-        hashtagsMongoRepository.findById(documentId).ifPresent(document -> {
+        mongoSearchRepository.findById(documentId).ifPresent(document -> {
             Map<String, Long> HashtagsCount = document.getHashtags().stream()
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
             Assertions.assertThat(HashtagsCount).containsEntry("해시태그1", 1L);
@@ -301,12 +297,12 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        HashtagDocument updatedDocument = mongoTemplate.findOne(query, HashtagDocument.class);
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(updatedDocument); // null 체크
         Assertions.assertThat(savedCount).isEqualTo(1); // 업데이트가 진행된다.
 
-        hashtagsMongoRepository.findById(documentId).ifPresent(document -> {
+        mongoSearchRepository.findById(documentId).ifPresent(document -> {
             Map<String, Long> hashtagsCount = document.getHashtags().stream()
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
             Assertions.assertThat(hashtagsCount).containsEntry("해시태그5", 1L);
@@ -324,12 +320,12 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // then
         Query query = new Query(Criteria.where("id").is(documentId));
-        HashtagDocument updatedDocument = mongoTemplate.findOne(query, HashtagDocument.class);
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class);
 
         assertNotNull(updatedDocument);
         Assertions.assertThat(savedCount).isEqualTo(0);
 
-        hashtagsMongoRepository.findById(documentId).ifPresent(document -> {
+        mongoSearchRepository.findById(documentId).ifPresent(document -> {
             Map<String, Long> hashtagsCount = document.getHashtags().stream()
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
             Assertions.assertThat(hashtagsCount).containsEntry("해시태그1", 1L);
@@ -342,7 +338,7 @@ class MongoAdapterTest extends TotalTestSupport {
 
         // given
         Query query = new Query(Criteria.where("id").is(documentId)); // 해당 ID로 문서를 찾기 위한 쿼리 생성
-        HashtagDocument document = mongoTemplate.findOne(query, HashtagDocument.class); // 쿼리를 사용하여 문서를 찾음
+        SearchDocument document = mongoTemplate.findOne(query, SearchDocument.class); // 쿼리를 사용하여 문서를 찾음
         System.out.println("저장전 해시태그: " + document.getHashtags());
 
         int originalSize = document.getHashtags().size(); // 테스트 시작 전, 원래 문서에 저장된 재료의 개수
@@ -356,7 +352,7 @@ class MongoAdapterTest extends TotalTestSupport {
         }
 
         // then
-        HashtagDocument updatedDocument = mongoTemplate.findOne(query, HashtagDocument.class); // 업데이트된 문서를 다시 조회
+        SearchDocument updatedDocument = mongoTemplate.findOne(query, SearchDocument.class); // 업데이트된 문서를 다시 조회
         System.out.println("저장후 해시태그: " + updatedDocument.getHashtags());
         int updatedSize = updatedDocument.getHashtags().size(); // 업데이트 후의 재료 개수 측정
         int expectedSize = originalSize + (newHashtags.stream().anyMatch(hashtag -> !document.getHashtags().contains(hashtag)) ? newHashtags.size() : 0);
@@ -382,10 +378,11 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithKoreanPrefix() {
         // given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "김치", 10);
+        String fieldName = "ingredients";
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
 
         // when
-        List<String> result = sut.searchData(dto);
+        List<String> result = sut.searchData(dto, fieldName);
 
         // then
         assertNotNull(result);
@@ -400,10 +397,11 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithEnglishPrefix() {
         // given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "ca", 10);
+        String fieldName = "ingredients";
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "ca", 10);
 
         // when
-        List<String> result = sut.searchData(dto);
+        List<String> result = sut.searchData(dto, fieldName);
 
         // then
         assertNotNull(result);
@@ -414,10 +412,11 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithNonexistentPrefix() {
         // given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "zzzk", 10);
+        String fieldName = "ingredients";
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "zzzk", 10);
 
         // when
-        List<String> result = sut.searchData(dto);
+        List<String> result = sut.searchData(dto, fieldName);
 
         // then
         assertNotNull(result);
@@ -428,10 +427,11 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithNoPrefix() {
         // given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "", 10);
+        String fieldName = "ingredients";
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "", 10);
 
         // when
-        List<String> result = sut.searchData(dto);
+        List<String> result = sut.searchData(dto, fieldName);
 
         // then
         assertNotNull(result);

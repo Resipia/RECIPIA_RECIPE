@@ -10,6 +10,6 @@ public interface MongoPort {
 
     Long saveHashTagsIntoMongo(List<String> newHashtags);
 
-    List<String> searchData(SearchRequestDto searchRequestDto);
+    List<String> searchData(SearchRequestDto searchRequestDto, String fieldName);
 
 }

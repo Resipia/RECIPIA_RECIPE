@@ -1,9 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
-import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
-import com.recipia.recipe.adapter.out.persistence.document.HashtagDocument;
-import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
+import com.recipia.recipe.adapter.out.persistence.document.SearchDocument;
 import com.recipia.recipe.application.port.out.MongoPort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -67,10 +65,10 @@ public class MongoAdapter implements MongoPort {
         // 3. dataType에 따라 적절한 문서 클래스를 선택하여 업데이트한다.
         if ("ingredients".equals(dataType)) {
             // IngredientDocument에 대한 업데이트
-            return mongoTemplate.updateFirst(query, update, IngredientDocument.class).getModifiedCount();
+            return mongoTemplate.updateFirst(query, update, SearchDocument.class).getModifiedCount();
         } else if ("hashtags".equals(dataType)) {
             // HashtagDocument에 대한 업데이트
-            return mongoTemplate.updateFirst(query, update, HashtagDocument.class).getModifiedCount();
+            return mongoTemplate.updateFirst(query, update, SearchDocument.class).getModifiedCount();
         }
 
         // 적절한 dataType이 없는 경우
@@ -80,13 +78,13 @@ public class MongoAdapter implements MongoPort {
     /**
      * 유저가 검색에 입력한 접두사를 기준으로 10개의 단어를 반환한다.
      */
-    public List<String> searchData(SearchRequestDto searchRequestDto) {
-        return getSearchResults(searchRequestDto);
+    public List<String> searchData(SearchRequestDto searchRequestDto, String fieldName) {
+        return getSearchResults(searchRequestDto, fieldName);
     }
 
-    private List<String> getSearchResults(SearchRequestDto searchRequestDto) {
+    private List<String> getSearchResults(SearchRequestDto searchRequestDto, String fieldName) {
+
         String searchWord = searchRequestDto.getSearchWord();
-        String condition = searchRequestDto.getCondition().toString();
         // 접두사가 비어 있는 경우 빈 목록 반환
         if (searchWord == null || searchWord.isEmpty()) {
             return Collections.emptyList();
@@ -97,14 +95,14 @@ public class MongoAdapter implements MongoPort {
         // Aggregation pipeline 구성
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("id").is(documentId)),
-                Aggregation.unwind(condition),
-                Aggregation.match(Criteria.where(condition).regex(regexPattern, "i")),
-                Aggregation.project(condition),
+                Aggregation.unwind(fieldName),
+                Aggregation.match(Criteria.where(fieldName).regex(regexPattern, "i")),
+                Aggregation.project(fieldName),
                 Aggregation.limit(searchRequestDto.getResultSize())
         );
 
         // Aggregation 실행
-        AggregationResults<String> results = mongoTemplate.aggregate(aggregation, IngredientDocument.class, String.class);
+        AggregationResults<String> results = mongoTemplate.aggregate(aggregation, SearchDocument.class, String.class);
 
         // 결과 반환
         return results.getMappedResults();

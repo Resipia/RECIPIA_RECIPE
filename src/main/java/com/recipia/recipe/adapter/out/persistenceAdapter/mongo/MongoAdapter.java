@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
+import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.adapter.out.persistence.document.HashtagDocument;
 import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
@@ -79,9 +80,13 @@ public class MongoAdapter implements MongoPort {
     /**
      * 유저가 검색에 입력한 접두사를 기준으로 10개의 단어를 반환한다.
      */
-    public List<String> findIngredientsByPrefix(SearchRequestDto searchRequestDto) {
+    public List<String> searchData(SearchRequestDto searchRequestDto) {
+        return getSearchResults(searchRequestDto);
+    }
 
+    private List<String> getSearchResults(SearchRequestDto searchRequestDto) {
         String searchWord = searchRequestDto.getSearchWord();
+        String condition = searchRequestDto.getCondition().toString();
         // 접두사가 비어 있는 경우 빈 목록 반환
         if (searchWord == null || searchWord.isEmpty()) {
             return Collections.emptyList();
@@ -92,9 +97,9 @@ public class MongoAdapter implements MongoPort {
         // Aggregation pipeline 구성
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("id").is(documentId)),
-                Aggregation.unwind("ingredients"),
-                Aggregation.match(Criteria.where("ingredients").regex(regexPattern, "i")),
-                Aggregation.project("ingredients"),
+                Aggregation.unwind(condition),
+                Aggregation.match(Criteria.where(condition).regex(regexPattern, "i")),
+                Aggregation.project(condition),
                 Aggregation.limit(searchRequestDto.getResultSize())
         );
 

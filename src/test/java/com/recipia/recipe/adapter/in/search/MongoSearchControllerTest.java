@@ -40,7 +40,7 @@ class MongoSearchControllerTest extends TotalTestSupport {
     @Test
     void search() throws Exception {
         //given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "김치", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
         List<String> resultList = Arrays.asList("김치", "김치찌개", "김치전");
 
         when(mongoUseCase.searchWordByPrefix(dto)).thenReturn(resultList);

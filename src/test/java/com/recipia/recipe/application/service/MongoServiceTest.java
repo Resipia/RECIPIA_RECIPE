@@ -114,15 +114,16 @@ class MongoServiceTest {
     @Test
     void findIngredientsByPrefixTest() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "김치", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
         List<String> mockResponse = Arrays.asList("김치", "김치가루");
-        when(mongoPort.searchData(dto)).thenReturn(mockResponse);
+        String fieldName = "ingredients";
+        when(mongoPort.searchData(dto, fieldName)).thenReturn(mockResponse);
 
         //when
         List<String> result = sut.searchWordByPrefix(dto);
 
         //then
-        verify(mongoPort).searchData(dto);
+        verify(mongoPort).searchData(dto, fieldName);
         Assertions.assertThat(result).isEqualTo(mockResponse);
     }
 
@@ -130,7 +131,7 @@ class MongoServiceTest {
     @Test
     void findIngredientsByEmptyPrefixTest() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "", 10);
 
         //when & then
         Assertions.assertThatThrownBy(() -> sut.searchWordByPrefix(dto))
@@ -143,15 +144,16 @@ class MongoServiceTest {
     @Test
     void searchWordByPrefix() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "김치", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
         List<String> searchResult = Arrays.asList("김치", "김밥", "김가루");
-        when(mongoPort.searchData(dto)).thenReturn(searchResult);
+        String fieldName = "ingredients";
+        when(mongoPort.searchData(dto, fieldName)).thenReturn(searchResult);
 
         //when
         List<String> result = sut.searchWordByPrefix(dto);
 
         //then
-        verify(mongoPort).searchData(dto);
+        verify(mongoPort).searchData(dto, fieldName);
         Assertions.assertThat(result.size()).isEqualTo(searchResult.size());
     }
 
@@ -159,15 +161,16 @@ class MongoServiceTest {
     @Test
     void searchWordByPrefix2() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "감자", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "감자", 10);
         List<String> searchResult = Arrays.asList("감자", "감자채", "감자전분");
-        when(mongoPort.searchData(dto)).thenReturn(searchResult);
+        String fieldName = "ingredients";
+        when(mongoPort.searchData(dto, fieldName)).thenReturn(searchResult);
 
         //when
         List<String> result = sut.searchWordByPrefix(dto);
 
         //then
-        verify(mongoPort).searchData(dto);
+        verify(mongoPort).searchData(dto, fieldName);
         Assertions.assertThat(result.size()).isEqualTo(searchResult.size());
     }
 
@@ -175,15 +178,16 @@ class MongoServiceTest {
     @Test
     void searchWordByPrefix_hashtag() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.HASHTAGS, "감자", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.HASHTAG, "감자", 10);
         List<String> searchResult = Arrays.asList("감자", "감자채", "감자전분");
-        when(mongoPort.searchData(dto)).thenReturn(searchResult);
+        String fieldName = "hashtags";
+        when(mongoPort.searchData(dto, fieldName)).thenReturn(searchResult);
 
         //when
         List<String> result = sut.searchWordByPrefix(dto);
 
         //then
-        verify(mongoPort).searchData(dto);
+        verify(mongoPort).searchData(dto, fieldName);
         Assertions.assertThat(result.size()).isEqualTo(searchResult.size());
     }
 
@@ -192,24 +196,26 @@ class MongoServiceTest {
     void searchWordByPrefix_all() {
         //given
         SearchRequestDto dto = SearchRequestDto.of(SearchType.ALL, "감자", 10);
-        List<String> ingredientResults = Arrays.asList("감자", "감자채", "감자전분");
-        List<String> hashtagResults = Arrays.asList("감자", "감자요리", "감자튀김");
+        SearchRequestDto ingredientDto = SearchRequestDto.of(SearchType.INGREDIENT, "감자", 5);
+        SearchRequestDto hashtagDto = SearchRequestDto.of(SearchType.HASHTAG, "감자", 5);
 
-        when(mongoPort.searchData(any(SearchRequestDto.class)))
-                .thenReturn(ingredientResults)
-                .thenReturn(hashtagResults);
+        List<String> searchResults = Arrays.asList("감자", "감자채", "감자전분");
+
+        when(mongoPort.searchData(ingredientDto, "ingredients")).thenReturn(searchResults);
+        when(mongoPort.searchData(hashtagDto, "hashtags")).thenReturn(searchResults);
 
         //when
         List<String> result = sut.searchWordByPrefix(dto);
 
         //then
-        verify(mongoPort, times(2)).searchData(any(SearchRequestDto.class));
-        Assertions.assertThat(result.size()).isEqualTo(ingredientResults.size() + hashtagResults.size());
-        Assertions.assertThat(result).containsAll(ingredientResults);
-        Assertions.assertThat(result).containsAll(hashtagResults);
+        verify(mongoPort, times(1)).searchData(ingredientDto, "ingredients");
+        verify(mongoPort, times(1)).searchData(hashtagDto, "hashtags");
+        Assertions.assertThat(result.size()).isEqualTo(searchResults.size() + searchResults.size());
+        Assertions.assertThat(result).containsAll(searchResults);
+        Assertions.assertThat(result).containsAll(searchResults);
     }
 
-    @DisplayName("[bad] 검색 조건 없이 검색 시 예외 발생")
+    @DisplayName("[bad] 검색 조건 없이 검색 시 예외가 발생한다.")
     @Test
     void searchWordByPrefix_noCondition() {
         //given
@@ -226,7 +232,7 @@ class MongoServiceTest {
     @Test
     void searchWordByPrefix_emptySearchWord() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "", 10);
 
         //when & then
         Assertions.assertThatThrownBy(() -> sut.searchWordByPrefix(dto))
@@ -239,7 +245,7 @@ class MongoServiceTest {
     @Test
     void searchWordByPrefix_nullSearchWord() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, null, 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, null, 10);
 
         //when & then
         Assertions.assertThatThrownBy(() -> sut.searchWordByPrefix(dto))

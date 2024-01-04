@@ -3,6 +3,7 @@ package com.recipia.recipe.adapter.in.search;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
+import com.recipia.recipe.adapter.in.search.dto.SearchResponseDto;
 import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.config.TotalTestSupport;
 import org.junit.jupiter.api.DisplayName;
@@ -42,8 +43,9 @@ class MongoSearchControllerTest extends TotalTestSupport {
         //given
         SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
         List<String> resultList = Arrays.asList("김치", "김치찌개", "김치전");
+        List<SearchResponseDto> searchResponseDto = List.of(SearchResponseDto.of(resultList));
 
-        when(mongoUseCase.searchWordByPrefix(dto)).thenReturn(resultList);
+        when(mongoUseCase.searchWordByPrefix(dto)).thenReturn(searchResponseDto);
 
         //when & then
         mockMvc.perform(get("/mongo/search")

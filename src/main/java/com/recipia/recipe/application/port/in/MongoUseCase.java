@@ -1,6 +1,7 @@
 package com.recipia.recipe.application.port.in;
 
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
+import com.recipia.recipe.adapter.in.search.dto.SearchResponseDto;
 
 import java.util.List;
 
@@ -11,6 +12,6 @@ public interface MongoUseCase {
 
     void saveHashtagsIntoMongo(List<String> hashtags);
 
-    List<String> searchWordByPrefix(SearchRequestDto searchRequestDto);
+    List<SearchResponseDto> searchWordByPrefix(SearchRequestDto searchRequestDto);
 
 }

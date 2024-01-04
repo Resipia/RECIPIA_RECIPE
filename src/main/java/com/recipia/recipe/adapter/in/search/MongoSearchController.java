@@ -1,8 +1,11 @@
 package com.recipia.recipe.adapter.in.search;
 
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
+import com.recipia.recipe.adapter.in.search.dto.SearchResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.MongoUseCase;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,8 +30,9 @@ public class MongoSearchController {
      * 클라이언트는 이 컨트롤러를 호출할 때 검색 받고자 하는 결과의 개수(resultCount)를 담아서 보내줘야 한다. [5 or 10]
      */
     @GetMapping("/search")
-    public List<String> search(SearchRequestDto searchRequestDto) {
-        return mongoUseCase.searchWordByPrefix(searchRequestDto);
+    public ResponseEntity<ResponseDto<List<SearchResponseDto>>> search(SearchRequestDto searchRequestDto) {
+        List<SearchResponseDto> searchResponseDto = mongoUseCase.searchWordByPrefix(searchRequestDto);
+        return ResponseEntity.ok(ResponseDto.success(searchResponseDto));
     }
 
 }

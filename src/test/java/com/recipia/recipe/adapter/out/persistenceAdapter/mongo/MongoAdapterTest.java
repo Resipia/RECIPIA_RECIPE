@@ -2,6 +2,7 @@ package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
 import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
+import com.recipia.recipe.adapter.in.search.dto.SearchResponseDto;
 import com.recipia.recipe.adapter.out.persistence.document.SearchDocument;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -379,17 +380,21 @@ class MongoAdapterTest extends TotalTestSupport {
     void testFindIngredientsWithKoreanPrefix() {
         // given
         String fieldName = "ingredients";
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
+        SearchRequestDto searchRequestDto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
 
         // when
-        List<String> result = sut.searchData(dto, fieldName);
+        List<SearchResponseDto> searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
 
         // then
-        assertNotNull(result);
+        assertNotNull(searchResponseDto);
         List<String> validIngredients = Arrays.asList("김치", "김", "김가루", "김밥", "김빱");
 
-        assertTrue(result.stream().allMatch(ingredient ->
-                validIngredients.stream().anyMatch(ingredient::contains)));
+        boolean allMatch = searchResponseDto.stream()
+                .flatMap(dto -> dto.getSearchResultList().stream()) // 모든 검색 결과를 하나의 스트림으로 평탄화
+                .allMatch(result -> validIngredients.stream().anyMatch(result::contains)); // 각 결과가 유효한 재료 리스트에 있는지 확인
+
+        assertTrue(allMatch); // 모든 결과가 유효한 재료 리스트에 있는지 확인
+
 
     }
 
@@ -398,14 +403,20 @@ class MongoAdapterTest extends TotalTestSupport {
     void testFindIngredientsWithEnglishPrefix() {
         // given
         String fieldName = "ingredients";
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "ca", 10);
+        SearchRequestDto searchRequestDto = SearchRequestDto.of(SearchType.INGREDIENT, "ca", 10);
 
         // when
-        List<String> result = sut.searchData(dto, fieldName);
+        List<SearchResponseDto> searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
 
         // then
-        assertNotNull(result);
-        assertTrue(result.stream().allMatch(ingredient -> ingredient.toLowerCase().contains(dto.getSearchWord().toLowerCase())));
+        assertNotNull(searchResponseDto);
+        List<String> validIngredients = Arrays.asList("ca", "cad", "cas", "css");
+
+        boolean allMatch = searchResponseDto.stream()
+                .flatMap(dto -> dto.getSearchResultList().stream())
+                .allMatch(result -> validIngredients.stream().anyMatch(result::contains));
+
+        assertTrue(allMatch);
     }
 
     @DisplayName("[happy] 존재하지 않는 접두사로 재료를 검색하면 빈 목록이 반환된다.")
@@ -413,14 +424,14 @@ class MongoAdapterTest extends TotalTestSupport {
     void testFindIngredientsWithNonexistentPrefix() {
         // given
         String fieldName = "ingredients";
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "zzzk", 10);
+        SearchRequestDto searchRequestDto = SearchRequestDto.of(SearchType.INGREDIENT, "zzzk", 10);
 
         // when
-        List<String> result = sut.searchData(dto, fieldName);
+        List<SearchResponseDto> searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
 
         // then
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertNotNull(searchResponseDto);
+        assertTrue(searchResponseDto.get(0).getSearchResultList().isEmpty());
     }
 
     @DisplayName("[bad] 접두사가 없는 경우 빈 목록이 반환된다.")
@@ -428,14 +439,14 @@ class MongoAdapterTest extends TotalTestSupport {
     void testFindIngredientsWithNoPrefix() {
         // given
         String fieldName = "ingredients";
-        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "", 10);
+        SearchRequestDto searchRequestDto = SearchRequestDto.of(SearchType.INGREDIENT, "", 10);
 
         // when
-        List<String> result = sut.searchData(dto, fieldName);
+        List<SearchResponseDto> searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
 
         // then
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertNotNull(searchResponseDto);
+        assertTrue(searchResponseDto.isEmpty()); // 리스트가 비어 있는지 확인
     }
 
 

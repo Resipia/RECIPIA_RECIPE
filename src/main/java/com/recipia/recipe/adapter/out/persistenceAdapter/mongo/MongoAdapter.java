@@ -1,6 +1,8 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
+import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
+import com.recipia.recipe.adapter.in.search.dto.SearchResponseDto;
 import com.recipia.recipe.adapter.out.persistence.document.SearchDocument;
 import com.recipia.recipe.application.port.out.MongoPort;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -78,11 +80,11 @@ public class MongoAdapter implements MongoPort {
     /**
      * 유저가 검색에 입력한 접두사를 기준으로 10개의 단어를 반환한다.
      */
-    public List<String> searchData(SearchRequestDto searchRequestDto, String fieldName) {
-        return getSearchResults(searchRequestDto, fieldName);
+    public List<SearchResponseDto> searchData(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName) {
+        return getSearchResults(searchRequestDto, searchType, fieldName);
     }
 
-    private List<String> getSearchResults(SearchRequestDto searchRequestDto, String fieldName) {
+    private List<SearchResponseDto> getSearchResults(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName) {
 
         String searchWord = searchRequestDto.getSearchWord();
         // 접두사가 비어 있는 경우 빈 목록 반환
@@ -104,10 +106,9 @@ public class MongoAdapter implements MongoPort {
         // Aggregation 실행
         AggregationResults<String> results = mongoTemplate.aggregate(aggregation, SearchDocument.class, String.class);
 
-        // 결과 반환
-        return results.getMappedResults();
+        List<String> searchResults = results.getMappedResults();
+        return List.of(SearchResponseDto.of(searchType, searchResults));
     }
-
 
     /**
      * 만약 사용자가 입력한 문자열이 짧다면, 반복문의 비용은 무시할 수 있을 정도로 작으며,

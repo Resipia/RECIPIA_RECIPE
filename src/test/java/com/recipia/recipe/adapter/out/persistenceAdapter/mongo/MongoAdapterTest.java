@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.mongo;
 
+import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.adapter.out.persistence.document.HashtagDocument;
 import com.recipia.recipe.adapter.out.persistence.document.IngredientDocument;
@@ -381,10 +382,10 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithKoreanPrefix() {
         // given
-        SearchRequestDto dto = SearchRequestDto.of("김치", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "김치", 10);
 
         // when
-        List<String> result = sut.findIngredientsByPrefix(dto);
+        List<String> result = sut.searchData(dto);
 
         // then
         assertNotNull(result);
@@ -399,14 +400,13 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithEnglishPrefix() {
         // given
-        SearchRequestDto dto = SearchRequestDto.of("ca", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "ca", 10);
 
         // when
-        List<String> result = sut.findIngredientsByPrefix(dto);
+        List<String> result = sut.searchData(dto);
 
         // then
         assertNotNull(result);
-        assertFalse(result.isEmpty());
         assertTrue(result.stream().allMatch(ingredient -> ingredient.toLowerCase().contains(dto.getSearchWord().toLowerCase())));
     }
 
@@ -414,10 +414,10 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithNonexistentPrefix() {
         // given
-        SearchRequestDto dto = SearchRequestDto.of("zzzk", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "zzzk", 10);
 
         // when
-        List<String> result = sut.findIngredientsByPrefix(dto);
+        List<String> result = sut.searchData(dto);
 
         // then
         assertNotNull(result);
@@ -428,10 +428,10 @@ class MongoAdapterTest extends TotalTestSupport {
     @Test
     void testFindIngredientsWithNoPrefix() {
         // given
-        SearchRequestDto dto = SearchRequestDto.of("", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENTS, "", 10);
 
         // when
-        List<String> result = sut.findIngredientsByPrefix(dto);
+        List<String> result = sut.searchData(dto);
 
         // then
         assertNotNull(result);

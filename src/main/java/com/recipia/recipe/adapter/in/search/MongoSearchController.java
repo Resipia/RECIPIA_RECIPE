@@ -22,7 +22,7 @@ public class MongoSearchController {
     /**
      * 사용자가 입력한 단어의 접두사를 기준으로 몽고 db에서 연관된 단어를 검색한다.
      */
-    @GetMapping
+    @GetMapping("/search")
     public List<String> search(SearchRequestDto searchRequestDto) {
         return mongoUseCase.searchWordByPrefix(searchRequestDto);
     }

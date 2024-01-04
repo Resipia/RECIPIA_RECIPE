@@ -48,27 +48,19 @@ public class MongoService implements MongoUseCase {
      */
     @Override
     public List<String> searchWordByPrefix(SearchRequestDto searchRequestDto) {
-        // 1. 조건을 뽑아내고 null체크를 진행한다.
+        // 1. dto의 데이터를 검증하고 검색 조건을 mongoDB의 필드명으로 변화시켜 준다.
         validateSearchCondition(searchRequestDto);
         SearchType condition = searchRequestDto.getCondition();
         String fieldName = mapToFieldName(condition);
 
-        // 2. 조건에 따라 다른 검색을 실행한다.
+        // 2. 검색 조건 [전체, 재료, 해시태그]에 따라 분기처리 실시
         return switch (condition) {
-            case ALL -> combineSearchResults(searchRequestDto, 5);
-            case INGREDIENT, HASHTAG -> performSearch(searchRequestDto, fieldName);
+            // 전체 검색은 재료, 해시태그 검색결과 2개를 합친다.
+            case ALL -> allSearch(searchRequestDto, 5);
+            case INGREDIENT, HASHTAG -> ingredientsOrHashtagSearch(searchRequestDto, fieldName);
             default -> throw new RecipeApplicationException(ErrorCode.INVALID_SEARCH_CONDITION);
         };
     }
-
-    private String mapToFieldName(SearchType searchType) {
-        return switch (searchType) {
-            case INGREDIENT -> "ingredients"; // 실제 컬렉션명
-            case HASHTAG -> "hashtags"; // 실제 컬렉션명
-            default -> "ingredients"; // 기본 컬렉션명
-        };
-    }
-
 
     // 검색 조건과 단어의 검증을 실시
     private void validateSearchCondition(SearchRequestDto searchRequestDto) {
@@ -80,33 +72,46 @@ public class MongoService implements MongoUseCase {
         }
     }
 
-    /**
-     * 전체 검색일 경우에는 [재료 검색 결과 5개 + 해시태그 검색 결과 5개] 를 더한 10개의 결과 리스트를 만든다.
-     */
-    private List<String> combineSearchResults(SearchRequestDto searchRequestDto, Integer resultSize) {
+    // ENUM 필드명을 실제 mongoDB에 저장할 필드명으로 바뀌준다.
+    private String mapToFieldName(SearchType searchType) {
+        return switch (searchType) {
+            case INGREDIENT -> "ingredients";
+            case HASHTAG -> "hashtags";
+            default -> "ingredients";
+        };
+    }
 
-        // 재료, 해시태그 각각의 검색 요청에 필요한 dto를 생성한다.
+    /**
+     * 검색 조건이 [전체]일 경우
+     * [재료 결과 5개 + 해시태그 결과 5개]를 합쳐서 총 10개의 결과값을 가진 리스트를 반환한다.
+     */
+    private List<String> allSearch(SearchRequestDto searchRequestDto, Integer resultSize) {
+
         String searchWord = searchRequestDto.getSearchWord();
+        // [재료, 해시태그] 검색 요청에 사용할 dto 생성 (2개를 합칠 예정이라 resultSize는 상위 계층에서 5를 주입한다.)
         SearchRequestDto ingredientsDto = createSearchDto(SearchType.INGREDIENT, searchWord, resultSize);
         SearchRequestDto hashtagsDto = createSearchDto(SearchType.HASHTAG, searchWord, resultSize);
 
-        // 각각의 필드에 대해 검색을 수행한다.
+        // 검색 조건에 따른 [검색 결과]를 리스트로 반환한다.
         List<String> ingredientResults = mongoPort.searchData(ingredientsDto, "ingredients");
         List<String> hashtagResults = mongoPort.searchData(hashtagsDto, "hashtags");
 
-        // 결과를 합친다.
+        // 검색 결과를 합쳐서 하나의 리스트로 만들어 준다.
         return Stream.concat(ingredientResults.stream(), hashtagResults.stream())
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 검색 조건이 [재료, 해시태그]일 경우
+     * 각 검색 조건에 따라 10개의 데이터를 리스트로 반환받는다.
+     */
+    private List<String> ingredientsOrHashtagSearch(SearchRequestDto searchRequestDto, String fieldName) {
+        return mongoPort.searchData(searchRequestDto, fieldName);
     }
 
     // dto를 새롭게 생성
     private SearchRequestDto createSearchDto(SearchType type, String searchWord, Integer resultSize) {
         return SearchRequestDto.of(type, searchWord, resultSize);
-    }
-
-    // 전체가 아닐때 조건에 따른 검색 실시
-    private List<String> performSearch(SearchRequestDto searchRequestDto, String fieldName) {
-        return mongoPort.searchData(searchRequestDto, fieldName);
     }
 
 

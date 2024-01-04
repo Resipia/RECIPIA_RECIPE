@@ -1,5 +1,6 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.application.port.out.MongoPort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -17,8 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("[단위] 몽고 서비스 테스트")
@@ -107,5 +107,37 @@ class MongoServiceTest {
         assertThrows(DataAccessException.class,
                 () -> sut.saveIngredientsIntoMongo(ingredients));
     }
+
+    @DisplayName("[happy] 접두사로 재료를 검색하면 올바른 결과를 반환한다.")
+    @Test
+    void findIngredientsByPrefixTest() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of("김치", 10);
+        List<String> mockResponse = Arrays.asList("김치", "김치가루");
+        when(mongoPort.findIngredientsByPrefix(dto)).thenReturn(mockResponse);
+
+        //when
+        List<String> result = sut.findIngredientsByPrefix(dto);
+
+        //then
+        verify(mongoPort).findIngredientsByPrefix(dto);
+        Assertions.assertThat(result).isEqualTo(mockResponse);
+    }
+
+    @DisplayName("[bad] 비어있는 접두사로 재료를 검색할 경우 빈 목록을 반환한다.")
+    @Test
+    void findIngredientsByEmptyPrefixTest() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of("", 10);
+        when(mongoPort.findIngredientsByPrefix(dto)).thenReturn(Collections.emptyList());
+
+        //when
+        List<String> result = sut.findIngredientsByPrefix(dto);
+
+        //then
+        verify(mongoPort).findIngredientsByPrefix(dto);
+        Assertions.assertThat(result).isEmpty();
+    }
+
 
 }

@@ -1,5 +1,7 @@
 package com.recipia.recipe.application.port.in;
 
+import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
+
 import java.util.List;
 
 public interface MongoUseCase {
@@ -8,5 +10,7 @@ public interface MongoUseCase {
     void saveIngredientsIntoMongo(List<String> ingredients);
 
     void saveHashtagsIntoMongo(List<String> hashtags);
+
+    List<String> findIngredientsByPrefix(SearchRequestDto searchRequestDto);
 
 }

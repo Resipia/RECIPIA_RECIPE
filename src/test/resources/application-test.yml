@@ -41,7 +41,6 @@ some.configuration.for.tracer: false
 
 # 몽고db test id값
 mongo:
-  test:
     documentId: 658a766fd4751ba6ea28f1a9
 
 feign:

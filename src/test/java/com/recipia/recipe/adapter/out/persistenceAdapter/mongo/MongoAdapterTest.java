@@ -4,6 +4,7 @@ import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.adapter.in.search.dto.SearchResponseDto;
 import com.recipia.recipe.adapter.out.persistence.document.SearchDocument;
+import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
 import org.assertj.core.api.Assertions;
@@ -41,7 +42,7 @@ class MongoAdapterTest extends TotalTestSupport {
     @Autowired
     private MongoSearchRepository mongoSearchRepository;
 
-    @Value("${mongo.test.documentId}")
+    @Value("${mongo.documentId}")
     private String documentId;
 
     /**
@@ -383,16 +384,16 @@ class MongoAdapterTest extends TotalTestSupport {
         SearchRequestDto searchRequestDto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
 
         // when
-        List<SearchResponseDto> searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
+        SearchResponseDto searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
 
         // then
         assertNotNull(searchResponseDto);
         List<String> validIngredients = Arrays.asList("김치", "김", "김가루", "김밥", "김빱");
 
-        boolean allMatch = searchResponseDto.stream()
-                .flatMap(dto -> dto.getSearchResultList().stream()) // 모든 검색 결과를 하나의 스트림으로 평탄화
-                .allMatch(result -> validIngredients.stream().anyMatch(result::contains)); // 각 결과가 유효한 재료 리스트에 있는지 확인
 
+        boolean allMatch = searchResponseDto.getSearchResultList()
+                .stream()
+                .allMatch(result -> validIngredients.stream().anyMatch(result::contains));
         assertTrue(allMatch); // 모든 결과가 유효한 재료 리스트에 있는지 확인
 
 
@@ -406,17 +407,16 @@ class MongoAdapterTest extends TotalTestSupport {
         SearchRequestDto searchRequestDto = SearchRequestDto.of(SearchType.INGREDIENT, "ca", 10);
 
         // when
-        List<SearchResponseDto> searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
+        SearchResponseDto searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
 
         // then
         assertNotNull(searchResponseDto);
         List<String> validIngredients = Arrays.asList("ca", "cad", "cas", "css");
 
-        boolean allMatch = searchResponseDto.stream()
-                .flatMap(dto -> dto.getSearchResultList().stream())
+        boolean allMatch = searchResponseDto.getSearchResultList()
+                .stream()
                 .allMatch(result -> validIngredients.stream().anyMatch(result::contains));
-
-        assertTrue(allMatch);
+        assertTrue(allMatch); // 모든 결과가 유효한 재료 리스트에 있는지 확인
     }
 
     @DisplayName("[happy] 존재하지 않는 접두사로 재료를 검색하면 빈 목록이 반환된다.")
@@ -427,11 +427,11 @@ class MongoAdapterTest extends TotalTestSupport {
         SearchRequestDto searchRequestDto = SearchRequestDto.of(SearchType.INGREDIENT, "zzzk", 10);
 
         // when
-        List<SearchResponseDto> searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
+        SearchResponseDto searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
 
         // then
         assertNotNull(searchResponseDto);
-        assertTrue(searchResponseDto.get(0).getSearchResultList().isEmpty());
+        assertTrue(searchResponseDto.getSearchResultList().isEmpty());
     }
 
     @DisplayName("[bad] 접두사가 없는 경우 빈 목록이 반환된다.")
@@ -441,12 +441,11 @@ class MongoAdapterTest extends TotalTestSupport {
         String fieldName = "ingredients";
         SearchRequestDto searchRequestDto = SearchRequestDto.of(SearchType.INGREDIENT, "", 10);
 
-        // when
-        List<SearchResponseDto> searchResponseDto = sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName);
-
-        // then
-        assertNotNull(searchResponseDto);
-        assertTrue(searchResponseDto.isEmpty()); // 리스트가 비어 있는지 확인
+        // when & then
+        Assertions.assertThatThrownBy(() -> sut.searchData(searchRequestDto, SearchType.INGREDIENT, fieldName))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("잘못된 입력입니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_INPUT);
     }
 
 

@@ -29,6 +29,11 @@ public enum ErrorCode {
     CATEGORY_NOT_VALID(404, "CATEGORY_NOT_VALID", "카테고리는 null이거나 공백이어서는 안됩니다."),
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "존재하지 않는 카테고리입니다."),
 
+    // 북마크 관련 에러
+    RECIPE_NOT_FOUND(404, "RECIPE_NOT_FOUND", "레시피가 존재하지 않습니다."),
+    INVALID_INPUT(404, "INVALID_INPUT", "잘못된 입력입니다."),
+    BOOKMARK_NOT_FOUND(404, "BOOKMARK_NOT_FOUND", "북마크를 찾을 수 없습니다."),
+
     // 검색 관련 에러
     CONDITION_NOT_FOUND(404, "CONDITION_NOT_FOUND", "검색 조건을 찾을 수 없습니다."),
     INVALID_SEARCH_CONDITION(404, "INVALID_SEARCH_CONDITION", "검색 조건이 유효하지 않습니다."),

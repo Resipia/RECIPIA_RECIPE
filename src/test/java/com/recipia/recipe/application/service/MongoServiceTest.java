@@ -33,7 +33,7 @@ class MongoServiceTest {
     @Mock
     MongoPort mongoPort;
 
-    @DisplayName("MongoDB에 재료 리스트 저장 시, MongoPort의 saveIngredientsIntoMongo를 호출한다.")
+    @DisplayName("[happy] MongoDB에 재료 리스트 저장 시, MongoPort의 saveIngredientsIntoMongo를 호출한다.")
     @Test
     void saveIngredientsIntoMongo() {
         //given
@@ -46,7 +46,7 @@ class MongoServiceTest {
         verify(mongoPort).saveIngredientsIntoMongo(ingredients);
     }
 
-    @DisplayName("비어있는 재료 리스트를 저장할 시 예외가 발생한다.")
+    @DisplayName("[bad] 비어있는 재료 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveEmptyIngredientsIntoMongo() {
         //given
@@ -59,7 +59,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_INGREDIENTS);
     }
 
-    @DisplayName("null인 재료 리스트를 저장할 시 예외가 발생한다.")
+    @DisplayName("[bad] null인 재료 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveNullIngredientsIntoMongo() {
         //given
@@ -72,7 +72,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_INGREDIENTS);
     }
 
-    @DisplayName("비어있는 해시태그 리스트를 저장할 시 예외가 발생한다.")
+    @DisplayName("[bad] 비어있는 해시태그 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveEmptyHashtagsIntoMongo() {
         //given
@@ -85,7 +85,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_HASHTAGS);
     }
 
-    @DisplayName("null인 해시태그 리스트를 저장할 시 예외가 발생한다.")
+    @DisplayName("[bad] null인 해시태그 리스트를 저장할 시 예외가 발생한다.")
     @Test
     void saveNullHashtagsIntoMongo() {
         //given
@@ -98,7 +98,7 @@ class MongoServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_HASHTAGS);
     }
 
-    @DisplayName("MongoPort 호출 중 DataAccessException 발생 시, 예외가 적절히 처리되는지 확인")
+    @DisplayName("[bad] MongoPort 호출 중 DataAccessException 발생 시, 예외가 적절히 처리되는지 확인")
     @Test
     void testMongoPortExceptionHandling() {
         //given
@@ -116,7 +116,7 @@ class MongoServiceTest {
     void findIngredientsByPrefixTest() {
         //given
         SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
-        List<SearchResponseDto> mockResponse = List.of(SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("김치", "김치가루")));
+        SearchResponseDto mockResponse = SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("김치", "김치가루"));
         String fieldName = "ingredients";
         when(mongoPort.searchData(dto, SearchType.INGREDIENT, fieldName)).thenReturn(mockResponse);
 
@@ -125,7 +125,7 @@ class MongoServiceTest {
 
         //then
         verify(mongoPort).searchData(dto, SearchType.INGREDIENT, fieldName);
-        Assertions.assertThat(searchResponseDto).isEqualTo(mockResponse);
+        Assertions.assertThat(searchResponseDto).isEqualTo(List.of(mockResponse));
     }
 
     @DisplayName("[bad] 비어있는 접두사로 재료를 검색할 경우 예외가 발생한다.")
@@ -146,7 +146,7 @@ class MongoServiceTest {
     void searchWordByPrefix() {
         //given
         SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
-        List<SearchResponseDto> searchResult = List.of(SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("김치", "김밥", "김가루")));
+        SearchResponseDto searchResult = SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("김치", "김밥", "김가루"));
         String fieldName = "ingredients";
         when(mongoPort.searchData(dto, SearchType.INGREDIENT, fieldName)).thenReturn(searchResult);
 
@@ -155,7 +155,7 @@ class MongoServiceTest {
 
         //then
         verify(mongoPort).searchData(dto, SearchType.INGREDIENT, fieldName);
-        Assertions.assertThat(searchResponseDto.get(0).getSearchResultList().size()).isEqualTo(searchResult.get(0).getSearchResultList().size());
+        Assertions.assertThat(searchResponseDto.get(0).getSearchResultList().size()).isEqualTo(searchResult.getSearchResultList().size());
     }
 
     @DisplayName("[happy] 재료를 조건으로 검색하면 검색한 단어의 접두사로 시작되는 재료 리스트를 반환한다2.")
@@ -163,7 +163,7 @@ class MongoServiceTest {
     void searchWordByPrefix2() {
         //given
         SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "감자", 10);
-        List<SearchResponseDto> searchResult = List.of(SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("감자", "감자채", "감자전분")));
+        SearchResponseDto searchResult = SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("감자", "감자채", "감자전분"));
         String fieldName = "ingredients";
         when(mongoPort.searchData(dto, SearchType.INGREDIENT, fieldName)).thenReturn(searchResult);
 
@@ -172,7 +172,7 @@ class MongoServiceTest {
 
         //then
         verify(mongoPort).searchData(dto, SearchType.INGREDIENT, fieldName);
-        Assertions.assertThat(searchResponseDto.get(0).getSearchResultList().size()).isEqualTo(searchResult.get(0).getSearchResultList().size());
+        Assertions.assertThat(searchResponseDto.get(0).getSearchResultList().size()).isEqualTo(searchResult.getSearchResultList().size());
     }
 
     @DisplayName("[happy] 해시태그를 조건으로 검색하면 검색한 단어의 접두사로 시작되는 해시태그 리스트를 반환한다.")
@@ -180,7 +180,7 @@ class MongoServiceTest {
     void searchWordByPrefix_hashtag() {
         //given
         SearchRequestDto dto = SearchRequestDto.of(SearchType.HASHTAG, "감자", 10);
-        List<SearchResponseDto> searchResult = List.of(SearchResponseDto.of(SearchType.HASHTAG, Arrays.asList("감자", "감자채", "감자전분")));
+        SearchResponseDto searchResult = SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("감자", "감자채", "감자전분"));
         String fieldName = "hashtags";
         when(mongoPort.searchData(dto, SearchType.HASHTAG, fieldName)).thenReturn(searchResult);
 
@@ -189,7 +189,7 @@ class MongoServiceTest {
 
         //then
         verify(mongoPort).searchData(dto, SearchType.HASHTAG, fieldName);
-        Assertions.assertThat(searchResponseDto.get(0).getSearchResultList().size()).isEqualTo(searchResult.get(0).getSearchResultList().size());
+        Assertions.assertThat(searchResponseDto.get(0).getSearchResultList().size()).isEqualTo(searchResult.getSearchResultList().size());
     }
 
     @DisplayName("[happy] 전체 조건으로 검색하면 검색한 단어의 접두사로 시작되는 재료5개 해시태그5개의 결과를 가진 리스트를 반환한다.")
@@ -200,7 +200,7 @@ class MongoServiceTest {
         SearchRequestDto ingredientDto = SearchRequestDto.of(SearchType.INGREDIENT, "감자", 5);
         SearchRequestDto hashtagDto = SearchRequestDto.of(SearchType.HASHTAG, "감자", 5);
 
-        List<SearchResponseDto> searchResult = List.of(SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("감자", "감자채", "감자전분")));
+        SearchResponseDto searchResult = SearchResponseDto.of(SearchType.INGREDIENT, Arrays.asList("감자", "감자채", "감자전분"));
 
         when(mongoPort.searchData(ingredientDto, SearchType.INGREDIENT, "ingredients")).thenReturn(searchResult);
         when(mongoPort.searchData(hashtagDto, SearchType.HASHTAG, "hashtags")).thenReturn(searchResult);

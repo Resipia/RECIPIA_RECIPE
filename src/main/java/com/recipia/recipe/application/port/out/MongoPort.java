@@ -12,6 +12,6 @@ public interface MongoPort {
 
     Long saveHashTagsIntoMongo(List<String> newHashtags);
 
-    List<SearchResponseDto> searchData(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName);
+    SearchResponseDto searchData(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName);
 
 }

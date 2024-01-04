@@ -1,6 +1,5 @@
 package com.recipia.recipe.adapter.in.listener.springevent.recipe;
 
-import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.MongoUseCase;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 public class SpringEventRecipeCreateListener {
 
     private final MongoUseCase mongoUseCase;
-    private final CreateRecipeUseCase createRecipeUseCase;
 
     /**
      * MongoDB에 재료 저장을 요청하는 스프링 이벤트 리스너

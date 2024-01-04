@@ -32,7 +32,7 @@ public class MongoAdapter implements MongoPort {
 
     private final MongoTemplate mongoTemplate;
 
-    @Value("${mongo.test.documentId}")
+    @Value("${mongo.documentId}")
     private String documentId;
 
 
@@ -80,16 +80,16 @@ public class MongoAdapter implements MongoPort {
     /**
      * 유저가 검색에 입력한 접두사를 기준으로 10개의 단어를 반환한다.
      */
-    public List<SearchResponseDto> searchData(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName) {
+    public SearchResponseDto searchData(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName) {
         return getSearchResults(searchRequestDto, searchType, fieldName);
     }
 
-    private List<SearchResponseDto> getSearchResults(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName) {
+    private SearchResponseDto getSearchResults(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName) {
 
         String searchWord = searchRequestDto.getSearchWord();
-        // 접두사가 비어 있는 경우 빈 목록 반환
+        // 접두사가 비어 있는 경우 예외처리
         if (searchWord == null || searchWord.isEmpty()) {
-            return Collections.emptyList();
+            throw new RecipeApplicationException(ErrorCode.INVALID_INPUT);
         }
 
         String regexPattern = (containsKorean(searchWord) ? "^" + searchWord : "^" + searchWord + "[A-Za-z]*");
@@ -107,7 +107,7 @@ public class MongoAdapter implements MongoPort {
         AggregationResults<String> results = mongoTemplate.aggregate(aggregation, SearchDocument.class, String.class);
 
         List<String> searchResults = results.getMappedResults();
-        return List.of(SearchResponseDto.of(searchType, searchResults));
+        return SearchResponseDto.of(searchType, searchResults);
     }
 
     /**

@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * 몽고 DB에 대한 트랜잭션은 지원하지 않기때문에 @Transactional 추가x
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -96,13 +99,14 @@ public class MongoService implements MongoUseCase {
         SearchRequestDto hashtagsDto = createSearchDto(SearchType.HASHTAG, searchWord, resultSize);
 
         // 검색 결과를 가져온다.
-        List<SearchResponseDto> searchIngredientResults = mongoPort.searchData(ingredientsDto, SearchType.INGREDIENT, "ingredients");
-        List<SearchResponseDto> searchHashtagResults = mongoPort.searchData(hashtagsDto, SearchType.HASHTAG, "hashtags");
+        SearchResponseDto searchIngredientResults = mongoPort.searchData(ingredientsDto, SearchType.INGREDIENT, "ingredients");
+        SearchResponseDto searchHashtagResults = mongoPort.searchData(hashtagsDto, SearchType.HASHTAG, "hashtags");
+
 
         // 두 결과 리스트를 합친다.
         List<SearchResponseDto> combinedResults = new ArrayList<>();
-        combinedResults.addAll(searchIngredientResults);
-        combinedResults.addAll(searchHashtagResults);
+        combinedResults.add(searchIngredientResults);
+        combinedResults.add(searchHashtagResults);
         return combinedResults;
     }
 
@@ -112,7 +116,7 @@ public class MongoService implements MongoUseCase {
      * 각 검색 조건에 따라 10개의 데이터를 리스트로 반환받는다.
      */
     private List<SearchResponseDto> ingredientsOrHashtagSearch(SearchRequestDto searchRequestDto, SearchType searchType, String fieldName) {
-        return mongoPort.searchData(searchRequestDto, searchType, fieldName);
+        return List.of(mongoPort.searchData(searchRequestDto, searchType, fieldName));
     }
 
     // dto를 새롭게 생성

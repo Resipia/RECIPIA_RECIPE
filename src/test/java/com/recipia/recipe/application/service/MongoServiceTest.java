@@ -1,5 +1,6 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.search.constant.SearchType;
 import com.recipia.recipe.adapter.in.search.dto.SearchRequestDto;
 import com.recipia.recipe.application.port.out.MongoPort;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -112,31 +114,144 @@ class MongoServiceTest {
     @Test
     void findIngredientsByPrefixTest() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of("김치", 10);
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
         List<String> mockResponse = Arrays.asList("김치", "김치가루");
-        when(mongoPort.findIngredientsByPrefix(dto)).thenReturn(mockResponse);
+        String fieldName = "ingredients";
+        when(mongoPort.searchData(dto, fieldName)).thenReturn(mockResponse);
 
         //when
-        List<String> result = sut.findIngredientsByPrefix(dto);
+        List<String> result = sut.searchWordByPrefix(dto);
 
         //then
-        verify(mongoPort).findIngredientsByPrefix(dto);
+        verify(mongoPort).searchData(dto, fieldName);
         Assertions.assertThat(result).isEqualTo(mockResponse);
     }
 
-    @DisplayName("[bad] 비어있는 접두사로 재료를 검색할 경우 빈 목록을 반환한다.")
+    @DisplayName("[bad] 비어있는 접두사로 재료를 검색할 경우 예외가 발생한다.")
     @Test
     void findIngredientsByEmptyPrefixTest() {
         //given
-        SearchRequestDto dto = SearchRequestDto.of("", 10);
-        when(mongoPort.findIngredientsByPrefix(dto)).thenReturn(Collections.emptyList());
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "", 10);
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.searchWordByPrefix(dto))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("검색 단어 입력은 필수입니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEARCH_WORD_NECESSARY);
+    }
+
+    @DisplayName("[happy] 재료를 조건으로 검색하면 검색한 단어의 접두사로 시작되는 재료 리스트를 반환한다1.")
+    @Test
+    void searchWordByPrefix() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "김치", 10);
+        List<String> searchResult = Arrays.asList("김치", "김밥", "김가루");
+        String fieldName = "ingredients";
+        when(mongoPort.searchData(dto, fieldName)).thenReturn(searchResult);
 
         //when
-        List<String> result = sut.findIngredientsByPrefix(dto);
+        List<String> result = sut.searchWordByPrefix(dto);
 
         //then
-        verify(mongoPort).findIngredientsByPrefix(dto);
-        Assertions.assertThat(result).isEmpty();
+        verify(mongoPort).searchData(dto, fieldName);
+        Assertions.assertThat(result.size()).isEqualTo(searchResult.size());
+    }
+
+    @DisplayName("[happy] 재료를 조건으로 검색하면 검색한 단어의 접두사로 시작되는 재료 리스트를 반환한다2.")
+    @Test
+    void searchWordByPrefix2() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "감자", 10);
+        List<String> searchResult = Arrays.asList("감자", "감자채", "감자전분");
+        String fieldName = "ingredients";
+        when(mongoPort.searchData(dto, fieldName)).thenReturn(searchResult);
+
+        //when
+        List<String> result = sut.searchWordByPrefix(dto);
+
+        //then
+        verify(mongoPort).searchData(dto, fieldName);
+        Assertions.assertThat(result.size()).isEqualTo(searchResult.size());
+    }
+
+    @DisplayName("[happy] 해시태그를 조건으로 검색하면 검색한 단어의 접두사로 시작되는 해시태그 리스트를 반환한다.")
+    @Test
+    void searchWordByPrefix_hashtag() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.HASHTAG, "감자", 10);
+        List<String> searchResult = Arrays.asList("감자", "감자채", "감자전분");
+        String fieldName = "hashtags";
+        when(mongoPort.searchData(dto, fieldName)).thenReturn(searchResult);
+
+        //when
+        List<String> result = sut.searchWordByPrefix(dto);
+
+        //then
+        verify(mongoPort).searchData(dto, fieldName);
+        Assertions.assertThat(result.size()).isEqualTo(searchResult.size());
+    }
+
+    @DisplayName("[happy] 전체 조건으로 검색하면 검색한 단어의 접두사로 시작되는 재료5개 해시태그5개의 결과를 가진 리스트를 반환한다.")
+    @Test
+    void searchWordByPrefix_all() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.ALL, "감자", 10);
+        SearchRequestDto ingredientDto = SearchRequestDto.of(SearchType.INGREDIENT, "감자", 5);
+        SearchRequestDto hashtagDto = SearchRequestDto.of(SearchType.HASHTAG, "감자", 5);
+
+        List<String> searchResults = Arrays.asList("감자", "감자채", "감자전분");
+
+        when(mongoPort.searchData(ingredientDto, "ingredients")).thenReturn(searchResults);
+        when(mongoPort.searchData(hashtagDto, "hashtags")).thenReturn(searchResults);
+
+        //when
+        List<String> result = sut.searchWordByPrefix(dto);
+
+        //then
+        verify(mongoPort, times(1)).searchData(ingredientDto, "ingredients");
+        verify(mongoPort, times(1)).searchData(hashtagDto, "hashtags");
+        Assertions.assertThat(result.size()).isEqualTo(searchResults.size() + searchResults.size());
+        Assertions.assertThat(result).containsAll(searchResults);
+        Assertions.assertThat(result).containsAll(searchResults);
+    }
+
+    @DisplayName("[bad] 검색 조건 없이 검색 시 예외가 발생한다.")
+    @Test
+    void searchWordByPrefix_noCondition() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of(null, "감자", 10);
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.searchWordByPrefix(dto))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("검색 조건을 찾을 수 없습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.CONDITION_NOT_FOUND);
+    }
+
+    @DisplayName("[happy] 검색어가 빈 문자열인 경우 예외가 발생한다.")
+    @Test
+    void searchWordByPrefix_emptySearchWord() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, "", 10);
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.searchWordByPrefix(dto))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("검색 단어 입력은 필수입니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEARCH_WORD_NECESSARY);
+    }
+
+    @DisplayName("[bad] 검색어가 null인 경우 예외가 발생한다.")
+    @Test
+    void searchWordByPrefix_nullSearchWord() {
+        //given
+        SearchRequestDto dto = SearchRequestDto.of(SearchType.INGREDIENT, null, 10);
+
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.searchWordByPrefix(dto))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("검색 단어 입력은 필수입니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEARCH_WORD_NECESSARY);
     }
 
 

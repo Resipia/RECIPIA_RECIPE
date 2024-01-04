@@ -30,7 +30,9 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "존재하지 않는 카테고리입니다."),
 
     // 검색 관련 에러
-    CONDITION_NOT_FOUND(404, "CONDITION_NOT_FOUND", "검색조건을 찾을 수 없습니다."),
+    CONDITION_NOT_FOUND(404, "CONDITION_NOT_FOUND", "검색 조건을 찾을 수 없습니다."),
+    INVALID_SEARCH_CONDITION(404, "INVALID_SEARCH_CONDITION", "검색 조건이 유효하지 않습니다."),
+    SEARCH_WORD_NECESSARY(404, "SEARCH_WORD_NOT_FOUND", "검색 단어 입력은 필수입니다."),
 
     // DB 관련 에러
     REQUIRED_FIELD_NULL(404, "REQUIRED_FIELD_NULL", "필수 컬럼값이 존재하지 않습니다."),

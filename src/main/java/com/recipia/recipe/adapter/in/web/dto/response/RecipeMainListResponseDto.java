@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.in.web.dto.response;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,4 +25,13 @@ public class RecipeMainListResponseDto {
         this.nickname = nickname;
         this.isBookmarked = isBookmarked;
     }
+
+    public static RecipeMainListResponseDto of(Long id, String recipeName, String nickname, boolean isBookmarked) {
+        return new RecipeMainListResponseDto(id, recipeName, nickname, isBookmarked);
+    }
+
+    public static RecipeMainListResponseDto of(String recipeName, String nickname, boolean isBookmarked) {
+        return new RecipeMainListResponseDto(null, recipeName, nickname, isBookmarked);
+    }
+
 }

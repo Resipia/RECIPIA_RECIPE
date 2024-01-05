@@ -154,7 +154,7 @@ class RecipeServiceTest {
 
     private List<RecipeMainListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> new RecipeMainListResponseDto((long) i, "Recipe " + i, "Nickname", false))
+                .mapToObj(i -> RecipeMainListResponseDto.of((long) i, "Recipe " + i, "Nickname", false))
                 .collect(Collectors.toList());
     }
 

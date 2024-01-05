@@ -17,6 +17,7 @@ public class RecipeMainListResponseDto {
     private String nickname;
     private List<String> subCategoryList;
     private boolean isBookmarked;
+    // todo: 추후 썸네일 이미지 추가
     //제목, 닉넴, 카테고리(list or string), 북마크 여부, 조회수, order by (조회수 높고낮음, 등록날짜 높고낮음)
 
     public RecipeMainListResponseDto(Long id, String recipeName, String nickname, boolean isBookmarked) {

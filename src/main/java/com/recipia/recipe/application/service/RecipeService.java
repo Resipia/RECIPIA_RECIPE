@@ -1,5 +1,6 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
@@ -70,6 +71,10 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         List<RecipeMainListResponseDto> content = allRecipeList.getContent();
         Long totalCount = allRecipeList.getTotalElements();
         return PagingResponseDto.of(content, totalCount);
+    }
+
+    public RecipeDetailViewDto getRecipeDetailView(Long recipeId) {
+        return recipePort.getRecipeDetailView(recipeId);
     }
 
 }

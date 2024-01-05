@@ -61,3 +61,7 @@ VALUES (4, '파스타', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        (4, '샐러드', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 -- 추가적인 양식 서브 카테고리 ...
 
+INSERT INTO recipe_category_map (recipe_id, sub_category_id, create_dttm)
+VALUES (1, 5, CURRENT_TIMESTAMP),
+       (1, 6, CURRENT_TIMESTAMP),
+       (1, 7, CURRENT_TIMESTAMP);

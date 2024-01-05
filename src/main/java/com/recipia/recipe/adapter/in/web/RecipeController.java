@@ -2,6 +2,7 @@ package com.recipia.recipe.adapter.in.web;
 
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
@@ -49,5 +50,17 @@ public class RecipeController {
         PagingResponseDto<RecipeMainListResponseDto> allRecipeList = readRecipeUseCase.getAllRecipeList(page, size, sortType);
         return ResponseEntity.ok(allRecipeList);
     }
+
+    /**
+     * 레시피 단건 조회
+     */
+    @GetMapping("/getRecipeDetail")
+    public ResponseEntity<ResponseDto<RecipeDetailViewDto>> getRecipeDetailView(
+            @RequestParam(value = "recipeId") Long recipeId
+    ) {
+        RecipeDetailViewDto recipeDetailViewDto = readRecipeUseCase.getRecipeDetailView(recipeId);
+        return ResponseEntity.ok(ResponseDto.success(recipeDetailViewDto));
+    }
+
 
 }

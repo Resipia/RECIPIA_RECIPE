@@ -73,6 +73,9 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         return PagingResponseDto.of(content, totalCount);
     }
 
+    /**
+     * 레시피 단건 조회
+     */
     public RecipeDetailViewDto getRecipeDetailView(Long recipeId) {
         return recipePort.getRecipeDetailView(recipeId);
     }

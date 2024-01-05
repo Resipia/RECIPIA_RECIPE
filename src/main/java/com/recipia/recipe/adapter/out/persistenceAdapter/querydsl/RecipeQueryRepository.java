@@ -118,7 +118,7 @@ public class RecipeQueryRepository {
     /**
      * 단건 레시피를 상세조회
      */
-    public RecipeDetailViewDto getRecipeDetailView(Long recipeId, Long currentMemberId) {
+    public Optional<RecipeDetailViewDto> getRecipeDetailView(Long recipeId, Long currentMemberId) {
 
         // 북마크 여부 서브쿼리
         JPQLQuery<Boolean> bookmarkSubQuery = JPAExpressions
@@ -127,7 +127,7 @@ public class RecipeQueryRepository {
                 .where(bookmarkEntity.memberId.eq(currentMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
         // 레시피 상세조회
-        return queryFactory
+        return Optional.ofNullable(queryFactory
                 .select(Projections.constructor(RecipeDetailViewDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
@@ -137,6 +137,6 @@ public class RecipeQueryRepository {
                 ))
                 .from(recipeEntity)
                 .where(recipeEntity.id.eq(recipeId))
-                .fetchOne();
+                .fetchOne());
     }
 }

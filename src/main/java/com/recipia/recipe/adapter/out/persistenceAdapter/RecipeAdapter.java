@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.querydsl.core.Tuple;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
@@ -19,8 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -117,13 +116,31 @@ public class RecipeAdapter implements RecipePort {
                 .toList();
 
         // 3. recipeId로 관련된 서브 카테고리를 받아온다.
-        List<Tuple> subCategoryNameResults = querydslRepository.getSubCategoryNameListTuple(selectedRecipeIdList);
+        List<Tuple> subCategoryNameResults = querydslRepository.findSubCategoriesForRecipe(selectedRecipeIdList);
         Map<Long, List<String>> subCategoryNameMap = getSubCategoryNameMap(subCategoryNameResults);
 
         // 4. 결과값 dto에 서브 카테고리를 추가한다.
         recipeList.getContent().forEach(dto -> dto.setSubCategoryList(subCategoryNameMap.get(dto.getId())));
         return recipeList;
     }
+
+    /**
+     * 한개의 레시피를 조회하는 레시피
+     */
+    @Override
+    public RecipeDetailViewDto getRecipeDetailView(Long recipeId) {
+        // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
+        Long currentMemberId = securityUtil.getCurrentMemberId();
+        RecipeDetailViewDto recipeDetailViewDto = querydslRepository.getRecipeDetailView(recipeId, currentMemberId)
+                .orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
+
+        // 2. recipeId로 관련된 서브 카테고리를 받아온다.
+        List<Tuple> subCategoriesForRecipe = querydslRepository.findSubCategoriesForRecipe(recipeDetailViewDto.getId());
+        List<String> sunCategoryNames = getSubCategoryNameMap(subCategoriesForRecipe).get(recipeDetailViewDto.getId());
+        recipeDetailViewDto.setSubCategoryList(sunCategoryNames);
+        return recipeDetailViewDto;
+    }
+
 
     /**
      * 서브 카테고리를 Map<Long, List<String>> 형태로 받아온다.

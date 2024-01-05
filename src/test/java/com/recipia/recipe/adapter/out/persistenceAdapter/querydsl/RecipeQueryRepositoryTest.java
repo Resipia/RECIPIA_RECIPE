@@ -6,6 +6,8 @@ import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.RecipeRepository;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -131,7 +134,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         Long memberId = 1L; // 존재하는 멤버 ID 사용
 
         // When
-        RecipeDetailViewDto detailView = sut.getRecipeDetailView(recipeId, memberId);
+        RecipeDetailViewDto detailView = sut.getRecipeDetailView(recipeId, memberId).get();
 
         // Then
         assertThat(detailView).isNotNull();
@@ -149,11 +152,11 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
         Long memberId = 1L;
 
-        // When
-        RecipeDetailViewDto result = sut.getRecipeDetailView(invalidRecipeId, memberId);
+        //when
+        Optional<RecipeDetailViewDto> recipeDetailView = sut.getRecipeDetailView(invalidRecipeId, memberId);
 
-        // Then
-        assertThat(result).isNull();
+        // then
+        Assertions.assertThat(recipeDetailView).isEmpty();
     }
 
 }

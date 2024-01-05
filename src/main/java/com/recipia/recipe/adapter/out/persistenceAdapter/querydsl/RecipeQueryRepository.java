@@ -1,8 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
-import com.querydsl.core.group.GroupBy;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.*;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -13,13 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
@@ -50,15 +45,6 @@ public class RecipeQueryRepository {
      */
     public Page<RecipeMainListResponseDto> getAllRecipeList(Long memberId, Pageable pageable, String sortType) {
 
-        // 서브쿼리를 사용하여 subCategory 문자열 생성
-        JPQLQuery<String> subCategorySubQuery = JPAExpressions
-                .select(Expressions.stringTemplate(
-                        "string_agg({0}, ',')", recipeCategoryMapEntity.subCategoryEntity.subCategoryNm))
-                .from(recipeCategoryMapEntity)
-                .where(recipeCategoryMapEntity.recipeEntity.id.eq(recipeEntity.id))
-                .groupBy(recipeCategoryMapEntity.recipeEntity.id);
-
-
         // 북마크 여부 서브쿼리
         JPQLQuery<Boolean> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.count().gt(0L))
@@ -71,7 +57,6 @@ public class RecipeQueryRepository {
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         recipeEntity.nickname,
-                        ExpressionUtils.as(subCategorySubQuery, "subCategory"),
                         ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
                 ))
                 .from(recipeEntity)
@@ -102,5 +87,19 @@ public class RecipeQueryRepository {
 
         return new PageImpl<>(resultList, pageable, totalCount);
     }
+
+    /**
+     * 매게변수로 받은 recipeId들을 사용하여 연관된 서브 카테고리 값들을 List<Tuple> 형태로 반환한다.
+     */
+    public List<Tuple> getSubCategoryNameListTuple(List<Long> selectedRecipeIdList) {
+        return queryFactory
+                .select(recipeEntity.id.as("id"), subCategoryEntity.subCategoryNm.as("subCategoryNm"))
+                .from(recipeEntity)
+                .join(recipeCategoryMapEntity).on(recipeEntity.id.eq(recipeCategoryMapEntity.recipeEntity.id))
+                .join(recipeCategoryMapEntity.subCategoryEntity, subCategoryEntity)
+                .where(recipeEntity.id.in(selectedRecipeIdList), recipeEntity.delYn.eq("N"))
+                .fetch();
+    }
+
 
 }

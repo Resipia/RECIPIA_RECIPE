@@ -1,21 +1,25 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
-import com.recipia.recipe.application.port.out.BookmarkPort;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
+import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.SubCategory;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Adapter 클래스는 port 인터페이스를 구현한다.
@@ -26,6 +30,7 @@ import java.util.List;
 @Component
 public class RecipeAdapter implements RecipePort {
 
+    private final SecurityUtil securityUtil;
     private final RecipeConverter converter;
     private final RecipeQueryRepository querydslRepository;
     private final RecipeRepository recipeRepository;
@@ -89,6 +94,17 @@ public class RecipeAdapter implements RecipePort {
         subCategoryList.stream()
                 .map(subCategory -> converter.domainToRecipeCategoryMapEntity(recipe, subCategory))
                 .forEach(recipeCategoryMapRepository::save);
+    }
+
+    /**
+     * 전체 레시피를 조회하는 메서드
+     * querydsl을 사용해서 데이터를 조회한다.
+     */
+    @Override
+    public Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType) {
+        // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
+        Long currentMemberId = securityUtil.getCurrentMemberId();
+        return querydslRepository.getAllRecipeList(currentMemberId, pageable, sortType);
     }
 
     /**

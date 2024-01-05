@@ -117,9 +117,9 @@ class RecipeAdapterTest extends TotalTestSupport {
         sut.createRecipeCategoryMap(domain, recipeId);
 
         //then
-        List<RecipeCategoryMapEntity> result = recipeCategoryMapRepository.findAll();
+        List<RecipeCategoryMapEntity> result = recipeCategoryMapRepository.findAll(); // 기존3개 존재 + 테스트로 2개 추가 = 5
         assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.size()).isEqualTo(5);
     }
 
     @DisplayName("[bad] 카테고리 리스트가 null이라면 예외가 발생한다.")

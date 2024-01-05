@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
+import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.config.TestJwtConfig;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -39,6 +40,7 @@ class RecipeControllerTest extends TotalTestSupport {
 
     @Autowired private MockMvc mockMvc;
     @MockBean RecipeConverter converter;
+    @MockBean private ReadRecipeUseCase readRecipeUseCase;
     @MockBean CreateRecipeUseCase createRecipeUseCase;
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -50,8 +52,9 @@ class RecipeControllerTest extends TotalTestSupport {
         //given
         RecipeCreateRequestDto recipeCreateRequestDto = RecipeCreateRequestDto.of("고구마찜", "고구마찜이다");
         Recipe domain = createRecipeDomain();
+
         when(converter.requestDtoToDomain(recipeCreateRequestDto)).thenReturn(domain);
-        when(createRecipeUseCase.createRecipe(domain)).thenReturn(1L);
+        when(createRecipeUseCase.createRecipe(domain)).thenReturn(2L);
 
         // MockMvc 테스트
         mockMvc.perform(post("/recipe/createRecipe")
@@ -62,7 +65,6 @@ class RecipeControllerTest extends TotalTestSupport {
 
     private Recipe createRecipeDomain() {
         return Recipe.of(
-                10L,
                 "레시피",
                 "레시피 설명",
                 20,
@@ -70,7 +72,6 @@ class RecipeControllerTest extends TotalTestSupport {
                 "#진안",
                 NutritionalInfo.of(10,10,10,10,10),
                 List.of(SubCategory.of(1L), SubCategory.of(2L)),
-                "진안",
                 "N"
         );
     }

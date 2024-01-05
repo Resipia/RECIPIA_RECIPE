@@ -31,14 +31,14 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     @Test
     void updateRecipesNicknamesTest() {
         // Given
-        NicknameDto nicknameDto = new NicknameDto(1L, "새로운닉네임");
+        NicknameDto nicknameDto = new NicknameDto(1L, "새로운 닉네임");
 
         // When
         sut.updateRecipesNicknames(nicknameDto);
 
         // Then
         RecipeEntity updatedRecipe = recipeRepository.findById(1L).orElseThrow();
-        assertThat(updatedRecipe.getNickname()).isEqualTo("새로운닉네임");
+        assertThat(updatedRecipe.getNickname()).isEqualTo("새로운 닉네임");
     }
 
 

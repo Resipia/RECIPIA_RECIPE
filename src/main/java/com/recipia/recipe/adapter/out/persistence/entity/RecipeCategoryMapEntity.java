@@ -14,7 +14,7 @@ import java.util.Objects;
 public class RecipeCategoryMapEntity extends CreateDateTimeForEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recipe_category_map_id", nullable = false)
     private Long id;
 

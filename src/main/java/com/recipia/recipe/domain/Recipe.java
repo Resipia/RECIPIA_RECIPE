@@ -54,6 +54,10 @@ public class Recipe {
         return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, delYn);
     }
 
+    public static Recipe of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String delYn) {
+        return new Recipe(null, null, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, null, delYn);
+    }
+
     public void change(Long memberId, String nickname) {
         this.memberId = memberId;
         this.nickname = nickname;

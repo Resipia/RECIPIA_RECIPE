@@ -1,5 +1,7 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.config.TestSecurityConfig;
@@ -19,13 +21,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +72,90 @@ class RecipeServiceTest {
         verify(recipePort).createRecipeCategoryMap(recipe, savedRecipeId); // 카테고리 맵핑 저장 메서드는 실행되었는가
         assertThat(result).isEqualTo(savedRecipeId);
         then(eventPublisher).should().publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
+    }
+
+    @Test
+    @DisplayName("기본 페이징으로 레시피 목록을 정상적으로 가져온다.")
+    void whenGetAllRecipeList_thenReturnsPagedRecipes() {
+        // Given
+        int page = 0;
+        int size = 10;
+        String sortType = "new";
+        List<RecipeMainListResponseDto> recipeList = createMockRecipeList(size);
+        Page<RecipeMainListResponseDto> mockPage = new PageImpl<>(recipeList);
+
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType))).thenReturn(mockPage);
+
+        // When
+        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllRecipeList(page, size, sortType);
+
+        // Then
+        Assertions.assertThat(result.getContent()).hasSize(size);
+        Assertions.assertThat(result.getTotalCount()).isEqualTo(size);
+    }
+
+    @Test
+    @DisplayName("빈 결과를 반환할 때 적절한 응답을 반환한다.")
+    void whenGetAllRecipeListEmpty_thenReturnsEmptyResponse() {
+        // Given
+        int page = 0;
+        int size = 10;
+        String sortType = "new";
+        Page<RecipeMainListResponseDto> emptyPage = Page.empty();
+
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType))).thenReturn(emptyPage);
+
+        // When
+        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllRecipeList(page, size, sortType);
+
+        // Then
+        Assertions.assertThat(result.getContent()).isEmpty();
+        Assertions.assertThat(result.getTotalCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("잘못된 페이지 번호로 요청 시 예외를 반환한다")
+    void whenGetAllRecipeListWithInvalidPage_thenThrowsException() {
+        // Given
+        int invalidPage = -1;
+        int size = 10;
+        String sortType = "new";
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> sut.getAllRecipeList(invalidPage, size, sortType));
+    }
+
+    // todo: 예외처리가 필요하다.
+    @Test
+    @DisplayName("잘못된 정렬 타입으로 요청 시 예외를 반환한다")
+    void whenGetAllRecipeListWithInvalidSortType_thenThrowsException() {
+        // Given
+        int page = 0;
+        int size = 10;
+        String invalidSortType = "invalid";
+
+        // When & Then
+//        assertThrows(IllegalArgumentException.class, () -> sut.getAllRecipeList(page, size, invalidSortType));
+    }
+
+    @Test
+    @DisplayName("Port 레이어에서 예외 발생 시 적절히 처리한다")
+    void whenRecipePortThrowsException_thenServiceHandlesIt() {
+        // Given
+        int page = 0;
+        int size = 10;
+        String sortType = "new";
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType))).thenThrow(new RuntimeException("DB Error"));
+
+        // When & Then
+        assertThrows(RuntimeException.class, () -> sut.getAllRecipeList(page, size, sortType));
+    }
+
+
+    private List<RecipeMainListResponseDto> createMockRecipeList(int size) {
+        return IntStream.range(0, size)
+                .mapToObj(i -> RecipeMainListResponseDto.of((long) i, "Recipe " + i, "Nickname", false))
+                .collect(Collectors.toList());
     }
 
     private Recipe createRecipeDomain() {

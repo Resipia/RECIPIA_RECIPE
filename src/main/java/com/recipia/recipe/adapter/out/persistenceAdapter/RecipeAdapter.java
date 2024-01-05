@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
+import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
@@ -18,8 +19,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Adapter 클래스는 port 인터페이스를 구현한다.
@@ -104,7 +108,33 @@ public class RecipeAdapter implements RecipePort {
     public Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType) {
         // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
         Long currentMemberId = securityUtil.getCurrentMemberId();
-        return querydslRepository.getAllRecipeList(currentMemberId, pageable, sortType);
+        Page<RecipeMainListResponseDto> recipeList = querydslRepository.getAllRecipeList(currentMemberId, pageable, sortType);
+
+        // 2. 받아온 데이터의 모든 recipeId값을 추출한다.
+        List<Long> selectedRecipeIdList = recipeList.getContent()
+                .stream()
+                .map(RecipeMainListResponseDto::getId)
+                .toList();
+
+        // 3. recipeId로 관련된 서브 카테고리를 받아온다.
+        List<Tuple> subCategoryNameResults = querydslRepository.getSubCategoryNameListTuple(selectedRecipeIdList);
+        Map<Long, List<String>> subCategoryNameMap = getSubCategoryNameMap(subCategoryNameResults);
+
+        // 4. 결과값 dto에 서브 카테고리를 추가한다.
+        recipeList.getContent().forEach(dto -> dto.setSubCategoryList(subCategoryNameMap.get(dto.getId())));
+        return recipeList;
+    }
+
+    /**
+     * 서브 카테고리를 Map<Long, List<String>> 형태로 받아온다.
+     * Long에는 recipeId가 List<String>에는 서브 카테고리 이름들이 들어가 있다.
+     */
+    public Map<Long, List<String>> getSubCategoryNameMap(List<Tuple> subCategoryNameResults) {
+        return subCategoryNameResults.stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get(0, Long.class),
+                        Collectors.mapping(tuple -> tuple.get(1, String.class), Collectors.toList())
+                ));
     }
 
     /**

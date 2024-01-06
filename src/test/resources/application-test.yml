@@ -21,7 +21,6 @@ spring:
         default_batch_fetch_size: 10
         highlight_sql: true
 
-
   cloud:
     aws:
       credentials:
@@ -31,6 +30,8 @@ spring:
         static: ${REGION}
       sqs:
         nickname-sqs-name: dev-sqs-test
+      s3:
+        bucketName: recipia-file
 
   sql:
     init:

@@ -7,9 +7,6 @@ import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
-import com.recipia.recipe.config.TestSecurityConfig;
-import com.recipia.recipe.config.TestZipkinConfig;
-import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.SubCategory;
@@ -20,16 +17,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -70,7 +64,7 @@ class RecipeServiceTest {
         when(recipePort.createNutritionalInfo(recipe, savedRecipeId)).thenReturn(savedNutritionalInfoId);
 
         // when
-        Long result = sut.createRecipe(recipe);
+        Long result = sut.createRecipe(recipe, Collections.emptyList());
 
         // then
         verify(recipePort).createRecipeCategoryMap(recipe, savedRecipeId); // 카테고리 맵핑 저장 메서드는 실행되었는가

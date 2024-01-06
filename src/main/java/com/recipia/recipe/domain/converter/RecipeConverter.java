@@ -1,13 +1,11 @@
 package com.recipia.recipe.domain.converter;
 
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
-import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.SubCategoryEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.*;
 import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.RecipeFile;
 import com.recipia.recipe.domain.SubCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -114,6 +112,23 @@ public class RecipeConverter {
     }
 
     /**
+     * 레시피 파일 도메인을 엔티티로 변환
+     */
+    public RecipeFileEntity domainToRecipeFileEntity(RecipeFile recipeFile) {
+        return RecipeFileEntity.of(
+                RecipeEntity.of(recipeFile.getRecipe().getId()),
+                recipeFile.getFileOrder(),
+                recipeFile.getStoredFilePath(),
+                recipeFile.getObjectUrl(),
+                recipeFile.getOriginFileNm(),
+                recipeFile.getStoredFileNm(),
+                recipeFile.getFileExtension(),
+                recipeFile.getFileSize(),
+                recipeFile.getDelYn()
+        );
+    }
+
+    /**
      * 레시피를 생성할때 요청 dto에서 영양소 정보를 뽑아낸 후 영양소 도메인 객체로 변환해주는 메서드
      */
     public NutritionalInfo getNutritionalInfo(RecipeCreateRequestDto dto) {
@@ -135,5 +150,4 @@ public class RecipeConverter {
                 .map(SubCategory::of)
                 .collect(Collectors.toList());
     }
-
 }

@@ -8,12 +8,13 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
 /**
  * AWS S3 설정 클래스
  */
-@Service
+@Configuration
 @RequiredArgsConstructor
 public class S3Config {
 

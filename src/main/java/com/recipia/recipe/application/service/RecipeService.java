@@ -3,7 +3,6 @@ package com.recipia.recipe.application.service;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
@@ -59,7 +58,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
 
             // 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
             List<RecipeFile> recipeFileList = IntStream.range(0, files.size())
-                    .mapToObj(fileOrder -> imageS3Service.createRecipeFileEntity(files.get(fileOrder), fileOrder, savedRecipeId))
+                    .mapToObj(fileOrder -> imageS3Service.createRecipeFile(files.get(fileOrder), fileOrder, savedRecipeId))
                     .collect(Collectors.toList());
 
             // db에 레시피 파일(이미지)를 저장한다.

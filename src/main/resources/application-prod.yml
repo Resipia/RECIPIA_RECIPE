@@ -15,6 +15,8 @@ spring:
         static: ${REGION}
       sqs:
         nickname-sqs-name: nickname-change-sqs
+      s3:
+        bucketName: recipia-file
 
 
 feign:

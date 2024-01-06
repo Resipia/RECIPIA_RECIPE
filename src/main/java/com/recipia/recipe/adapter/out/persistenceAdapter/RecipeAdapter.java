@@ -6,16 +6,19 @@ import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.RecipeFile;
 import com.recipia.recipe.domain.SubCategory;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -40,6 +43,7 @@ public class RecipeAdapter implements RecipePort {
     private final NutritionalInfoRepository nutritionalInfoRepository;
     private final SubCategoryEntityRepository subCategoryEntityRepository;
     private final RecipeCategoryMapRepository recipeCategoryMapRepository;
+    private final RecipeFileRepository recipeFileRepository;
 
 
     /**
@@ -141,6 +145,30 @@ public class RecipeAdapter implements RecipePort {
         return recipeDetailViewDto;
     }
 
+    /**
+     * s3에 저장된 파일 정보를 rdb에 저장한다.
+     * 서비스 레이어에서 이미 s3에 이미지는 업로드가 완료되고 이곳에서는 그 url정보를 함께 담아서 rdb에 저장한다.
+     */
+    @Override
+    public List<Long> saveRecipeFile(List<RecipeFile> recipeFile) {
+        try {
+            // 1. 도메인을 엔티티로 변환한다.
+            List<RecipeFileEntity> recipeFileEntities = recipeFile.stream()
+                    .map(converter::domainToRecipeFileEntity)
+                    .collect(Collectors.toList());
+
+            // 2. 모든 레시피 파일 엔티티를 RDB에 저장하고 저장된 엔티티를 받아서 id값 리스트로 변환해서 반환한다.
+            List<RecipeFileEntity> savedEntities = recipeFileRepository.saveAll(recipeFileEntities);
+            return savedEntities.stream()
+                    .map(RecipeFileEntity::getId)
+                    .collect(Collectors.toList());
+        } catch (DataAccessException e) {
+            // 로그 기록
+            log.error("[Error] saving recipe files", e);
+            // 사용자 정의 예외 또는 특정 행동 수행
+            throw new RecipeApplicationException(ErrorCode.RECIPE_FILE_SAVE_ERROR);
+        }
+    }
 
     /**
      * 서브 카테고리를 Map<Long, List<String>> 형태로 받아온다.

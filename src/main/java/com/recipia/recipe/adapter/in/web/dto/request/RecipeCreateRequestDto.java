@@ -7,7 +7,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,8 +40,11 @@ public class RecipeCreateRequestDto {
     @NotNull
     private List<Long> subCategoryList;   // 카테고리
 
+    private List<MultipartFile> fileList; // 이미지 파일들
+
+
     @Builder
-    private RecipeCreateRequestDto(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList) {
+    private RecipeCreateRequestDto(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList, List<MultipartFile> fileList) {
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
         this.timeTaken = timeTaken;
@@ -47,17 +52,28 @@ public class RecipeCreateRequestDto {
         this.hashtag = hashtag;
         this.nutritionalInfo = nutritionalInfo;
         this.subCategoryList = subCategoryList;
+        this.fileList = fileList;
     }
 
+    /**
+     * 이미지가 존재할 때 팩토리 메서드
+     */
+    public static RecipeCreateRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList, List<MultipartFile> images) {
+        return new RecipeCreateRequestDto(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList, images);
+    }
+
+    /**
+     * 이미지가 존재하지 않을때 팩토리 메서드
+     */
     public static RecipeCreateRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList) {
-        return new RecipeCreateRequestDto(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList);
+        return new RecipeCreateRequestDto(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList, Collections.emptyList());
     }
 
     /**
      * 테스트용
      */
     public static RecipeCreateRequestDto of(String recipeName, String recipeDesc) {
-        return new RecipeCreateRequestDto(recipeName, recipeDesc, null, null, null, null, List.of(1L));
+        return new RecipeCreateRequestDto(recipeName, recipeDesc, null, null, null, null, List.of(1L), Collections.emptyList());
     }
 
 }

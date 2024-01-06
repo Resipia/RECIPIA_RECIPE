@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -51,13 +52,13 @@ class RecipeControllerTest extends TotalTestSupport {
         RecipeCreateRequestDto recipeCreateRequestDto = RecipeCreateRequestDto.of("고구마찜", "고구마찜이다");
         Recipe domain = createRecipeDomain();
 
-        when(converter.requestDtoToDomain(recipeCreateRequestDto)).thenReturn(domain);
-        when(createRecipeUseCase.createRecipe(domain)).thenReturn(2L);
+        when(converter.recipeCreateDtoToDomain(recipeCreateRequestDto)).thenReturn(domain);
+        when(createRecipeUseCase.createRecipe(domain, Collections.emptyList())).thenReturn(2L);
 
         // MockMvc 테스트
         mockMvc.perform(post("/recipe/createRecipe")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(recipeCreateRequestDto)))// 실제 DTO 객체를 JSON으로 변환
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .flashAttr("recipeCreateRequestDto", recipeCreateRequestDto))
                 .andExpect(status().isOk());
     }
 
@@ -116,6 +117,7 @@ class RecipeControllerTest extends TotalTestSupport {
 
     private Recipe createRecipeDomain() {
         return Recipe.of(
+                1L,
                 "레시피",
                 "레시피 설명",
                 20,
@@ -123,6 +125,7 @@ class RecipeControllerTest extends TotalTestSupport {
                 "#진안",
                 NutritionalInfo.of(10,10,10,10,10),
                 List.of(SubCategory.of(1L), SubCategory.of(2L)),
+                "진안",
                 "N"
         );
     }

@@ -7,9 +7,6 @@ import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
-import com.recipia.recipe.config.TestSecurityConfig;
-import com.recipia.recipe.config.TestZipkinConfig;
-import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.SubCategory;
@@ -20,16 +17,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -40,8 +36,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -54,10 +49,13 @@ class RecipeServiceTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private ImageS3Service imageS3Service;
+
     @InjectMocks
     private RecipeService sut;
 
-    @DisplayName("[happy] - 레시피 저장 시 저장된 레시피 ID를 반환하고 이벤트를 발생시킨다.")
+    @DisplayName("[happy] 레시피 저장 시 저장된 레시피 ID를 반환하고 이벤트를 발생시킨다.")
     @Test
     void createRecipe_Success() {
         // given
@@ -70,7 +68,7 @@ class RecipeServiceTest {
         when(recipePort.createNutritionalInfo(recipe, savedRecipeId)).thenReturn(savedNutritionalInfoId);
 
         // when
-        Long result = sut.createRecipe(recipe);
+        Long result = sut.createRecipe(recipe, Collections.emptyList());
 
         // then
         verify(recipePort).createRecipeCategoryMap(recipe, savedRecipeId); // 카테고리 맵핑 저장 메서드는 실행되었는가
@@ -79,7 +77,7 @@ class RecipeServiceTest {
     }
 
     @Test
-    @DisplayName("기본 페이징으로 레시피 목록을 정상적으로 가져온다.")
+    @DisplayName("[happy] 기본 페이징으로 레시피 목록을 정상적으로 가져온다.")
     void whenGetAllRecipeList_thenReturnsPagedRecipes() {
         // Given
         int page = 0;
@@ -99,7 +97,7 @@ class RecipeServiceTest {
     }
 
     @Test
-    @DisplayName("빈 결과를 반환할 때 적절한 응답을 반환한다.")
+    @DisplayName("[happy] 빈 결과를 반환할 때 적절한 응답을 반환한다.")
     void whenGetAllRecipeListEmpty_thenReturnsEmptyResponse() {
         // Given
         int page = 0;
@@ -118,7 +116,7 @@ class RecipeServiceTest {
     }
 
     @Test
-    @DisplayName("잘못된 페이지 번호로 요청 시 예외를 반환한다")
+    @DisplayName("[bad] 잘못된 페이지 번호로 요청 시 예외를 반환한다")
     void whenGetAllRecipeListWithInvalidPage_thenThrowsException() {
         // Given
         int invalidPage = -1;
@@ -143,7 +141,7 @@ class RecipeServiceTest {
     }
 
     @Test
-    @DisplayName("Port 레이어에서 예외 발생 시 적절히 처리한다")
+    @DisplayName("[bad] Port 레이어에서 예외 발생 시 적절히 처리한다")
     void whenRecipePortThrowsException_thenServiceHandlesIt() {
         // Given
         int page = 0;
@@ -156,7 +154,7 @@ class RecipeServiceTest {
     }
 
     @Test
-    @DisplayName("[happy] 유효한 레시피 ID로 단건 조회시 데이터가 잘 받아진다.")
+    @DisplayName("[happy] 유효한 레시피 ID로 단건 조회시 데이터를 잘 가져온다.")
     void getRecipeDetailViewWithValidId() {
         // Given
         Long validRecipeId = 1L;
@@ -172,18 +170,19 @@ class RecipeServiceTest {
     }
 
     @Test
-    @DisplayName("[bad] 존재하지 않는 레시피 ID로 조회 시 예외 발생")
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 레시피를 단건 조회하면 예외가 발생한다.")
     void getRecipeDetailViewWithInvalidId() {
         // Given
         Long invalidRecipeId = 9999L;
-        given(recipePort.getRecipeDetailView(invalidRecipeId)).willThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
+        given(recipePort.getRecipeDetailView(invalidRecipeId))
+                .willThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         // When & Then
         assertThrows(RecipeApplicationException.class, () -> sut.getRecipeDetailView(invalidRecipeId));
     }
 
     @Test
-    @DisplayName("[bad] Port 레이어에서 예외 발생 시 서비스 레이어 예외 처리")
+    @DisplayName("[bad] 만약 Port 레이어에서 예외가 발생하면 서비스 레이어에서 예외를 처리한다.")
     void getRecipeDetailViewWhenPortThrowsException() {
         // Given
         Long recipeId = 1L;
@@ -193,6 +192,26 @@ class RecipeServiceTest {
         assertThrows(RuntimeException.class, () -> sut.getRecipeDetailView(recipeId));
     }
 
+    @Test
+    @DisplayName("[bad] S3 파일 업로드에 실패할 시 예외가 발생한다.")
+    void whenFileUploadFails_thenThrowsException() {
+        // given
+        Recipe recipe = createRecipeDomain();
+        List<MultipartFile> mockFiles = createMockMultipartFileList();
+        when(imageS3Service.createRecipeFile(any(MultipartFile.class), anyInt(), anyLong()))
+                .thenThrow(new RecipeApplicationException(ErrorCode.S3_UPLOAD_ERROR));
+
+        // when & then
+        assertThrows(RecipeApplicationException.class, () -> sut.createRecipe(recipe, mockFiles));
+    }
+
+    private List<MultipartFile> createMockMultipartFileList() {
+        return List.of(
+                new MockMultipartFile("file1", "filename1.jpg", "image/jpeg", "some-image".getBytes()),
+                new MockMultipartFile("file2", "filename2.png", "image/png", "some-image".getBytes()),
+                new MockMultipartFile("file3", "filename3.gif", "image/gif", "some-image".getBytes())
+        );
+    }
 
     private List<RecipeMainListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)

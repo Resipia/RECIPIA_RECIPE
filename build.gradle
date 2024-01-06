@@ -57,6 +57,7 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 
 	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.0'
+	testImplementation 'io.findify:s3mock_2.12:0.2.4'
 
 
 
@@ -76,10 +77,12 @@ dependencies {
 	}
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
-	// AWS - SNS, SQS
+	// AWS - SNS, SQS, S3
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sns'
+	implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
+	implementation 'com.amazonaws:aws-java-sdk-s3'
 
 	// zipkin
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'

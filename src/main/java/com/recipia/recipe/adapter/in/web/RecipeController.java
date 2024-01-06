@@ -13,6 +13,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequestMapping("/recipe")
 @RequiredArgsConstructor
@@ -27,12 +30,16 @@ public class RecipeController {
      * 유저가 레시피 생성을 요청하는 컨트롤러
      */
     @PostMapping("/createRecipe")
-    public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @RequestBody RecipeCreateRequestDto recipeCreateRequestDto) {
+    public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @ModelAttribute RecipeCreateRequestDto recipeCreateRequestDto) {
 
-        // dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
-        Recipe recipe = converter.requestDtoToDomain(recipeCreateRequestDto);
+        // 1. dto에서 이미지 파일 리스트 추출
+        List<MultipartFile> files = recipeCreateRequestDto.getFileList();
 
-        Long savedRecipeId = createRecipeUseCase.createRecipe(recipe);
+        // 2. dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
+        Recipe recipe = converter.recipeCreateDtoToDomain(recipeCreateRequestDto);
+
+        // 3. 레시피 저장 실시
+        Long savedRecipeId = createRecipeUseCase.createRecipe(recipe, files);
 
         return ResponseEntity.ok(ResponseDto.success(savedRecipeId));
     }

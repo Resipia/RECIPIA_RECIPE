@@ -1,18 +1,27 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
+import com.recipia.recipe.config.TestJwtConfig;
+import com.recipia.recipe.config.TestSecurityConfig;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.SubCategory;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
@@ -111,9 +120,9 @@ class RecipeAdapterTest extends TotalTestSupport {
         sut.createRecipeCategoryMap(domain, recipeId);
 
         //then
-        List<RecipeCategoryMapEntity> result = recipeCategoryMapRepository.findAll();
+        List<RecipeCategoryMapEntity> result = recipeCategoryMapRepository.findAll(); // 기존3개 존재 + 테스트로 2개 추가 = 5
         assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.size()).isEqualTo(5);
     }
 
     @DisplayName("[bad] 카테고리 리스트가 null이라면 예외가 발생한다.")
@@ -153,6 +162,87 @@ class RecipeAdapterTest extends TotalTestSupport {
         assertThatThrownBy(() -> sut.createRecipeCategoryMap(domain, recipeId))
                 .hasMessageContaining("존재하지 않는 카테고리입니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.CATEGORY_NOT_FOUND);
+    }
+
+    @DisplayName("[happy] 유효한 페이지 정보와 정렬 유형이 주어지면, 페이지화된 레시피 목록과 서브 카테고리 정보를 반환한다.")
+    @Test
+    void getAllRecipeListTest() {
+        // given
+        Long expectedMemberId = 1L;
+        String dummyNickname = "진아";
+        TestJwtConfig.setupMockJwt(expectedMemberId, dummyNickname);
+        Pageable pageable = PageRequest.of(0, 10);
+        String sortType = "new";
+
+        // when
+        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(pageable, sortType);
+        System.out.println(result.getContent());
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isNotEmpty();
+        result.getContent().forEach(dto -> {
+            assertThat(dto.getSubCategoryList()).isNotEmpty();
+        });
+    }
+
+    @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시, 상세 정보와 북마크 여부가 반환된다.")
+    @Test
+    void getRecipeDetailViewWithValidRecipeIdTest() {
+        // Given
+        Long validRecipeId = 1L; // 존재하는 레시피 ID
+        Long memberId = 1L; // 예시 유저 ID
+        TestJwtConfig.setupMockJwt(memberId, "진안");
+
+        // When
+        RecipeDetailViewDto result = sut.getRecipeDetailView(validRecipeId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(validRecipeId);
+        assertThat(result.getRecipeName()).isNotNull();
+        assertThat(result.getNickname()).isNotNull();
+        assertThat(result.getRecipeDesc()).isNotNull();
+        assertThat(result.isBookmarked()).isFalse(); // 북마크 여부 확인
+        assertThat(result.getSubCategoryList()).isNotEmpty(); // 서브 카테고리 목록 확인
+    }
+
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 상세 조회 시, 예외가 발생한다.")
+    @Test
+    void getRecipeDetailViewWithInvalidRecipeIdTest() {
+        // Given
+        Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
+        Long memberId = 1L; // 예시 유저 ID
+        TestJwtConfig.setupMockJwt(memberId, "진안");
+
+
+        // When & Then
+        assertThatThrownBy(() -> sut.getRecipeDetailView(invalidRecipeId))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("레시피가 존재하지 않습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
+    }
+
+    @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시, 올바른 서브 카테고리 정보가 포함된다.")
+    @Test
+    void getRecipeDetailViewWithSubCategoryTest() {
+        // Given
+        Long validRecipeId = 1L; // 존재하는 레시피 ID
+        Long memberId = 1L; // 예시 유저 ID
+        TestJwtConfig.setupMockJwt(memberId, "진안");
+
+
+        // When
+        RecipeDetailViewDto result = sut.getRecipeDetailView(validRecipeId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(validRecipeId);
+        // 서브 카테고리 정보 확인
+        assertThat(result.getSubCategoryList()).isNotEmpty();
+        result.getSubCategoryList().forEach(subCategoryName -> {
+            assertThat(subCategoryName).isNotNull().isNotBlank();
+        });
     }
 
     private RecipeEntity createRecipeEntity() {

@@ -1,10 +1,12 @@
 package com.recipia.recipe.application.port.out;
 
 
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.domain.Recipe;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * adapter 클래스의 인터페이스
@@ -18,4 +20,8 @@ public interface RecipePort {
     Long createNutritionalInfo(Recipe recipe, Long savedRecipeId);
 
     void createRecipeCategoryMap(Recipe recipe, Long savedRecipeId);
+
+    Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType);
+
+    RecipeDetailViewDto getRecipeDetailView(Long recipeId);
 }

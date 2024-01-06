@@ -3,9 +3,12 @@ package com.recipia.recipe.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
@@ -75,6 +78,40 @@ class RecipeControllerTest extends TotalTestSupport {
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").exists())
                 .andExpect(jsonPath("$.totalCount").value(pagingResponseDto.getTotalCount()));
+    }
+
+    @Test
+    @DisplayName("유효한 레시피 ID로 단건 조회 시, 성공적으로 데이터와 성공 응답을 반환한다.")
+    void getRecipeDetailViewWithValidId() throws Exception {
+        // Given
+        Long validRecipeId = 1L;
+        RecipeDetailViewDto mockDetail = new RecipeDetailViewDto(validRecipeId, "Test Recipe", "Test Nickname", "Test Description", false);
+        when(readRecipeUseCase.getRecipeDetailView(eq(validRecipeId))).thenReturn(mockDetail);
+
+        // When & Then
+        mockMvc.perform(get("/recipe/getRecipeDetail")
+                        .param("recipeId", String.valueOf(validRecipeId))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.id").value(validRecipeId))
+                .andExpect(jsonPath("$.result.recipeName").value(mockDetail.getRecipeName()))
+                .andExpect(jsonPath("$.result.nickname").value(mockDetail.getNickname()))
+                .andExpect(jsonPath("$.result.recipeDesc").value(mockDetail.getRecipeDesc()))
+                .andExpect(jsonPath("$.result.bookmarked").value(mockDetail.isBookmarked()));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 레시피 ID로 조회 시, 적절한 예외 응답을 반환한다.")
+    void getRecipeDetailViewWithInvalidId() throws Exception {
+        // Given
+        Long invalidRecipeId = 9999L;
+        when(readRecipeUseCase.getRecipeDetailView(eq(invalidRecipeId))).thenThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
+
+        // When & Then
+        mockMvc.perform(get("/recipe/getRecipeDetail")
+                        .param("recipeId", String.valueOf(invalidRecipeId))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError());
     }
 
     private Recipe createRecipeDomain() {

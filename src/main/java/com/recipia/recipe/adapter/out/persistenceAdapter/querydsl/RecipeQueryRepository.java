@@ -6,6 +6,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import lombok.RequiredArgsConstructor;
@@ -91,15 +92,51 @@ public class RecipeQueryRepository {
     /**
      * 매게변수로 받은 recipeId들을 사용하여 연관된 서브 카테고리 값들을 List<Tuple> 형태로 반환한다.
      */
-    public List<Tuple> getSubCategoryNameListTuple(List<Long> selectedRecipeIdList) {
+    public List<Tuple> findSubCategoriesForRecipe(List<Long> recipeIdList) {
         return queryFactory
                 .select(recipeEntity.id.as("id"), subCategoryEntity.subCategoryNm.as("subCategoryNm"))
                 .from(recipeEntity)
                 .join(recipeCategoryMapEntity).on(recipeEntity.id.eq(recipeCategoryMapEntity.recipeEntity.id))
                 .join(recipeCategoryMapEntity.subCategoryEntity, subCategoryEntity)
-                .where(recipeEntity.id.in(selectedRecipeIdList), recipeEntity.delYn.eq("N"))
+                .where(recipeEntity.id.in(recipeIdList), recipeEntity.delYn.eq("N"))
                 .fetch();
     }
 
+    /**
+     * 매게변수로 받은 recipeId들을 사용하여 연관된 서브 카테고리 값들을 List<Tuple> 형태로 반환한다.
+     */
+    public List<Tuple> findSubCategoriesForRecipe(Long recipeId) {
+        return queryFactory
+                .select(recipeEntity.id.as("id"), subCategoryEntity.subCategoryNm.as("subCategoryNm"))
+                .from(recipeEntity)
+                .join(recipeCategoryMapEntity).on(recipeEntity.id.eq(recipeCategoryMapEntity.recipeEntity.id))
+                .join(recipeCategoryMapEntity.subCategoryEntity, subCategoryEntity)
+                .where(recipeEntity.id.eq(recipeId), recipeEntity.delYn.eq("N"))
+                .fetch();
+    }
 
+    /**
+     * 단건 레시피를 상세조회
+     */
+    public Optional<RecipeDetailViewDto> getRecipeDetailView(Long recipeId, Long currentMemberId) {
+
+        // 북마크 여부 서브쿼리
+        JPQLQuery<Boolean> bookmarkSubQuery = JPAExpressions
+                .select(bookmarkEntity.count().gt(0L))
+                .from(bookmarkEntity)
+                .where(bookmarkEntity.memberId.eq(currentMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
+
+        // 레시피 상세조회
+        return Optional.ofNullable(queryFactory
+                .select(Projections.constructor(RecipeDetailViewDto.class,
+                        recipeEntity.id,
+                        recipeEntity.recipeName,
+                        recipeEntity.nickname,
+                        recipeEntity.recipeDesc,
+                        ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
+                ))
+                .from(recipeEntity)
+                .where(recipeEntity.id.eq(recipeId))
+                .fetchOne());
+    }
 }

@@ -1,9 +1,12 @@
 package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TestSecurityConfig;
 import com.recipia.recipe.config.TestZipkinConfig;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -35,6 +38,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -149,6 +153,44 @@ class RecipeServiceTest {
 
         // When & Then
         assertThrows(RuntimeException.class, () -> sut.getAllRecipeList(page, size, sortType));
+    }
+
+    @Test
+    @DisplayName("[happy] 유효한 레시피 ID로 단건 조회시 데이터가 잘 받아진다.")
+    void getRecipeDetailViewWithValidId() {
+        // Given
+        Long validRecipeId = 1L;
+        RecipeDetailViewDto mockDto = new RecipeDetailViewDto(validRecipeId, "레시피명", "닉네임", "설명", false);
+        when(recipePort.getRecipeDetailView(validRecipeId)).thenReturn(mockDto);
+
+        // When
+        RecipeDetailViewDto result = sut.getRecipeDetailView(validRecipeId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(validRecipeId);
+    }
+
+    @Test
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 조회 시 예외 발생")
+    void getRecipeDetailViewWithInvalidId() {
+        // Given
+        Long invalidRecipeId = 9999L;
+        given(recipePort.getRecipeDetailView(invalidRecipeId)).willThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
+
+        // When & Then
+        assertThrows(RecipeApplicationException.class, () -> sut.getRecipeDetailView(invalidRecipeId));
+    }
+
+    @Test
+    @DisplayName("[bad] Port 레이어에서 예외 발생 시 서비스 레이어 예외 처리")
+    void getRecipeDetailViewWhenPortThrowsException() {
+        // Given
+        Long recipeId = 1L;
+        given(recipePort.getRecipeDetailView(recipeId)).willThrow(new RuntimeException("DB Error"));
+
+        // When & Then
+        assertThrows(RuntimeException.class, () -> sut.getRecipeDetailView(recipeId));
     }
 
 

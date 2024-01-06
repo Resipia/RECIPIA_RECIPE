@@ -20,49 +20,55 @@ public class RecipeFileEntity {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
-    private RecipeEntity recipeEntity;
+    private RecipeEntity recipeEntity; // 어떤 레시피와 연관있는지
 
     @Column(name = "file_order", nullable = false)
-    private Integer file_order;
+    private Integer file_order; // 파일 정렬 조건
 
     @Column(name = "flpth", nullable = false)
-    private String flpth;
+    private String storedFilePath; // 저장된 파일 경로 url
 
     @Column(name = "origin_file_nm", nullable = false)
-    private String originFileNm;
+    private String originFileNm;    // 원본 파일 이름
 
     @Column(name = "strd_file_nm", nullable = false)
-    private String strdFileNm;
+    private String storedFileNm;  // 저장된 파일 이름
 
     @Column(name = "file_extsn", nullable = false)
-    private String fileExtsn;
+    private String fileExtension; // 파일 확장자 (jpg, jpeg, png)
 
     @Column(name = "file_size", nullable = false)
-    private Integer fileSize;
+    private Integer fileSize; // 파일 크기
 
     @Column(name = "del_yn", nullable = false)
-    private String delYn;
+    private String delYn; // 삭제 여부
 
     @Builder
-    private RecipeFileEntity(Long id, RecipeEntity recipeEntity, Integer file_order, String flpth, String originFileNm, String strdFileNm, String fileExtsn, Integer fileSize, String delYn) {
+    private RecipeFileEntity(Long id, RecipeEntity recipeEntity, Integer file_order, String storedFilePath, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
         this.id = id;
         this.recipeEntity = recipeEntity;
         this.file_order = file_order;
-        this.flpth = flpth;
+        this.storedFilePath = storedFilePath;
         this.originFileNm = originFileNm;
-        this.strdFileNm = strdFileNm;
-        this.fileExtsn = fileExtsn;
+        this.storedFileNm = storedFileNm;
+        this.fileExtension = fileExtension;
         this.fileSize = fileSize;
         this.delYn = delYn;
     }
 
-    public static RecipeFileEntity of(Long id, RecipeEntity recipeEntity, Integer file_order, String flpth, String originFileNm, String strdFileNm, String fileExtsn, Integer fileSize, String delYn) {
-        return new RecipeFileEntity(id, recipeEntity, file_order, flpth, originFileNm, strdFileNm, fileExtsn, fileSize, delYn);
+    public static RecipeFileEntity of(Long id, RecipeEntity recipeEntity, Integer file_order, String storedFilePath, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
+        return new RecipeFileEntity(id, recipeEntity, file_order, storedFilePath, originFileNm, storedFileNm, fileExtension, fileSize, delYn);
     }
 
-    public static RecipeFileEntity of(RecipeEntity recipeEntity, Integer file_order, String flpth, String originFileNm, String strdFileNm, String fileExtsn, Integer fileSize, String delYn) {
-        return new RecipeFileEntity(null, recipeEntity, file_order, flpth, originFileNm, strdFileNm, fileExtsn, fileSize, delYn);
+    public static RecipeFileEntity of(RecipeEntity recipeEntity, Integer file_order, String storedFilePath, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
+        return new RecipeFileEntity(null, recipeEntity, file_order, storedFilePath, originFileNm, storedFileNm, fileExtension, fileSize, delYn);
     }
+
+    public static RecipeFileEntity saveFileEntity(RecipeEntity recipeEntity, String storedFilePath, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize) {
+        return new RecipeFileEntity(null, recipeEntity, null, storedFilePath, originFileNm, storedFileNm, fileExtension, fileSize, null);
+    }
+
+
 
     @Override
     public boolean equals(Object o) {

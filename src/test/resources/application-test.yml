@@ -28,10 +28,13 @@ spring:
         secret-key: ${AWS_SECRET_KEY}
       region:
         static: ${REGION}
+        auto: false
       sqs:
         nickname-sqs-name: dev-sqs-test
       s3:
         bucketName: recipia-file
+      stack:
+        auto: false
 
   sql:
     init:

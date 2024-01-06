@@ -23,10 +23,13 @@ public class RecipeFileEntity {
     private RecipeEntity recipeEntity; // 어떤 레시피와 연관있는지
 
     @Column(name = "file_order", nullable = false)
-    private Integer file_order; // 파일 정렬 조건
+    private Integer fileOrder; // 파일 정렬 조건
 
     @Column(name = "flpth", nullable = false)
-    private String storedFilePath; // 저장된 파일 경로 url
+    private String storedFilePath; // s3에 저장된 파일 경로 url
+
+    @Column(name = "object_url", nullable = false)
+    private String objectUrl;      // 저장된 객체 url (사진 바로 볼수있음)
 
     @Column(name = "origin_file_nm", nullable = false)
     private String originFileNm;    // 원본 파일 이름
@@ -44,11 +47,12 @@ public class RecipeFileEntity {
     private String delYn; // 삭제 여부
 
     @Builder
-    private RecipeFileEntity(Long id, RecipeEntity recipeEntity, Integer file_order, String storedFilePath, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
+    private RecipeFileEntity(Long id, RecipeEntity recipeEntity, Integer fileOrder, String storedFilePath, String objectUrl, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
         this.id = id;
         this.recipeEntity = recipeEntity;
-        this.file_order = file_order;
+        this.fileOrder = fileOrder;
         this.storedFilePath = storedFilePath;
+        this.objectUrl = objectUrl;
         this.originFileNm = originFileNm;
         this.storedFileNm = storedFileNm;
         this.fileExtension = fileExtension;
@@ -56,16 +60,19 @@ public class RecipeFileEntity {
         this.delYn = delYn;
     }
 
-    public static RecipeFileEntity of(Long id, RecipeEntity recipeEntity, Integer file_order, String storedFilePath, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
-        return new RecipeFileEntity(id, recipeEntity, file_order, storedFilePath, originFileNm, storedFileNm, fileExtension, fileSize, delYn);
+    public static RecipeFileEntity of(Long id, RecipeEntity recipeEntity, Integer fileOrder, String storedFilePath, String objectUrl, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
+        return new RecipeFileEntity(id, recipeEntity, fileOrder, storedFilePath, objectUrl, originFileNm, storedFileNm, fileExtension, fileSize, delYn);
     }
 
-    public static RecipeFileEntity of(RecipeEntity recipeEntity, Integer file_order, String storedFilePath, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
-        return new RecipeFileEntity(null, recipeEntity, file_order, storedFilePath, originFileNm, storedFileNm, fileExtension, fileSize, delYn);
+    public static RecipeFileEntity of(RecipeEntity recipeEntity, Integer fileOrder, String storedFilePath, String objectUrl, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
+        return new RecipeFileEntity(null, recipeEntity, fileOrder, storedFilePath, objectUrl, originFileNm, storedFileNm, fileExtension, fileSize, delYn);
     }
 
-    public static RecipeFileEntity saveFileEntity(RecipeEntity recipeEntity, String storedFilePath, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize) {
-        return new RecipeFileEntity(null, recipeEntity, null, storedFilePath, originFileNm, storedFileNm, fileExtension, fileSize, null);
+    /**
+     * s3 저장을 하기위해 ImageS3Service 에서 사용하는 팩토리 메서드
+     */
+    public static RecipeFileEntity of(RecipeEntity recipeEntity, String storedFilePath, String objectUrl, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize) {
+        return new RecipeFileEntity(null, recipeEntity, null, storedFilePath, objectUrl, originFileNm, storedFileNm, fileExtension, fileSize, null);
     }
 
 

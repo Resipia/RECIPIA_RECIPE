@@ -28,6 +28,7 @@ public enum ErrorCode {
     INVALID_HASHTAGS(404, "INVALID_HASHTAGS", "해시태그가 유효하지 않습니다."),
     CATEGORY_NOT_VALID(404, "CATEGORY_NOT_VALID", "카테고리는 null이거나 공백이어서는 안됩니다."),
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "존재하지 않는 카테고리입니다."),
+    RECIPE_FILE_SAVE_ERROR(500, "RECIPE_FILE_SAVE_ERROR", "데이터 베이스에 파일을 저장하던중 예외가 발생했습니다."),
 
     // 북마크 관련 에러
     RECIPE_NOT_FOUND(404, "RECIPE_NOT_FOUND", "레시피가 존재하지 않습니다."),
@@ -65,7 +66,6 @@ public enum ErrorCode {
     WRIGGLE_SERVICE_ERROR(500, "WRIGGLE_SERVICE_ERROR", "WRIGGLE 서비스 에러"),
     CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러"),
     S3_UPLOAD_ERROR(500, "S3_UPLOAD_ERROR", "AWS S3 서비스 에러"),
-
 
     ;
 

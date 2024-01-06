@@ -10,9 +10,11 @@ import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
-import com.recipia.recipe.config.s3.ImageS3Service;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
+import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     private final RecipePort recipePort;
     private final ApplicationEventPublisher eventPublisher;
     private final ImageS3Service imageS3Service;
+    private final RecipeConverter converter;
 
     /**
      * 레시피 생성을 담당하는 메서드
@@ -45,18 +49,26 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     @Override
     public Long createRecipe(Recipe recipe, List<MultipartFile> files) {
 
-        // 주관심사: 레시피 저장, 영양소 저장,
+        // 주관심사: 레시피 저장, 영양소 저장, 서브 카테고리 매핑, 파일 s3/rdb 저장
         Long savedRecipeId = recipePort.createRecipe(recipe);
         Long savedNutritionalInfoId = recipePort.createNutritionalInfo(recipe, savedRecipeId);
-
-        // 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
-        List<RecipeFileEntity> recipeFileEntities = files.stream()
-                .map(file -> imageS3Service.createRecipeFileEntity(file, savedRecipeId))
-                .toList();
-
-        // db에 레시피 파일(이미지)를 저장한다.
-        recipePort.saveRecipeFile(recipeFileEntities);
         recipePort.createRecipeCategoryMap(recipe, savedRecipeId);
+
+        // 파일이 null이면 저장을 하지 않는다.
+        if (!files.isEmpty()) {
+
+            // 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
+            List<RecipeFile> recipeFileList = IntStream.range(0, files.size())
+                    .mapToObj(fileOrder -> imageS3Service.createRecipeFileEntity(files.get(fileOrder), fileOrder, savedRecipeId))
+                    .collect(Collectors.toList());
+
+            // db에 레시피 파일(이미지)를 저장한다.
+            List<Long> savedFileIdList = recipePort.saveRecipeFile(recipeFileList);
+
+            if (savedFileIdList.isEmpty()) {
+                throw new RecipeApplicationException(ErrorCode.RECIPE_FILE_SAVE_ERROR);
+            }
+        }
 
         // 비관심사: 스프링 이벤트 발행
         eventPublisher.publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));

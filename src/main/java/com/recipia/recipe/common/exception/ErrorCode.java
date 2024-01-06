@@ -30,6 +30,11 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "존재하지 않는 카테고리입니다."),
     RECIPE_FILE_SAVE_ERROR(500, "RECIPE_FILE_SAVE_ERROR", "데이터 베이스에 파일을 저장하던중 예외가 발생했습니다."),
 
+    // S3 관련 에러
+    S3_UPLOAD_ERROR(500, "S3_UPLOAD_ERROR", "AWS S3 서비스 에러"),
+    S3_UPLOAD_FILE_NOT_FOUND(404, "S3_UPLOAD_FILE_NOT_FOUND", "업로드할 파일이 존재하지 않습니다."),
+    INVALID_FILE_TYPE(404, "INVALID_FILE_TYPE", "S3에 업로드 할 수 없는 파일 타입입니다."),
+
     // 북마크 관련 에러
     RECIPE_NOT_FOUND(404, "RECIPE_NOT_FOUND", "레시피가 존재하지 않습니다."),
     INVALID_INPUT(404, "INVALID_INPUT", "잘못된 입력입니다."),
@@ -64,8 +69,7 @@ public enum ErrorCode {
     // 외부 서비스 에러
     RECIPE_SERVICE_ERROR(500, "RECIPE_SERVICE_ERROR", "RECIPE 서비스 에러"),
     WRIGGLE_SERVICE_ERROR(500, "WRIGGLE_SERVICE_ERROR", "WRIGGLE 서비스 에러"),
-    CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러"),
-    S3_UPLOAD_ERROR(500, "S3_UPLOAD_ERROR", "AWS S3 서비스 에러"),
+    CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러")
 
     ;
 

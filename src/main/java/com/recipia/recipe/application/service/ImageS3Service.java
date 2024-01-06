@@ -2,8 +2,6 @@ package com.recipia.recipe.application.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.domain.Recipe;
@@ -17,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -37,26 +37,24 @@ public class ImageS3Service {
     /**
      * 데이터베이스에 저장할 RecipeFileEntity 객체를 생성하여 반환한다.
      */
-    public RecipeFile createRecipeFileEntity(MultipartFile image, Integer fileOrder, Long savedRecipeId) {
+    public RecipeFile createRecipeFile(MultipartFile image, Integer fileOrder, Long savedRecipeId) {
 
-        String originFileName = image.getOriginalFilename(); //원본 이미지 이름
+        // 1. input 파라미터 검증
+        validateInput(image, savedRecipeId);
+        String originFileName = image.getOriginalFilename(); //원본 이미지 이름 추출
 
-        // 확장자 추출 과정에서의 안전한 처리
-        String fileExtension = "";
-        if (originFileName != null && originFileName.contains(".")) {
-            fileExtension = originFileName.substring(originFileName.lastIndexOf("."));
-        }
+        // 2. 파일 확장자 추출 및 검증
+        String fileExtension = getFileExtension(originFileName);
+        validateFileExtension(fileExtension);
 
-        /**
-         * 레시피 파일 저장 엔티티를 만들기 위한 값들을 세팅한다.
-         */
+        // 3. 파일 도메인을 만들기 위한 값 세팅
         String storedFileNameWithExtension = changeFileName(fileExtension); // 새로 생성된 이미지 이름 (UUID 적용)
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")); // 현재 날짜를 [년/월/일] 형식으로 가져와서 최종 저장될 파일 경로를 만들어 준다.
         String finalPath = "recipe/" + datePath + "/" + savedRecipeId + "/" + storedFileNameWithExtension; // s3 파일 저장 경로
         String objectUrl = uploadImageToS3(image, fileExtension, finalPath); // 저장된 s3 객체의 URL
         Integer fileSize = (int) image.getSize(); // 파일 사이즈 추출
 
-        // 도메인으로 변환
+        // 4. 파일 도메인으로 변환
         return RecipeFile.of(
                 Recipe.of(savedRecipeId),       // 연관 레시피
                 fileOrder,                      // 파일 정렬 순서
@@ -91,6 +89,46 @@ public class ImageS3Service {
 
         // 저장된 객체의 url 반환
         return amazonS3.getUrl(bucketName, finalPath).toString();
+    }
+
+
+
+
+
+    /**
+     * 파일의 확장자가 지원되는 확장자인지 검증한다.
+     */
+    private static void validateFileExtension(String fileExtension) {
+        // 지원되는 이미지 확장자 목록
+        List<String> supportedExtensions = Arrays.asList(".jpg", ".jpeg", ".png");
+
+        // 파일 확장자 검사
+        if (!supportedExtensions.contains(fileExtension.toLowerCase())) {
+            throw new RecipeApplicationException(ErrorCode.INVALID_FILE_TYPE);
+        }
+    }
+
+    /**
+     * 파일의 확장자를 안전하게 추출한다.
+     */
+    private static String getFileExtension(String originFileName) {
+        String fileExtension = "";
+        if (originFileName != null && originFileName.contains(".")) {
+            fileExtension = originFileName.substring(originFileName.lastIndexOf("."));
+        }
+        return fileExtension;
+    }
+
+    /**
+     * 파라미터로 들어온 값들의 유효성을 검증한다.
+     */
+    private static void validateInput(MultipartFile image, Long savedRecipeId) {
+        if (image == null || image.isEmpty()) {
+            throw new RecipeApplicationException(ErrorCode.S3_UPLOAD_FILE_NOT_FOUND);
+        }
+        if (savedRecipeId == null) {
+            throw new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND);
+        }
     }
 
     /**

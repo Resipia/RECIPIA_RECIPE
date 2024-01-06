@@ -73,5 +73,12 @@ public class Recipe {
         return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn);
     }
 
+    /**
+     * s3 업로드에 사용
+     */
+    public static Recipe of(Long id) {
+        return new Recipe(id, null, null, null, null, null, null, null, null, null, null, null);
+    }
+
 
 }

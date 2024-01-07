@@ -104,4 +104,42 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         return recipePort.getRecipeDetailView(recipeId);
     }
 
+    /**
+     * 레시피를 업데이트 한다.
+     * 레시피 생성과 거의 동일하다. 다만 업데이트다 보니 기존의 데이터를 삭제하고 추가하는 방식을 주로 적용시켰다.
+     */
+    @Transactional
+    @Override
+    public void updateRecipe(Recipe recipe, List<MultipartFile> files) {
+        // 레시피 업데이트
+        Long updatedRecipeId = recipePort.updateRecipe(recipe);
+
+        // 영양소 업데이트 (이미 id가 존재하니 보낼필요 없다.)
+        recipePort.updateNutritionalInfo(recipe);
+
+        // 카테고리 매핑 업데이트
+        recipePort.updateCategoryMapping(recipe);
+
+        // 파일이 null이면 저장을 하지 않는다.
+        if (!files.isEmpty()) {
+
+            // 기존 파일 전부 삭제
+            recipePort.deleteRecipeFilesByRecipeId(updatedRecipeId);
+
+            // 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
+            List<RecipeFile> recipeFileList = IntStream.range(0, files.size())
+                    .mapToObj(fileOrder -> imageS3Service.createRecipeFile(files.get(fileOrder), fileOrder, updatedRecipeId))
+                    .collect(Collectors.toList());
+
+            // db에 레시피 파일(이미지)를 저장한다.
+            List<Long> savedFileIdList = recipePort.saveRecipeFile(recipeFileList);
+
+            if (savedFileIdList.isEmpty()) {
+                throw new RecipeApplicationException(ErrorCode.RECIPE_FILE_SAVE_ERROR);
+            }
+        }
+
+        // 비관심사: 스프링 이벤트 발행 (몽고db: 재료, 해시태그 저장)
+        eventPublisher.publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
+    }
 }

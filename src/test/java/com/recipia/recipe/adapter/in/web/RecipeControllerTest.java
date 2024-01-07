@@ -1,7 +1,7 @@
 package com.recipia.recipe.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
@@ -49,16 +49,16 @@ class RecipeControllerTest extends TotalTestSupport {
     @Test
     void ifUserCreateRecipeShouldComplete() throws Exception {
         //given
-        RecipeCreateRequestDto recipeCreateRequestDto = RecipeCreateRequestDto.of("고구마찜", "고구마찜이다");
+        RecipeCreateUpdateRequestDto recipeCreateUpdateRequestDto = RecipeCreateUpdateRequestDto.of("고구마찜", "고구마찜이다");
         Recipe domain = createRecipeDomain();
 
-        when(converter.recipeCreateDtoToDomain(recipeCreateRequestDto)).thenReturn(domain);
+        when(converter.recipeCreateDtoToDomain(recipeCreateUpdateRequestDto)).thenReturn(domain);
         when(createRecipeUseCase.createRecipe(domain, Collections.emptyList())).thenReturn(2L);
 
         // MockMvc 테스트
         mockMvc.perform(post("/recipe/createRecipe")
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .flashAttr("recipeCreateRequestDto", recipeCreateRequestDto))
+                        .flashAttr("recipeCreateRequestDto", recipeCreateUpdateRequestDto))
                 .andExpect(status().isOk());
     }
 

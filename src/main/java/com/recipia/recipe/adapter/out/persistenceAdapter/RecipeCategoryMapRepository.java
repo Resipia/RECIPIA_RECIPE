@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RecipeCategoryMapRepository extends JpaRepository<RecipeCategoryMapEntity, Long> {
 
+    void deleteByRecipeEntityId(Long id);
 }

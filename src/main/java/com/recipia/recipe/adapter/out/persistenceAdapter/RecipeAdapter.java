@@ -4,9 +4,7 @@ import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
-import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.*;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -169,6 +167,52 @@ public class RecipeAdapter implements RecipePort {
             throw new RecipeApplicationException(ErrorCode.RECIPE_FILE_SAVE_ERROR);
         }
     }
+
+    /**
+     * 레시피를 업데이트 한다.
+     */
+    @Override
+    public Long updateRecipe(Recipe recipe) {
+        RecipeEntity recipeEntity = converter.domainToRecipeEntity(recipe);
+        return querydslRepository.updateRecipe(recipeEntity);
+    }
+
+    /**
+     * 영양소를 업데이트 한다.
+     */
+    @Override
+    public void updateNutritionalInfo(Recipe recipe) {
+        NutritionalInfoEntity nutritionalInfoEntity = converter.domainToNutritionalInfoEntity(recipe);
+        querydslRepository.updateNutritionalInfo(nutritionalInfoEntity);
+    }
+
+    /**
+     * 카테고리 매핑을 업데이트 한다.
+     * 정책상 최대3개의 카테고리만 업데이트하기 때문에 성능 문제는 없을듯 하여 기존의 카테고리를 지우고 새로운 카테고리를 저장한다.
+     */
+    @Override
+    public void updateCategoryMapping(Recipe recipe) {
+        // 기존 카테고리 매핑 삭제
+        recipeCategoryMapRepository.deleteByRecipeEntityId(recipe.getId());
+
+        // 새로운 카테고리 리스트 가져오기
+        List<SubCategory> newSubCategoryList = validSubCategory(recipe);
+        RecipeEntity recipeEntity = converter.domainToRecipeEntity(recipe);
+
+        // 새 카테고리 매핑 저장
+        newSubCategoryList.forEach(subCategory ->
+                recipeCategoryMapRepository.save(RecipeCategoryMapEntity.of(recipeEntity, SubCategoryEntity.of(subCategory.getId())
+                )));
+    }
+
+    /**
+     * 레시피와 연관된 파일을 모두 지운다.
+     */
+    @Override
+    public void deleteRecipeFilesByRecipeId(Long updatedRecipeId) {
+        recipeFileRepository.deleteByRecipeEntityId(updatedRecipeId);
+    }
+
 
     /**
      * 서브 카테고리를 Map<Long, List<String>> 형태로 받아온다.

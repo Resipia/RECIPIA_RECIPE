@@ -1,6 +1,6 @@
 package com.recipia.recipe.domain.converter;
 
-import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.out.persistence.entity.*;
 import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.NutritionalInfo;
@@ -92,7 +92,7 @@ public class RecipeConverter {
      * 레시피를 생성할때 컨트롤러에 들어온 요청 dto객체를 도메인으로 변환시키는 메서드
      * 여기서 도메인 객체를 만들어서 서비스 레이어에 보낸다.
      */
-    public Recipe recipeCreateDtoToDomain(RecipeCreateRequestDto dto) {
+    public Recipe recipeCreateDtoToDomain(RecipeCreateUpdateRequestDto dto) {
         NutritionalInfo nutritionalInfo = getNutritionalInfo(dto);
         List<SubCategory> subCategories = getSubCategories(dto);
 
@@ -131,7 +131,7 @@ public class RecipeConverter {
     /**
      * 레시피를 생성할때 요청 dto에서 영양소 정보를 뽑아낸 후 영양소 도메인 객체로 변환해주는 메서드
      */
-    public NutritionalInfo getNutritionalInfo(RecipeCreateRequestDto dto) {
+    public NutritionalInfo getNutritionalInfo(RecipeCreateUpdateRequestDto dto) {
         return NutritionalInfo.of(
                 dto.getNutritionalInfo().getCarbohydrates(),
                 dto.getNutritionalInfo().getProtein(),
@@ -144,7 +144,7 @@ public class RecipeConverter {
     /**
      * 레시피를 생성할때 요청 dto에서 서브 카테고리 정보를 뽑아낸 후 저장할때 필요한 서브 카테고리 도메인 객체로 변환
      */
-    public List<SubCategory> getSubCategories(RecipeCreateRequestDto dto) {
+    public List<SubCategory> getSubCategories(RecipeCreateUpdateRequestDto dto) {
         return dto.getSubCategoryList()
                 .stream()
                 .map(SubCategory::of)

@@ -9,6 +9,10 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
+import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfoEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -139,4 +143,38 @@ public class RecipeQueryRepository {
                 .where(recipeEntity.id.eq(recipeId))
                 .fetchOne());
     }
+
+    /**
+     * 레시피 업데이트
+     * 이름, 내용, 재료, 해시태그를 업데이트 한다.
+     */
+    public Long updateRecipe(RecipeEntity recipeEntity) {
+        QRecipeEntity qRecipe = QRecipeEntity.recipeEntity;
+
+        return queryFactory.update(qRecipe)
+                .where(qRecipe.id.eq(recipeEntity.getId()))
+                .set(qRecipe.recipeName, recipeEntity.getRecipeName())
+                .set(qRecipe.recipeDesc, recipeEntity.getRecipeDesc())
+                .set(qRecipe.ingredient, recipeEntity.getIngredient())
+                .set(qRecipe.hashtag, recipeEntity.getHashtag())
+                .execute();
+    }
+
+    /**
+     * 영양소 업데이트
+     * 모든 정보를 한번에 업데이트 한다.
+     */
+    public void updateNutritionalInfo(NutritionalInfoEntity nutritionalInfoEntity) {
+        QNutritionalInfoEntity qNutritionalInfo = QNutritionalInfoEntity.nutritionalInfoEntity;
+
+        queryFactory.update(qNutritionalInfo)
+                .where(qNutritionalInfo.id.eq(nutritionalInfoEntity.getId()))
+                .set(qNutritionalInfo.carbohydrates, nutritionalInfoEntity.getCarbohydrates())
+                .set(qNutritionalInfo.protein, nutritionalInfoEntity.getProtein())
+                .set(qNutritionalInfo.fat, nutritionalInfoEntity.getFat())
+                .set(qNutritionalInfo.vitamins, nutritionalInfoEntity.getVitamins())
+                .set(qNutritionalInfo.minerals, nutritionalInfoEntity.getMinerals())
+                .execute();
+    }
+
 }

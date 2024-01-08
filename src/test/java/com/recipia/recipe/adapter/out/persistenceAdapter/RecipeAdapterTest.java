@@ -256,13 +256,37 @@ class RecipeAdapterTest extends TotalTestSupport {
     // todo: 레시피 업데이트
     @DisplayName("[happy] 레시피를 업데이트 하면 업데이트된 레시피의 id값이 반환된다.")
     @Test
-    void testReady() {
+    void updateRecipeHappy() {
         //given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
+        NutritionalInfoEntity savedNutritionalInfoEntity = nutritionalInfoRepository.findById(1L).orElseThrow();
+
+        NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(savedNutritionalInfoEntity.getId(), 50, 50, 50, 50, 50);
+        Recipe recipe = createRecipeDomainWithId(savedRecipeEntity.getId(), savingNutritionInfo, 1L, List.of());
 
         //when
+        Long updateRecipeId = sut.updateRecipe(recipe);
+        entityManager.flush();
+        entityManager.clear();
 
         //then
+        RecipeEntity updatedEntity = recipeRepository.findById(updateRecipeId).orElseThrow();
+        Assertions.assertThat(updatedEntity.getRecipeName()).isEqualTo("수정할 이름");
+        Assertions.assertThat(updatedEntity.getRecipeDesc()).isEqualTo("수정할 내용");
+    }
 
+    @Test
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 업데이트를 시도하면 예외가 발생한다.")
+    void updateRecipeException1() {
+        //given
+        NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(1L, 50, 50, 50, 50, 50);
+        Recipe recipe = createRecipeDomainWithId(100L, savingNutritionInfo, 1L, List.of());
+
+        //when-then
+        Assertions.assertThatThrownBy(() -> sut.updateRecipe(recipe))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("레시피가 존재하지 않습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
     }
 
     @DisplayName("[happy] 주어진 영양소 정보가 올바르게 업데이트되면 데이터베이스에 반영된다.")
@@ -291,14 +315,14 @@ class RecipeAdapterTest extends TotalTestSupport {
     void updateNutritionalInfoException() {
         //given
         RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
-
-        // 잘못된 영양소 정보 생성 (음수 값 사용)
         NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(3L, 50, 50, 50, 50, 50);
         Recipe recipe = createRecipeDomainWithId(savedRecipeEntity.getId(), savingNutritionInfo, 1L, List.of());
 
         //when-then
         Assertions.assertThatThrownBy(() -> sut.updateNutritionalInfo(recipe))
-                .isInstanceOf(RecipeApplicationException.class);
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("업데이트 하려는 영양소 정보가 존재하지 않습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NUTRITIONAL_INFO_NOT_FOUND);
     }
 
     @DisplayName("[happy] 카테고리 매핑 정보가 올바르게 업데이트되면 데이터베이스에 반영된다.")
@@ -409,11 +433,11 @@ class RecipeAdapterTest extends TotalTestSupport {
         return Recipe.of(
                 recipeId,
                 memberId,
-                "레시피",
-                "레시피 설명",
-                20,
-                "닭",
-                "#진안",
+                "수정할 이름",
+                "수정할 내용",
+                2000,
+                "수정1, 수정2, 수정3",
+                "수정이다, 수정맞아, 수정이네",
                 savingNutritionInfo,
                 subCategory,
                 "진안",

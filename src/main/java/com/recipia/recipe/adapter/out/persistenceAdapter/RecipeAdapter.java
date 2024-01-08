@@ -177,6 +177,10 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public Long updateRecipe(Recipe recipe) {
+        // 1. 레시피 id를 통해 레시피의 존재여부를 파악하고 예외처리를 한다.
+        validExistRecipeEntity(recipe);
+
+        // 2. 도메인을 엔티티로 변환하고 레시피를 업데이트 한다.
         RecipeEntity recipeEntity = converter.domainToRecipeEntity(recipe);
         return querydslRepository.updateRecipe(recipeEntity);
     }

@@ -40,7 +40,7 @@ public enum ErrorCode {
     BOOKMARK_NOT_FOUND(404, "BOOKMARK_NOT_FOUND", "북마크를 찾을 수 없습니다."),
 
     // 영양소 관련 에러
-    NUTRITIONAL_INFO_NOT_FOUND(404, "NUTRITIONAL_INFO_NOT_FOUND", "업데이트하려는 영양소 정보가 존재하지 않습니다."),
+    NUTRITIONAL_INFO_NOT_FOUND(404, "NUTRITIONAL_INFO_NOT_FOUND", "업데이트 하려는 영양소 정보가 존재하지 않습니다."),
 
     // 카테고리, 서브카테고리 관련 에러
     SUB_CATEGORY_IS_NULL_OR_EMPTY(404, "SUB_CATEGORY_IS_NULL_OR_EMPTY", "카테고리는 null이거나 공백이어서는 안됩니다."),

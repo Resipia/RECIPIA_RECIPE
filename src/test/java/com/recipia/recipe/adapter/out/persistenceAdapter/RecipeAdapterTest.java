@@ -1,11 +1,13 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
+import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.SubCategoryEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TestJwtConfig;
@@ -23,13 +25,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("[통합] 레시피 Adapter 테스트")
 class RecipeAdapterTest extends TotalTestSupport {
@@ -138,7 +143,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         //when & then
         assertThatThrownBy(() -> sut.createRecipeCategoryMap(domain, recipeId))
                 .hasMessageContaining("카테고리는 null이거나 공백이어서는 안됩니다.")
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.CATEGORY_NOT_VALID);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SUB_CATEGORY_IS_NULL_OR_EMPTY);
     }
 
     @DisplayName("[bad] 카테고리 리스트가 비어있다면 비어있다면 예외가 발생한다.")
@@ -151,7 +156,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         //when & then
         assertThatThrownBy(() -> sut.createRecipeCategoryMap(domain, recipeId))
                 .hasMessageContaining("카테고리는 null이거나 공백이어서는 안됩니다.")
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.CATEGORY_NOT_VALID);
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SUB_CATEGORY_IS_NULL_OR_EMPTY);
     }
 
     @DisplayName("[bad] 존재하지 않는 카테고리 저장을 시도하면 예외가 발생한다.")
@@ -163,8 +168,8 @@ class RecipeAdapterTest extends TotalTestSupport {
 
         //when & then
         assertThatThrownBy(() -> sut.createRecipeCategoryMap(domain, recipeId))
-                .hasMessageContaining("존재하지 않는 카테고리입니다.")
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.CATEGORY_NOT_FOUND);
+                .hasMessageContaining("존재하지 않는 서브 카테고리입니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SUB_CATEGORY_NOT_EXIST);
     }
 
     @DisplayName("[happy] 유효한 페이지 정보와 정렬 유형이 주어지면, 페이지화된 레시피 목록과 서브 카테고리 정보를 반환한다.")
@@ -267,7 +272,9 @@ class RecipeAdapterTest extends TotalTestSupport {
         //given
         RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
         NutritionalInfoEntity savedNutritionalInfoEntity = nutritionalInfoRepository.findById(1L).orElseThrow();
-        Recipe recipe = createRecipeDomainWithId(savedRecipeEntity.getId(), savedNutritionalInfoEntity, 1L, List.of());
+
+        NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(savedNutritionalInfoEntity.getId(), 50, 50, 50, 50, 50);
+        Recipe recipe = createRecipeDomainWithId(savedRecipeEntity.getId(), savingNutritionInfo, 1L, List.of());
 
         //when
         // 이렇게하면 트랜잭션이 안끝나서 계속 이전값인 10을 반환함....
@@ -280,41 +287,87 @@ class RecipeAdapterTest extends TotalTestSupport {
         Assertions.assertThat(updatedNutritionInfoEntity.getCarbohydrates()).isEqualTo(50);
     }
 
-
-
-    @Test
-    @DisplayName("[bad] 잘못된 데이터로 영양소를 업데이트하면, 적절한 예외가 발생한다")
-    void test3() {
-        //given
-
-        //when
-
-        //then
-
-    }
-
     @Test
     @DisplayName("[bad] 존재하지 않는 영양소 ID로 업데이트를 시도하면 예외가 발생한다.")
-    void test4() {
+    void updateNutritionalInfoException() {
         //given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
 
-        //when
+        // 잘못된 영양소 정보 생성 (음수 값 사용)
+        NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(3L, 50, 50, 50, 50, 50);
+        Recipe recipe = createRecipeDomainWithId(savedRecipeEntity.getId(), savingNutritionInfo, 1L, List.of());
 
-        //then
-
+        //when-then
+        Assertions.assertThatThrownBy(() -> sut.updateNutritionalInfo(recipe))
+                .isInstanceOf(RecipeApplicationException.class);
     }
-
 
 
     // todo: 카테고리 매핑 업데이트
 
+    @DisplayName("[happy] 카테고리 매핑 정보가 올바르게 업데이트되면 데이터베이스에 반영된다.")
+    @Test
+    void test22() {
+        //given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
+        NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(3L, 50, 50, 50, 50, 50);
+
+        // 매핑 테이블에는 recipe_id, subCategory_id만 존재: 테스트에서 1번 레시피는 서브 카테고리 5,6,7과 기본적으로 매핑되어 있다.
+        List<SubCategory> subCategoryList = List.of(SubCategory.of(1L), SubCategory.of(2L), SubCategory.of(3L));
+        Recipe recipe = createRecipeDomainWithId(savedRecipeEntity.getId(), savingNutritionInfo, 1L, subCategoryList);
+
+        //when
+        sut.updateCategoryMapping(recipe);
+        entityManager.flush();
+        entityManager.clear();
+
+        //then
+        List<RecipeCategoryMapEntity> byRecipeEntityId = recipeCategoryMapRepository.findByRecipeEntityId(recipe.getId());
+        List<Long> idList = byRecipeEntityId.stream()
+                .map(entity -> entity.getSubCategoryEntity().getId())
+                .toList();
+
+        List<Long> insertId = Arrays.asList(1L, 2L, 3L);
+
+        Assertions.assertThat(idList).isNotEmpty();
+        Assertions.assertThat(idList).isEqualTo(insertId);
+    }
+
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 카테고리 매핑 업데이트를 시도하면 예외가 발생한다.")
+    @Test
+    void test2t() {
+        //given
+        NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(3L, 50, 50, 50, 50, 50);
+
+        // 매핑 테이블에는 recipe_id, subCategory_id만 존재: 테스트에서 1번 레시피는 서브 카테고리 5,6,7과 기본적으로 매핑되어 있다.
+        List<SubCategory> subCategoryList = List.of(SubCategory.of(1L), SubCategory.of(2L), SubCategory.of(3L));
+        Recipe recipe = createRecipeDomainWithId(20L, savingNutritionInfo, 1L, subCategoryList);
 
 
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.updateCategoryMapping(recipe))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("레시피가 존재하지 않습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
+    }
 
+    @DisplayName("[bad] 존재하지 않는 서브 카테고리 ID로 업데이트를 시도하면 예외가 발생한다.")
+    @Test
+    void testt() {
+        //given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
+        NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(3L, 50, 50, 50, 50, 50);
 
+        // 매핑 테이블에는 recipe_id, subCategory_id만 존재: 테스트에서 1번 레시피는 서브 카테고리 5,6,7과 기본적으로 매핑되어 있다.
+        List<SubCategory> subCategoryList = List.of(SubCategory.of(200L), SubCategory.of(207L), SubCategory.of(3L));
+        Recipe recipe = createRecipeDomainWithId(savedRecipeEntity.getId(), savingNutritionInfo, 1L, subCategoryList);
 
-
-
+        //when & then
+        Assertions.assertThatThrownBy(() -> sut.updateCategoryMapping(recipe))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("존재하지 않는 서브 카테고리입니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SUB_CATEGORY_NOT_EXIST);
+    }
 
 
     // todo: 레시피에 연관된 파일 모두 삭제
@@ -323,36 +376,6 @@ class RecipeAdapterTest extends TotalTestSupport {
 
 
 
-
-
-
-    private RecipeEntity createRecipeEntity() {
-        return RecipeEntity.of(
-                1L,
-                "레시피",
-                "레시피 설명",
-                20,
-                "김치, 감자",
-                "#고구마",
-                "진안",
-                "N"
-        );
-    }
-
-    private NutritionalInfoEntity createNutritionalInfoEntity(RecipeEntity recipeEntity, int carbohydrates, int protein, int fat, int vitamins, int minerals) {
-        return NutritionalInfoEntity.of(
-                carbohydrates,
-                protein,
-                fat,
-                vitamins,
-                minerals,
-                recipeEntity
-        );
-    }
-
-    public NutritionalInfo getNutritionalInfoFromEntity(NutritionalInfoEntity updateEntity) {
-        return NutritionalInfo.of(updateEntity.getCarbohydrates(), updateEntity.getProtein(), updateEntity.getFat(), updateEntity.getVitamins(), updateEntity.getMinerals());
-    }
 
     private Recipe createRecipeDomain(long memberId, List<SubCategory> subCategory) {
         return Recipe.of(
@@ -369,8 +392,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         );
     }
 
-    public Recipe createRecipeDomainWithId(Long recipeId, NutritionalInfoEntity savedNutritionalInfoEntity, long memberId, List<SubCategory> subCategory) {
-        NutritionalInfo nutritionalInfo = NutritionalInfo.of(savedNutritionalInfoEntity.getId(), 50, 50, 50, 50, 50);
+    public Recipe createRecipeDomainWithId(Long recipeId, NutritionalInfo savingNutritionInfo, long memberId, List<SubCategory> subCategory) {
         return Recipe.of(
                 recipeId,
                 memberId,
@@ -379,10 +401,22 @@ class RecipeAdapterTest extends TotalTestSupport {
                 20,
                 "닭",
                 "#진안",
-                nutritionalInfo,
+                savingNutritionInfo,
                 subCategory,
                 "진안",
                 "N"
+        );
+    }
+
+    public NutritionalInfo createNutritionalInfoEntity(long id, int carbohydrates, int protein, int fat, int vitamins, int minerals) {
+        NutritionalInfoDto dto = NutritionalInfoDto.of(id, carbohydrates, protein, fat, vitamins, minerals);
+        return NutritionalInfo.of(
+                dto.getId(),
+                dto.getCarbohydrates(),
+                dto.getProtein(),
+                dto.getFat(),
+                dto.getVitamins(),
+                dto.getMinerals()
         );
     }
 

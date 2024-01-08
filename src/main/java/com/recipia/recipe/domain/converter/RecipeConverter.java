@@ -77,6 +77,24 @@ public class RecipeConverter {
     }
 
     /**
+     * Recipe 도메인 내부의 영양소 도메인을 엔티티로 변환
+     * 영양소를 업데이트 할때는 이 컨버터를 사용해야 한다.
+     * 왜냐하면 저장할때는 id(pk)가 필요없지만 이미 저장된 영양소 엔티티가 존재하면 그 엔티티의 id(pk)를 가져와서 조건문에서 사용해야 하기 때문이다.
+     */
+    public NutritionalInfoEntity domainToNutritionalInfoEntityUpdate(Recipe domain) {
+
+        NutritionalInfo nutritionalInfo = domain.getNutritionalInfo();
+        return NutritionalInfoEntity.of(
+                nutritionalInfo.getId(),
+                nutritionalInfo.getCarbohydrates(),
+                nutritionalInfo.getProtein(),
+                nutritionalInfo.getFat(),
+                nutritionalInfo.getVitamins(),
+                nutritionalInfo.getMinerals()
+        );
+    }
+
+    /**
      * Recipe 도메인 내부의 영양소 도메인을 엔티티로 변환하는 로직
      * 레시피 엔티티에는 저장할때 꼭 필요한 pk값인 id만 필드로 하여 저장해 준다.(최적화)
      */

@@ -187,7 +187,7 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public void updateNutritionalInfo(Recipe recipe) {
-        NutritionalInfoEntity nutritionalInfoEntity = converter.domainToNutritionalInfoEntity(recipe);
+        NutritionalInfoEntity nutritionalInfoEntity = converter.domainToNutritionalInfoEntityUpdate(recipe);
         querydslRepository.updateNutritionalInfo(nutritionalInfoEntity);
     }
 

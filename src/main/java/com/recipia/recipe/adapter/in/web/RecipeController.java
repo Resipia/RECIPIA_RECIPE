@@ -40,7 +40,7 @@ public class RecipeController {
         // 2. dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
         Recipe recipe = converter.recipeCreateDtoToDomain(recipeCreateUpdateRequestDto);
 
-        // 3. 레시피 저장 실시
+        // 3. 레시피 저장
         Long savedRecipeId = createRecipeUseCase.createRecipe(recipe, files);
 
         return ResponseEntity.ok(ResponseDto.success(savedRecipeId));
@@ -83,7 +83,7 @@ public class RecipeController {
         // 2. dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
         Recipe recipe = converter.recipeCreateDtoToDomain(recipeCreateUpdateRequestDto);
 
-        // 3. 서비스 메서드 호출하여 변경감지
+        // 3. 레시피 업데이트
         updateRecipeUseCase.updateRecipe(recipe, files);
 
         return ResponseEntity.ok(ResponseDto.success());

@@ -256,7 +256,7 @@ class RecipeAdapterTest extends TotalTestSupport {
     // todo: 레시피 업데이트
     @DisplayName("[happy] 레시피를 업데이트 하면 업데이트된 레시피의 id값이 반환된다.")
     @Test
-    void test() {
+    void testReady() {
         //given
 
         //when
@@ -265,7 +265,6 @@ class RecipeAdapterTest extends TotalTestSupport {
 
     }
 
-    // todo: 영양소 업데이트
     @DisplayName("[happy] 주어진 영양소 정보가 올바르게 업데이트되면 데이터베이스에 반영된다.")
     @Test
     void updateNutritionalInfoHappy() {
@@ -302,12 +301,9 @@ class RecipeAdapterTest extends TotalTestSupport {
                 .isInstanceOf(RecipeApplicationException.class);
     }
 
-
-    // todo: 카테고리 매핑 업데이트
-
     @DisplayName("[happy] 카테고리 매핑 정보가 올바르게 업데이트되면 데이터베이스에 반영된다.")
     @Test
-    void test22() {
+    void updateCategoryMappingHappy() {
         //given
         RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
         NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(3L, 50, 50, 50, 50, 50);
@@ -335,7 +331,7 @@ class RecipeAdapterTest extends TotalTestSupport {
 
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 카테고리 매핑 업데이트를 시도하면 예외가 발생한다.")
     @Test
-    void test2t() {
+    void updateCategoryMappingException1() {
         //given
         NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(3L, 50, 50, 50, 50, 50);
 
@@ -353,7 +349,7 @@ class RecipeAdapterTest extends TotalTestSupport {
 
     @DisplayName("[bad] 존재하지 않는 서브 카테고리 ID로 업데이트를 시도하면 예외가 발생한다.")
     @Test
-    void testt() {
+    void updateCategoryMappingException2() {
         //given
         RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
         NutritionalInfo savingNutritionInfo = createNutritionalInfoEntity(3L, 50, 50, 50, 50, 50);
@@ -371,10 +367,16 @@ class RecipeAdapterTest extends TotalTestSupport {
 
 
     // todo: 레시피에 연관된 파일 모두 삭제
+    @DisplayName("")
+    @Test
+    void testReady2() {
+        //given
 
+        //when
 
+        //then
 
-
+    }
 
 
     private Recipe createRecipeDomain(long memberId, List<SubCategory> subCategory) {

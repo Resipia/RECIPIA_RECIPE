@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.in.web.dto.request;
 
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,10 +14,20 @@ import lombok.NoArgsConstructor;
 public class NutritionalInfoDto {
 
     private Long id; // pk
+
+    @Min(0)
     private Integer carbohydrates;  // 탄수화물 함량
+
+    @Min(0)
     private Integer protein; // 단백질 함량
+
+    @Min(0)
     private Integer fat; // 지방 함량
+
+    @Min(0)
     private Integer vitamins; // 비타민 함량
+
+    @Min(0)
     private Integer minerals; // 미네랄 함량
 
     @Builder

@@ -366,10 +366,9 @@ class RecipeAdapterTest extends TotalTestSupport {
     }
 
 
-    // todo: 레시피에 연관된 파일 모두 삭제
     @DisplayName("[happy] 레시피를 업데이트할 때 이미지가 업데이트 된다면 관련된 이미지에 대한 테이블이 모두 삭제된다.")
     @Test
-    void testReady2() {
+    void deleteRecipeFilesByRecipeIdHappy() {
         //given
         RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
         Long recipeId = savedRecipeEntity.getId();

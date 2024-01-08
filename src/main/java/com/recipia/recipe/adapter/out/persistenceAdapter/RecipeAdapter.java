@@ -44,7 +44,7 @@ public class RecipeAdapter implements RecipePort {
 
 
     /**
-     * [UPDATE - 레시피 테이블의 닉네임 컬럼 변경]
+     * [UPDATE] - 레시피 테이블의 닉네임 컬럼 변경
      * MSA 프로젝트라서 레시피 테이블에는 [유저의 닉네임] 컬럼이 존재한다.
      * 유저가 닉네임을 변경하면 SNS로 이벤트가 발행되고 SQSListener가 동작해서 이 메서드가 호출된다.
      * 여기서는 memberId로 유저가 작성한 모든 레시피를 조회한 다음 그 레시피 엔티티가 가진 유저의 닉네임 컬럼을 변경한다.
@@ -64,7 +64,7 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [CREATE - 레시피 저장]
+     * [CREATE] - 레시피 저장
      * 저장에 성공하면 레시피 엔티티의 id값을 반환한다.
      */
     @Override
@@ -76,7 +76,7 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [CREATE - 영양소 저장]
+     * [CREATE] - 영양소 저장
      * 저장에 성공하면 영양소 엔티티의 id값을 반환한다.
      */
     @Override
@@ -90,7 +90,7 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [CREATE - 카테고리 저장]
+     * [CREATE] - 카테고리 저장
      * 카테고리 Map 테이블에 서브 카테고리 정보를 저장한다.
      */
     @Override
@@ -104,7 +104,7 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [READ - 레시피 목록 조회(전체)]
+     * [READ] - 레시피 목록 조회(전체)
      * querydsl을 사용해서 데이터를 조회를 최적화 했다. (목록, count)
      */
     @Override
@@ -129,7 +129,7 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [READ - 단건의 레시피 상세조회]
+     * [READ] - 단건의 레시피 상세조회
      * 유저가 작성한 레시피 정보를 상세조회한다.
      */
     @Override
@@ -147,7 +147,7 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [CREATE - S3에 업로드된 파일(이미지) 정보 저장]
+     * [CREATE] - S3에 업로드된 파일(이미지) 정보 저장
      * 서비스에서 s3에 이미지 업로드가 완료된 후 호출되어 s3 object의 url정보를 rdb에 저장한다.
      */
     @Override
@@ -172,7 +172,7 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [UPDATE - 레시피 업데이트]
+     * [UPDATE] - 레시피 업데이트
      * 레시피의 [이름, 내용(설명), 재료, 해시태그]를 모두 업데이트 한다.
      */
     @Override
@@ -182,7 +182,7 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [UPDATE - 영양소 업데이트]
+     * [UPDATE] - 영양소 업데이트
      * 영양소의 모든 필드를 업데이트 한다.
      */
     @Override
@@ -204,7 +204,7 @@ public class RecipeAdapter implements RecipePort {
 
 
     /**
-     * [UPDATE - 카레고리 매핑정보 업데이트]
+     * [UPDATE] - 카레고리 매핑정보 업데이트
      * 기존의 카테고리를 지우고 새로운 카테고리를 저장한다.
      * 정책상 사용자는 최대3개의 카테고리만 선택할 수 있기 때문에 성능 문제는 없을듯 하여 선택한 방법이다.
      */
@@ -227,6 +227,15 @@ public class RecipeAdapter implements RecipePort {
         subCategoryList.forEach(subCategory ->
                 recipeCategoryMapRepository.save(RecipeCategoryMapEntity.of(recipeEntity, SubCategoryEntity.of(subCategory.getId())
                 )));
+    }
+
+    /**
+     * [DELETE] - 레시피에 연관된 파일 모두 삭제
+     * S3에 이미지를 업로드할 때 날짜-UUID 이런식으로 저장되어서 RDB의 조건문으로 검색해서 update하기에는 무리가 있어 모두 삭제하고 다시 넣기로 결정
+     */
+    @Override
+    public void deleteRecipeFilesByRecipeId(Long updatedRecipeId) {
+        recipeFileRepository.deleteByRecipeEntityId(updatedRecipeId);
     }
 
     /**
@@ -261,16 +270,6 @@ public class RecipeAdapter implements RecipePort {
 
         return subCategoryList;
     }
-
-    /**
-     * [DELETE - 레시피에 연관된 파일 모두 삭제]
-     * S3에 이미지를 업로드할 때 날짜-UUID 이런식으로 저장되어서 RDB의 조건문으로 검색해서 update하기에는 무리가 있어 모두 삭제하고 다시 넣기로 결정
-     */
-    @Override
-    public void deleteRecipeFilesByRecipeId(Long updatedRecipeId) {
-        recipeFileRepository.deleteByRecipeEntityId(updatedRecipeId);
-    }
-
 
     /**
      * [Extract method] - getAllRecipeList, getRecipeDetailView 에서 사용

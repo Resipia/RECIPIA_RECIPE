@@ -164,10 +164,10 @@ public class RecipeQueryRepository {
      * 영양소 업데이트
      * 모든 정보를 한번에 업데이트 한다.
      */
-    public void updateNutritionalInfo(NutritionalInfoEntity nutritionalInfoEntity) {
+    public Long updateNutritionalInfo(NutritionalInfoEntity nutritionalInfoEntity) {
         QNutritionalInfoEntity qNutritionalInfo = QNutritionalInfoEntity.nutritionalInfoEntity;
 
-        queryFactory.update(qNutritionalInfo)
+        return queryFactory.update(qNutritionalInfo)
                 .where(qNutritionalInfo.id.eq(nutritionalInfoEntity.getId()))
                 .set(qNutritionalInfo.carbohydrates, nutritionalInfoEntity.getCarbohydrates())
                 .set(qNutritionalInfo.protein, nutritionalInfoEntity.getProtein())

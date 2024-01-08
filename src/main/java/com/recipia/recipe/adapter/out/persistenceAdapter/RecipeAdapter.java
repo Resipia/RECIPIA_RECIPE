@@ -203,7 +203,7 @@ public class RecipeAdapter implements RecipePort {
 
         // 3. 업데이트할 값을 엔티티로 변환하고 업데이트 한다.
         NutritionalInfoEntity updateNutritionalInfoEntity = converter.domainToNutritionalInfoEntityUpdate(recipe);
-        querydslRepository.updateNutritionalInfo(updateNutritionalInfoEntity);
+        Long updatedNutritionalInfoId = querydslRepository.updateNutritionalInfo(updateNutritionalInfoEntity);
     }
 
 

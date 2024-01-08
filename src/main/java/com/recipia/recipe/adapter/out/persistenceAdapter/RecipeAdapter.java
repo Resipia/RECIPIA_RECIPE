@@ -96,7 +96,7 @@ public class RecipeAdapter implements RecipePort {
     @Override
     public void createRecipeCategoryMap(Recipe recipe, Long savedRecipeId) {
         recipe.setId(savedRecipeId);
-        List<SubCategory> subCategoryList = validSubCategory(recipe);
+        List<SubCategory> subCategoryList = validSubCategoryNotExist(recipe);
 
         subCategoryList.stream()
                 .map(subCategory -> converter.domainToRecipeCategoryMapEntity(recipe, subCategory))
@@ -187,9 +187,21 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public void updateNutritionalInfo(Recipe recipe) {
-        NutritionalInfoEntity nutritionalInfoEntity = converter.domainToNutritionalInfoEntityUpdate(recipe);
-        querydslRepository.updateNutritionalInfo(nutritionalInfoEntity);
+        // 1. 레시피 id를 통해 레시피의 존재여부를 파악하고 예외처리를 한다.
+        validExistRecipeEntity(recipe);
+
+        // 2. 업데이트하려는 영양소가 존재하는지 체크한다.
+        Long nutritionalInfoId = recipe.getNutritionalInfo().getId();
+        boolean exists = nutritionalInfoRepository.existsById(nutritionalInfoId);
+        if (!exists) {
+            throw new RecipeApplicationException(ErrorCode.NUTRITIONAL_INFO_NOT_FOUND);
+        }
+
+        // 3. 업데이트할 값을 엔티티로 변환하고 업데이트 한다.
+        NutritionalInfoEntity updateNutritionalInfoEntity = converter.domainToNutritionalInfoEntityUpdate(recipe);
+        querydslRepository.updateNutritionalInfo(updateNutritionalInfoEntity);
     }
+
 
     /**
      * [UPDATE - 카레고리 매핑정보 업데이트]
@@ -198,17 +210,56 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public void updateCategoryMapping(Recipe recipe) {
-        // 기존 카테고리 매핑 삭제
+
+        // 1. 레시피 id를 통해 레시피의 존재여부를 파악하고 예외처리를 한다.
+        validExistRecipeEntity(recipe);
+
+        // 2. 매핑하려는 카테고리가 존재하는 서브 카테고리인지 검증하고 예외처리를 한다.
+        List<SubCategory> subCategoryList = validSubCategoryNotExist(recipe);
+
+        // 3. 기존 카테고리 매핑을 삭제한다.
         recipeCategoryMapRepository.deleteByRecipeEntityId(recipe.getId());
 
-        // 새로운 카테고리 리스트 가져오기
-        List<SubCategory> newSubCategoryList = validSubCategory(recipe);
+        // 3. 저장을 위해 새로운 카테고리 리스트를 한번 검증하고 다시 반환한다.
         RecipeEntity recipeEntity = converter.domainToRecipeEntity(recipe);
 
-        // 새 카테고리 매핑 저장
-        newSubCategoryList.forEach(subCategory ->
+        // 4. 카테고리 매핑을 저장한다.
+        subCategoryList.forEach(subCategory ->
                 recipeCategoryMapRepository.save(RecipeCategoryMapEntity.of(recipeEntity, SubCategoryEntity.of(subCategory.getId())
                 )));
+    }
+
+    /**
+     * [EXTRACT METHOD]
+     * 카테고리 매핑을 추가/업데이트 할 때 검증하는 메서드
+     */
+    private List<SubCategory> validSubCategoryNotExist(Recipe recipe) {
+
+        // 1. subCategoryList가 null인 경우 커스텀 예외를 던짐
+        List<SubCategory> subCategoryList = recipe.getSubCategory();
+        if (subCategoryList == null || subCategoryList.isEmpty()) {
+            throw new RecipeApplicationException(ErrorCode.SUB_CATEGORY_IS_NULL_OR_EMPTY);
+        }
+
+        // 2. 서브 카테고리의 id값만 추출해서 List로 만든다.
+        List<Long> subCategoryIdList = recipe.getSubCategory()
+                .stream()
+                .map(SubCategory::getId)
+                .toList();
+
+        // 3. 추출한 id를 사용해서 실제 존재하는 서브 카테고리인지 검증하고 각각 검증된 결과값 (bool)을 리스트로 받는다.
+        List<Boolean> validResultList = subCategoryIdList.stream()
+                .map(subCategoryEntityRepository::existsById)
+                .toList();
+
+        // 4. bool 리스트를 순회하며 만약 존재하지 않는 서브 카테고리가 하나라도 존재하면 예외를 던진다.
+        validResultList.forEach(exist -> {
+            if (!exist) {
+                throw new RecipeApplicationException(ErrorCode.SUB_CATEGORY_NOT_EXIST);
+            }
+        });
+
+        return subCategoryList;
     }
 
     /**
@@ -234,28 +285,17 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [Extract method] - createRecipeCategoryMap, updateCategoryMapping 에서 사용
-     * 레시피 도메인을 받아와서 서브 카테고리가 null이거나 존재하지 않는 이상한 카테고리인지 검증한다.
+     * [EXTRACT METHOD]
+     * 레시피 도메인에 설정된 id를 통해 존재하는 레시피인지 확인한다.
      */
-    private List<SubCategory> validSubCategory(Recipe recipe) {
-        List<SubCategory> subCategoryList = recipe.getSubCategory();
+    public void validExistRecipeEntity(Recipe recipe) {
+        // 1. 연관된 레시피가 존재하는지 확인한다.
+        boolean existEntity = recipeRepository.existsById(recipe.getId());
 
-        // subCategoryList가 null인 경우 커스텀 예외를 던짐
-        if (subCategoryList == null || subCategoryList.isEmpty()) {
-            throw new RecipeApplicationException(ErrorCode.CATEGORY_NOT_VALID);
+        // 2. 없다면 예외처리 한다.
+        if (!existEntity) {
+            throw new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND);
         }
-
-        // 2. 서브 카테고리가 존재하는지 확인한다.
-        // (서브 카테고리는 사용자가 추가하는게 아니라 운영상 고정으로 세팅되어 있기 때문에 이상한 매핑이 되어있지 않은지 확인하는 작업)
-        subCategoryList.forEach(subCategory -> {
-            // subCategory가 데이터베이스에 존재하는지 확인
-            boolean exists = subCategoryEntityRepository.findById(subCategory.getId()).isPresent();
-            if (!exists) {
-                // 존재하지 않는 경우 예외 발생
-                throw new RecipeApplicationException(ErrorCode.CATEGORY_NOT_FOUND);
-            }
-        });
-        return subCategoryList;
     }
 
 

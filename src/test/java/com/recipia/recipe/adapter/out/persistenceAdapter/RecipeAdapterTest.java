@@ -9,11 +9,11 @@ import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TestJwtConfig;
-import com.recipia.recipe.config.TestSecurityConfig;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.SubCategory;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
@@ -30,6 +29,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("[통합] 레시피 Adapter 테스트")
 class RecipeAdapterTest extends TotalTestSupport {
@@ -45,6 +45,9 @@ class RecipeAdapterTest extends TotalTestSupport {
 
     @Autowired
     private RecipeCategoryMapRepository recipeCategoryMapRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
 
     @DisplayName("[happy] 유저가 닉네임을 변경하면 레시피 엔티티 내부의 유저 닉네임도 변경된다.")
@@ -245,6 +248,84 @@ class RecipeAdapterTest extends TotalTestSupport {
         });
     }
 
+    // todo: 레시피 업데이트
+    @DisplayName("[happy] 레시피를 업데이트 하면 업데이트된 레시피의 id값이 반환된다.")
+    @Test
+    void test() {
+        //given
+
+        //when
+
+        //then
+
+    }
+
+    // todo: 영양소 업데이트
+    @DisplayName("[happy] 주어진 영양소 정보가 올바르게 업데이트되면 데이터베이스에 반영된다.")
+    @Test
+    void updateNutritionalInfoHappy() {
+        //given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
+        NutritionalInfoEntity savedNutritionalInfoEntity = nutritionalInfoRepository.findById(1L).orElseThrow();
+        Recipe recipe = createRecipeDomainWithId(savedRecipeEntity.getId(), savedNutritionalInfoEntity, 1L, List.of());
+
+        //when
+        // 이렇게하면 트랜잭션이 안끝나서 계속 이전값인 10을 반환함....
+        sut.updateNutritionalInfo(recipe);
+        entityManager.flush();
+        entityManager.clear();
+
+        //then
+        NutritionalInfoEntity updatedNutritionInfoEntity = nutritionalInfoRepository.findById(savedNutritionalInfoEntity.getId()).orElseThrow();
+        Assertions.assertThat(updatedNutritionInfoEntity.getCarbohydrates()).isEqualTo(50);
+    }
+
+
+
+    @Test
+    @DisplayName("[bad] 잘못된 데이터로 영양소를 업데이트하면, 적절한 예외가 발생한다")
+    void test3() {
+        //given
+
+        //when
+
+        //then
+
+    }
+
+    @Test
+    @DisplayName("[bad] 존재하지 않는 영양소 ID로 업데이트를 시도하면 예외가 발생한다.")
+    void test4() {
+        //given
+
+        //when
+
+        //then
+
+    }
+
+
+
+    // todo: 카테고리 매핑 업데이트
+
+
+
+
+
+
+
+
+
+
+    // todo: 레시피에 연관된 파일 모두 삭제
+
+
+
+
+
+
+
+
     private RecipeEntity createRecipeEntity() {
         return RecipeEntity.of(
                 1L,
@@ -258,17 +339,19 @@ class RecipeAdapterTest extends TotalTestSupport {
         );
     }
 
-    private NutritionalInfoEntity createNutritionalInfoEntity() {
-
-        RecipeEntity recipeEntity = createRecipeEntity();
+    private NutritionalInfoEntity createNutritionalInfoEntity(RecipeEntity recipeEntity, int carbohydrates, int protein, int fat, int vitamins, int minerals) {
         return NutritionalInfoEntity.of(
-                10,
-                10,
-                10,
-                10,
-                10,
+                carbohydrates,
+                protein,
+                fat,
+                vitamins,
+                minerals,
                 recipeEntity
         );
+    }
+
+    public NutritionalInfo getNutritionalInfoFromEntity(NutritionalInfoEntity updateEntity) {
+        return NutritionalInfo.of(updateEntity.getCarbohydrates(), updateEntity.getProtein(), updateEntity.getFat(), updateEntity.getVitamins(), updateEntity.getMinerals());
     }
 
     private Recipe createRecipeDomain(long memberId, List<SubCategory> subCategory) {
@@ -280,6 +363,23 @@ class RecipeAdapterTest extends TotalTestSupport {
                 "닭",
                 "#진안",
                 NutritionalInfo.of(10, 10, 10, 10, 10),
+                subCategory,
+                "진안",
+                "N"
+        );
+    }
+
+    public Recipe createRecipeDomainWithId(Long recipeId, NutritionalInfoEntity savedNutritionalInfoEntity, long memberId, List<SubCategory> subCategory) {
+        NutritionalInfo nutritionalInfo = NutritionalInfo.of(savedNutritionalInfoEntity.getId(), 50, 50, 50, 50, 50);
+        return Recipe.of(
+                recipeId,
+                memberId,
+                "레시피",
+                "레시피 설명",
+                20,
+                "닭",
+                "#진안",
+                nutritionalInfo,
                 subCategory,
                 "진안",
                 "N"

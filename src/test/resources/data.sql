@@ -21,6 +21,9 @@ VALUES (1, '김치찌개', '매콤한 김치찌개 레시피', 30, '김치, 돼�
 --        (8, '죽', '몸에 좋은 죽 끓이기', 35, '쌀, 야채, 해산물', '#죽', '수아',
 --         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'N');
 
+INSERT INTO nutritional_info (carbohydrates, protein, fat, vitamins, minerals, recipe_id)
+VALUES (10, 10, 10, 10, 10, 1);
+
 
 INSERT INTO category (category_nm, sort_no, del_yn, create_dttm, update_dttm)
 VALUES ('한식', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),

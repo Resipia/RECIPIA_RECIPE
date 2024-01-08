@@ -253,7 +253,6 @@ class RecipeAdapterTest extends TotalTestSupport {
         });
     }
 
-    // todo: 레시피 업데이트
     @DisplayName("[happy] 레시피를 업데이트 하면 업데이트된 레시피의 id값이 반환된다.")
     @Test
     void updateRecipeHappy() {

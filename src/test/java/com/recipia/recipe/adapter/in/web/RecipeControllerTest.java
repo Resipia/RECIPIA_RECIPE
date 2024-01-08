@@ -7,6 +7,7 @@ import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
+import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -42,6 +43,7 @@ class RecipeControllerTest extends TotalTestSupport {
     @MockBean RecipeConverter converter;
     @MockBean private ReadRecipeUseCase readRecipeUseCase;
     @MockBean CreateRecipeUseCase createRecipeUseCase;
+    @MockBean UpdateRecipeUseCase updateRecipeUseCase;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -58,7 +60,7 @@ class RecipeControllerTest extends TotalTestSupport {
         // MockMvc 테스트
         mockMvc.perform(post("/recipe/createRecipe")
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .flashAttr("recipeCreateRequestDto", recipeCreateUpdateRequestDto))
+                        .flashAttr("recipeCreateUpdateRequestDto", recipeCreateUpdateRequestDto))
                 .andExpect(status().isOk());
     }
 

@@ -7,7 +7,7 @@ import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.SubCategoryEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TestJwtConfig;
@@ -29,12 +29,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("[통합] 레시피 Adapter 테스트")
 class RecipeAdapterTest extends TotalTestSupport {
@@ -53,6 +50,9 @@ class RecipeAdapterTest extends TotalTestSupport {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private RecipeFileRepository recipeFileRepository;
 
 
     @DisplayName("[happy] 유저가 닉네임을 변경하면 레시피 엔티티 내부의 유저 닉네임도 변경된다.")
@@ -367,15 +367,27 @@ class RecipeAdapterTest extends TotalTestSupport {
 
 
     // todo: 레시피에 연관된 파일 모두 삭제
-    @DisplayName("")
+    @DisplayName("[happy] 레시피를 업데이트할 때 이미지가 업데이트 된다면 관련된 이미지에 대한 테이블이 모두 삭제된다.")
     @Test
     void testReady2() {
         //given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
+        Long recipeId = savedRecipeEntity.getId();
+
+        RecipeFileEntity recipeFileEntity = RecipeFileEntity.of(savedRecipeEntity, 1, "/", "url", "nm", "nm2", "jpg", 100, "N");
+        recipeFileRepository.save(recipeFileEntity);
+        entityManager.flush();
+        entityManager.clear();
 
         //when
+        sut.deleteRecipeFilesByRecipeId(recipeId);
+        entityManager.flush();
+        entityManager.clear();
 
         //then
-
+        List<RecipeFileEntity> results = recipeFileRepository.findByRecipeId(recipeId);
+        // @Query로 정의된 JPA 쿼리에서 결과가 없을 경우에는 null을 반환하지 않고 비어있는 List를 반환한다.
+        Assertions.assertThat(results).isEmpty();
     }
 
 

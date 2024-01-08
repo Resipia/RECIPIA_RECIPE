@@ -4,7 +4,6 @@ package com.recipia.recipe.application.port.out;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
 import org.springframework.data.domain.Page;
@@ -30,4 +29,12 @@ public interface RecipePort {
     RecipeDetailViewDto getRecipeDetailView(Long recipeId);
 
     List<Long> saveRecipeFile(List<RecipeFile> recipeFile);
+
+    Long updateRecipe(Recipe recipe);
+
+    void updateNutritionalInfo(Recipe recipe);
+
+    void updateCategoryMapping(Recipe recipe);
+
+    void deleteRecipeFilesByRecipeId(Long updatedRecipeId);
 }

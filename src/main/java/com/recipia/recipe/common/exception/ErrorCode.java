@@ -26,7 +26,6 @@ public enum ErrorCode {
     REQUIRED_RECIPE_DELETE_YN(404, "RECIPE_TIME_SET_ERROR", "삭제 여부는 필수 항목입니다."),
     INVALID_INGREDIENTS(404, "INVALID_INGREDIENTS", "재료가 유효하지 않습니다."),
     INVALID_HASHTAGS(404, "INVALID_HASHTAGS", "해시태그가 유효하지 않습니다."),
-    CATEGORY_NOT_VALID(404, "CATEGORY_NOT_VALID", "카테고리는 null이거나 공백이어서는 안됩니다."),
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "존재하지 않는 카테고리입니다."),
     RECIPE_FILE_SAVE_ERROR(500, "RECIPE_FILE_SAVE_ERROR", "데이터 베이스에 파일을 저장하던중 예외가 발생했습니다."),
 
@@ -39,6 +38,13 @@ public enum ErrorCode {
     RECIPE_NOT_FOUND(404, "RECIPE_NOT_FOUND", "레시피가 존재하지 않습니다."),
     INVALID_INPUT(404, "INVALID_INPUT", "잘못된 입력입니다."),
     BOOKMARK_NOT_FOUND(404, "BOOKMARK_NOT_FOUND", "북마크를 찾을 수 없습니다."),
+
+    // 영양소 관련 에러
+    NUTRITIONAL_INFO_NOT_FOUND(404, "NUTRITIONAL_INFO_NOT_FOUND", "업데이트 하려는 영양소 정보가 존재하지 않습니다."),
+
+    // 카테고리, 서브카테고리 관련 에러
+    SUB_CATEGORY_IS_NULL_OR_EMPTY(404, "SUB_CATEGORY_IS_NULL_OR_EMPTY", "카테고리는 null이거나 공백이어서는 안됩니다."),
+    SUB_CATEGORY_NOT_EXIST(404, "SUB_CATEGORY_NOT_EXIST", "존재하지 않는 서브 카테고리입니다."),
 
     // 검색 관련 에러
     CONDITION_NOT_FOUND(404, "CONDITION_NOT_FOUND", "검색 조건을 찾을 수 없습니다."),
@@ -69,7 +75,7 @@ public enum ErrorCode {
     // 외부 서비스 에러
     RECIPE_SERVICE_ERROR(500, "RECIPE_SERVICE_ERROR", "RECIPE 서비스 에러"),
     WRIGGLE_SERVICE_ERROR(500, "WRIGGLE_SERVICE_ERROR", "WRIGGLE 서비스 에러"),
-    CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러")
+    CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러"),
 
     ;
 

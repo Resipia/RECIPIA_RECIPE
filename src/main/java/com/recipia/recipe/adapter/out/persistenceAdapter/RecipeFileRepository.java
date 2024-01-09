@@ -11,9 +11,10 @@ import java.util.List;
 @Repository
 public interface RecipeFileRepository extends JpaRepository<RecipeFileEntity, Long> {
 
-    void deleteByRecipeEntityId(Long updatedRecipeId);
-
-    @Query("SELECT rf FROM RecipeFileEntity rf WHERE rf.recipeEntity.id = :recipeId")
+    @Query("SELECT rf FROM RecipeFileEntity rf WHERE rf.recipeEntity.id = :recipeId and rf.delYn = 'Y'")
     List<RecipeFileEntity> findByRecipeId(@Param("recipeId") Long recipeId);
 
 }
+
+
+

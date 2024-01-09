@@ -30,6 +30,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,6 +61,7 @@ class RecipeControllerTest extends TotalTestSupport {
         mockMvc.perform(post("/recipe/createRecipe")
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .flashAttr("recipeCreateUpdateRequestDto", recipeCreateUpdateRequestDto))
+                .andDo(print())
                 .andExpect(status().isOk());
     }
 

@@ -9,7 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,13 +26,27 @@ class CommentServiceTest {
     @Test
     void saveCommentSuccess() {
         // given
-        Comment comment = Comment.of(1L, 1L, "commentValue", "N");
+        Comment comment = Comment.of(null, 1L, 1L, "commentValue", "N");
         when(commentPort.createComment(comment)).thenReturn(1L);
         when(sut.createComment(comment)).thenReturn(1L);
         // when
         Long createdCommentId = sut.createComment(comment);
         // then
         assertEquals(createdCommentId, 1L);
+    }
+
+    @DisplayName("[happy] commentId, memberId, commentText가 정상적으로 들어오면 댓글 수정에 성공한다.")
+    @Test
+    void updateCommentSuccess() {
+        // given
+        Comment comment = Comment.of(1L, null, 1L, "update-comment", "N");
+        when(commentPort.checkIsCommentExist(comment)).thenReturn(true);
+        when(commentPort.updateComment(comment)).thenReturn(1L);
+        // when
+        Long updatedCount = sut.updateComment(comment);
+        // then
+        assertThat(updatedCount).isNotNull();
+        assertThat(updatedCount).isGreaterThan(0);
 
     }
 

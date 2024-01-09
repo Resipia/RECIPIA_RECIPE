@@ -1,14 +1,13 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Comment;
-import com.recipia.recipe.domain.converter.CommentConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.mongodb.assertions.Assertions.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DisplayName("[통합] 댓글 Adapter 테스트")
@@ -23,7 +22,7 @@ class CommentAdapterTest extends TotalTestSupport {
     @Test
     void createCommentSuccess() {
         // given
-        Comment comment = Comment.of(1L, 1L, "comment", "N");
+        Comment comment = Comment.of(null, 1L, 1L, "comment", "N");
         // when
         Long createCommentId = commentAdapter.createComment(comment);
 
@@ -31,6 +30,32 @@ class CommentAdapterTest extends TotalTestSupport {
         CommentEntity savedCommentEntity = commentRepository.findById(createCommentId).get();
         assertThat(createCommentId).isNotNull();
         assertThat(createCommentId).isEqualTo(savedCommentEntity.getId());
+    }
+
+    @DisplayName("[happy] 댓글 수정에 성공하면 수정된 데이터 갯수를 반환한다.")
+    @Test
+    void updateCommentSuccess() {
+        // given
+        Comment comment = Comment.of(1L, null, 1L, "update-comment", "N");
+        // when
+        Long updatedCount = commentAdapter.updateComment(comment);
+
+        // then
+        String commentText = commentRepository.findById(comment.getId()).get().getCommentText();
+        assertThat(commentText).isEqualTo(comment.getCommentText());
+        assertThat(updatedCount).isNotNull();
+        assertThat(updatedCount).isGreaterThan(0);
+    }
+
+    @DisplayName("[happy] commentId, memberId에 해당하는 댓글이 존재할때 true를 반환한다.")
+    @Test
+    void whenCommentExistReturnTrue() {
+        // given
+        Comment comment = Comment.of(1L, null, 1L, "update-comment", "N");
+        // when
+        boolean isCommentExist = commentAdapter.checkIsCommentExist(comment);
+        // then
+        assertTrue(isCommentExist);
     }
 
 }

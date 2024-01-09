@@ -1,7 +1,8 @@
 package com.recipia.recipe.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recipia.recipe.adapter.in.web.dto.request.CommentRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Comment;
@@ -35,14 +36,33 @@ class CommentControllerTest extends TotalTestSupport {
     @Test
     void ifUserCreateCommentShouldComplete() throws Exception {
         // given
-        CommentRequestDto dto = CommentRequestDto.of(1L, "commentvalue");
-        Comment domain = Comment.of(1L, 1L, "commentvalue", "N");
+        CommentRegistRequestDto dto = CommentRegistRequestDto.of(1L, "commentvalue");
+        Comment domain = Comment.of(null, 1L, 1L, "commentvalue", "N");
 
-        when(commentConverter.dtoToDomain(dto)).thenReturn(domain);
+        when(commentConverter.registRequestDtoToDomain(dto)).thenReturn(domain);
         when(commentUseCase.createComment(domain)).thenReturn(1L);
 
         //when & then
         mockMvc.perform(post("/recipe/regist/comment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(dto)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @DisplayName("[happy] 유저가 댓글 수정 요청 시 정상적으로 저장되고 성공 응답을 반환한다.")
+    @Test
+    void ifUserUpdateCommentShouldComplete() throws Exception {
+        // given
+        CommentUpdateRequestDto dto = CommentUpdateRequestDto.of(1L, "update-value");
+        Comment domain = Comment.of(dto.getId(), null, 1L, dto.getCommentText(), "N");
+
+        when(commentConverter.updateRequestDtoToDomain(dto)).thenReturn(domain);
+        when(commentUseCase.updateComment(domain)).thenReturn(1L);
+
+        //when & then
+        mockMvc.perform(post("/recipe/update/comment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(dto)))
                 .andExpect(status().isOk())

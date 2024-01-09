@@ -11,8 +11,11 @@ import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
+import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
+import com.recipia.recipe.domain.SubCategory;
+import com.recipia.recipe.domain.converter.NutritionalInfoConverter;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +40,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     private final RecipePort recipePort;
     private final ApplicationEventPublisher eventPublisher;
     private final ImageS3Service imageS3Service;
-    private final RecipeConverter converter;
+    private final NutritionalInfoConverter nutritionalInfoConverter;
 
     /**
      * 레시피 생성을 담당하는 메서드
@@ -86,8 +89,6 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         // 1. 정렬조건을 정한 뒤 Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
 
-        // todo: 여기에 securytiutils 넣을지말지
-
         // 2. 데이터를 받아온다.
         Page<RecipeMainListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType);
 
@@ -98,10 +99,62 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     }
 
     /**
-     * 레시피 단건 조회
+     * 레시피 단건 상세조회
      */
-    public RecipeDetailViewDto getRecipeDetailView(Long recipeId) {
-        return recipePort.getRecipeDetailView(recipeId);
+    public Recipe getRecipeDetailView(Long recipeId) {
+
+        // 1. 레시피의 기본적인 정보를 받아온다.
+        Recipe recipe = recipePort.getRecipeDetailView(recipeId);
+
+        // 2. 서브 카테고리 정보를 받아와서 도메인에 세팅한다.
+        List<SubCategory> subCategories = recipePort.getSubCategories(recipeId);
+        recipe.setSubCategory(subCategories);
+
+        // 3. 영양소 정보를 받아와서 도메인에 세팅한다.
+        NutritionalInfo nutritionalInfo = recipePort.getNutritionalInfo(recipeId);
+        recipe.setNutritionalInfo(nutritionalInfo);
+
+        // 4. 이미지(파일)을 받아와서 도메인에 세팅한다.
+        List<RecipeFile> recipeFileList = recipePort.getRecipeFile(recipeId);
+        recipe.setRecipeFileList(recipeFileList);
+
+        return recipe;
     }
 
+    /**
+     * 레시피를 업데이트 한다.
+     * 레시피 생성과 거의 동일하다. 다만 업데이트다 보니 기존의 데이터를 삭제하고 추가하는 방식을 주로 적용시켰다.
+     */
+    @Transactional
+    @Override
+    public void updateRecipe(Recipe recipe, List<MultipartFile> files) {
+
+        // 1. 레시피, 영양소, 카테고리 매핑 업데이트
+        Long recipeId = recipePort.updateRecipe(recipe);
+        recipePort.updateNutritionalInfo(recipe);
+        recipePort.updateCategoryMapping(recipe);
+
+        // 2. 파일이 null이면 저장을 하지 않는다.
+        if (!files.isEmpty()) {
+
+            // 2-1. 기존 파일 전부 soft delete 처리
+            recipePort.softDeleteRecipeFilesByRecipeId(recipeId);
+
+            // 2-2. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
+            List<RecipeFile> recipeFileList = IntStream.range(0, files.size())
+                    .mapToObj(fileOrder -> imageS3Service.createRecipeFile(files.get(fileOrder), fileOrder, recipeId))
+                    .collect(Collectors.toList());
+
+            // 2-3. rdb에 레시피 파일(이미지)을 저장
+            List<Long> savedFileIdList = recipePort.saveRecipeFile(recipeFileList);
+
+            // 2-4. 만약 저장 후 반환받은 id값이 없다면 예외처리
+            if (savedFileIdList.isEmpty()) {
+                throw new RecipeApplicationException(ErrorCode.RECIPE_FILE_SAVE_ERROR);
+            }
+        }
+
+        // 3. 비관심사: 스프링 이벤트 발행 (몽고db: 재료, 해시태그 저장)
+        eventPublisher.publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
+    }
 }

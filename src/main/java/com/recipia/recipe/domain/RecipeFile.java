@@ -52,4 +52,10 @@ public class RecipeFile {
     }
 
 
+    /**
+     * 어댑터에서 파일을 조회할때 EntityToDomain 컨버터를 호출하면 이 메서드가 사용된다.
+     */
+    public static RecipeFile of(Integer fileOrder, String storedFilePath, String objectUrl, String originFileNm, String storedFileNm, String fileExtension, Integer fileSize, String delYn) {
+        return new RecipeFile(null, null, fileOrder, storedFilePath, objectUrl, originFileNm, storedFileNm, fileExtension, fileSize, delYn);
+    }
 }

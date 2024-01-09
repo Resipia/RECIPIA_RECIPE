@@ -382,7 +382,7 @@ class RecipeAdapterTest extends TotalTestSupport {
     }
 
 
-    @DisplayName("[happy] 레시피를 업데이트할 때 이미지가 업데이트 된다면 관련된 이미지에 대한 테이블이 모두 삭제된다.")
+    @DisplayName("[happy] 이미지를 삭제하면 테이블 내부의 del_yn 컬럼이 모두 'Y'로 변경된다.")
     @Test
     void deleteRecipeFilesByRecipeIdHappy() {
         //given
@@ -390,7 +390,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         Long recipeId = savedRecipeEntity.getId();
 
         RecipeFileEntity recipeFileEntity = RecipeFileEntity.of(savedRecipeEntity, 1, "/", "url", "nm", "nm2", "jpg", 100, "N");
-        recipeFileRepository.save(recipeFileEntity);
+        RecipeFileEntity savedFileEntity = recipeFileRepository.save(recipeFileEntity);
         entityManager.flush();
         entityManager.clear();
 
@@ -400,9 +400,27 @@ class RecipeAdapterTest extends TotalTestSupport {
         entityManager.clear();
 
         //then
-        List<RecipeFileEntity> results = recipeFileRepository.findByRecipeId(recipeId);
+        RecipeFileEntity result = recipeFileRepository.findById(savedFileEntity.getId()).orElseThrow();
+        Assertions.assertThat(result.getDelYn()).isEqualTo("Y");
+    }
+
+    @DisplayName("[happy] 레시피를 삭제하면 soft delete가 적용되어 del_yn이 'Y'로 변경된다.")
+    @Test
+    void softDeleteRecipeByRecipeIdHappy() {
+        //given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
+        Long recipeId = savedRecipeEntity.getId();
+
+        //when
+        Long deleteCount = sut.softDeleteRecipeByRecipeId(recipeId);
+        entityManager.flush();
+        entityManager.clear();
+
+        //then
+        RecipeEntity result = recipeRepository.findById(savedRecipeEntity.getId()).orElseThrow();
         // del_yn은 Y인 조건으로 검색하면 된다.
-        Assertions.assertThat(results.size()).isEqualTo(0);
+        Assertions.assertThat(result.getDelYn()).isEqualTo("Y");
+        Assertions.assertThat(deleteCount).isEqualTo(1);
     }
 
 

@@ -200,10 +200,23 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public List<RecipeFile> getRecipeFile(Long recipeId) {
-        List<RecipeFileEntity> resultEntityList = recipeFileRepository.findByRecipeId(recipeId);
+        List<RecipeFileEntity> resultEntityList = recipeFileRepository.findAllByRecipeId(recipeId);
         return resultEntityList.stream()
                 .map(recipeFileConverter::entityToDomain)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * [DELETE] - 레시피를 soft delete 방식으로 삭제한다.
+     * 사용자로부터 받아온 recipeId로 삭제를 시도한다.
+     * 사용자에게 복구기간을 1주일 주고 기간이 지날 시 배치를 통해 del_yn이 Y인 데이터를 진짜 삭제한다.
+     */
+    @Override
+    public Long softDeleteRecipeByRecipeId(Long recipeId) {
+        // soft delete로 del_yn을 모두 "Y"로 변경한다.
+        Long softDeletedRecipeCount = querydslRepository.softDeleteRecipeByRecipeId(recipeId);
+        log.info("recipeId : {}, softDeletedRecipeCount : {}", recipeId, softDeletedRecipeCount);
+        return softDeletedRecipeCount;
     }
 
     /**

@@ -109,12 +109,12 @@ class RecipeControllerTest extends TotalTestSupport {
     @DisplayName("존재하지 않는 레시피 ID로 조회 시, 적절한 예외 응답을 반환한다.")
     void getRecipeDetailViewWithInvalidId() throws Exception {
         //given
-        Long invalidRecipeId = 9999L;
-        when(readRecipeUseCase.getRecipeDetailView(eq(invalidRecipeId))).thenThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
+        Recipe domain = Recipe.of(9999L);
+        when(readRecipeUseCase.getRecipeDetailView(eq(domain))).thenThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         //when & then
         mockMvc.perform(get("/recipe/getRecipeDetail")
-                        .param("recipeId", String.valueOf(invalidRecipeId))
+                        .param("recipeId", String.valueOf(domain.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is5xxServerError());
     }

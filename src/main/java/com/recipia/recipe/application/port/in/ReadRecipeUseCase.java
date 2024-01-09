@@ -8,5 +8,5 @@ public interface ReadRecipeUseCase {
 
     PagingResponseDto<RecipeMainListResponseDto> getAllRecipeList(int page, int size, String sortType);
 
-    Recipe getRecipeDetailView(Long recipeId);
+    Recipe getRecipeDetailView(Recipe domain);
 }

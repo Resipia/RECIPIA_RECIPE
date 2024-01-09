@@ -9,6 +9,7 @@ import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
+import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import jakarta.validation.Valid;
@@ -29,6 +30,7 @@ public class RecipeController {
     private final UpdateRecipeUseCase updateRecipeUseCase;
     private final DeleteRecipeUseCase deleteRecipeUseCase;
 
+    private final SecurityUtil securityUtil;
     private final RecipeConverter recipeConverter;
 
     /**
@@ -70,10 +72,13 @@ public class RecipeController {
     public ResponseEntity<ResponseDto<RecipeDetailViewResponseDto>> getRecipeDetailView(
             @RequestParam(value = "recipeId") Long recipeId
     ) {
-        // 1. recipe 정보를 받아온다.
-        Recipe recipe = readRecipeUseCase.getRecipeDetailView(recipeId);
+        // 1. securityContext에서 memberId를 가져와서 recipeId와 조립하여 도메인 객체를 만든다.
+        Recipe domain = Recipe.of(recipeId, securityUtil.getCurrentMemberId());
 
-        // 2. 도메인을 dto로 변환하여 반환한다.
+        // 2. 레시피 상세정보 조회
+        Recipe recipe = readRecipeUseCase.getRecipeDetailView(domain);
+
+        // 3. 조회 결과를 dto로 변환하여 클라이언트한테 반환
         RecipeDetailViewResponseDto responseDto = recipeConverter.domainToResponseDto(recipe);
         return ResponseEntity.ok(ResponseDto.success(responseDto));
     }

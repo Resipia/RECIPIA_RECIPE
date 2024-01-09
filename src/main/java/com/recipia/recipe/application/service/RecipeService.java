@@ -98,10 +98,11 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      * [READ] - 레시피 단건 상세조회
      * 서브 카테고리, 영양소, 이미지 정보는 각각 어댑터에 요청해서 받아온 후 조립한다.
      */
-    public Recipe getRecipeDetailView(Long recipeId) {
+    public Recipe getRecipeDetailView(Recipe domain) {
 
+        Long recipeId = domain.getId();
         // 1. 레시피의 기본적인 정보를 받아온다.
-        Recipe recipe = recipePort.getRecipeDetailView(recipeId);
+        Recipe recipe = recipePort.getRecipeDetailView(domain);
 
         // 2. 서브 카테고리 정보를 받아와서 도메인에 세팅한다.
         List<SubCategory> subCategories = recipePort.getSubCategories(recipeId);

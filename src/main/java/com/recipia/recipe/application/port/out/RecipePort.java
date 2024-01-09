@@ -27,7 +27,7 @@ public interface RecipePort {
 
     Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType);
 
-    Recipe getRecipeDetailView(Long recipeId);
+    Recipe getRecipeDetailView(Recipe domain);
 
     List<SubCategory> getSubCategories(Long recipeId);
 

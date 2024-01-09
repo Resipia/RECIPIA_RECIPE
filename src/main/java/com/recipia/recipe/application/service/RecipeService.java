@@ -11,8 +11,11 @@ import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
+import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
+import com.recipia.recipe.domain.SubCategory;
+import com.recipia.recipe.domain.converter.NutritionalInfoConverter;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +40,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     private final RecipePort recipePort;
     private final ApplicationEventPublisher eventPublisher;
     private final ImageS3Service imageS3Service;
-    private final RecipeConverter converter;
+    private final NutritionalInfoConverter nutritionalInfoConverter;
 
     /**
      * 레시피 생성을 담당하는 메서드
@@ -86,8 +89,6 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         // 1. 정렬조건을 정한 뒤 Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
 
-        // todo: 여기에 securytiutils 넣을지말지
-
         // 2. 데이터를 받아온다.
         Page<RecipeMainListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType);
 
@@ -98,10 +99,26 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     }
 
     /**
-     * 레시피 단건 조회
+     * 레시피 단건 상세조회
      */
-    public RecipeDetailViewDto getRecipeDetailView(Long recipeId) {
-        return recipePort.getRecipeDetailView(recipeId);
+    public Recipe getRecipeDetailView(Long recipeId) {
+
+        // 1. 레시피의 기본적인 정보를 받아온다.
+        Recipe recipe = recipePort.getRecipeDetailView(recipeId);
+
+        // 2. 서브 카테고리 정보를 받아와서 도메인에 세팅한다.
+        List<SubCategory> subCategories = recipePort.getSubCategories(recipeId);
+        recipe.setSubCategory(subCategories);
+
+        // 3. 영양소 정보를 받아와서 도메인에 세팅한다.
+        NutritionalInfo nutritionalInfo = recipePort.getNutritionalInfo(recipeId);
+        recipe.setNutritionalInfo(nutritionalInfo);
+
+        // 4. 이미지(파일)을 받아와서 도메인에 세팅한다.
+        List<RecipeFile> recipeFileList = recipePort.getRecipeFile(recipeId);
+        recipe.setRecipeFileList(recipeFileList);
+
+        return recipe;
     }
 
     /**

@@ -4,8 +4,10 @@ package com.recipia.recipe.application.port.out;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
+import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
+import com.recipia.recipe.domain.SubCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -26,7 +28,9 @@ public interface RecipePort {
 
     Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType);
 
-    RecipeDetailViewDto getRecipeDetailView(Long recipeId);
+    Recipe getRecipeDetailView(Long recipeId);
+
+    List<SubCategory> getSubCategories(Long recipeId);
 
     List<Long> saveRecipeFile(List<RecipeFile> recipeFile);
 
@@ -37,4 +41,8 @@ public interface RecipePort {
     void updateCategoryMapping(Recipe recipe);
 
     Long softDeleteRecipeFilesByRecipeId(Long recipeId);
+
+    NutritionalInfo getNutritionalInfo(Long recipeId);
+
+    List<RecipeFile> getRecipeFile(Long recipeId);
 }

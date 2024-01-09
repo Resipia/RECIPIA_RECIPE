@@ -238,8 +238,11 @@ public class RecipeAdapter implements RecipePort {
      * S3에 이미지를 업로드할 때 날짜-UUID 이런식으로 저장되어서 RDB의 조건문으로 검색해서 update하기에는 무리가 있어 모두 삭제하고 다시 넣기로 결정
      */
     @Override
-    public void deleteRecipeFilesByRecipeId(Long updatedRecipeId) {
-        recipeFileRepository.deleteByRecipeEntityId(updatedRecipeId);
+    public Long softDeleteRecipeFilesByRecipeId(Long recipeId) {
+        // soft delete로 del_yn을 모두 "Y"로 변경한다.
+        Long softDeletedFileCount = querydslRepository.softDeleteRecipeFilesByRecipeId(recipeId);
+        log.info("recipeId : {}, softDeletedFileCount : {}", recipeId, softDeletedFileCount);
+        return softDeletedFileCount;
     }
 
     /**

@@ -36,5 +36,5 @@ public interface RecipePort {
 
     void updateCategoryMapping(Recipe recipe);
 
-    void deleteRecipeFilesByRecipeId(Long updatedRecipeId);
+    Long softDeleteRecipeFilesByRecipeId(Long recipeId);
 }

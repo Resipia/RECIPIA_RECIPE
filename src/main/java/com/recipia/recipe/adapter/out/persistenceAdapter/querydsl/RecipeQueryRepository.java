@@ -24,6 +24,7 @@ import java.util.*;
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeFileEntity.recipeFileEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QSubCategoryEntity.subCategoryEntity;
 
 
@@ -177,4 +178,14 @@ public class RecipeQueryRepository {
                 .execute();
     }
 
+    /**
+     * 레시피와 연관된 파일을 soft delete 처리한다.
+     * 업데이트된 엔티티의 개수를 반환한다.
+     */
+    public Long softDeleteRecipeFilesByRecipeId(Long recipeId) {
+        return queryFactory.update(recipeFileEntity)
+                .where(recipeFileEntity.recipeEntity.id.eq(recipeId))
+                .set(recipeFileEntity.delYn, "Y")
+                .execute();
+    }
 }

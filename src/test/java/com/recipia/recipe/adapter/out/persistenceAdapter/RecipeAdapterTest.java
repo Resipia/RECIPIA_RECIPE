@@ -402,14 +402,14 @@ class RecipeAdapterTest extends TotalTestSupport {
         entityManager.clear();
 
         //when
-        sut.deleteRecipeFilesByRecipeId(recipeId);
+        sut.softDeleteRecipeFilesByRecipeId(recipeId);
         entityManager.flush();
         entityManager.clear();
 
         //then
         List<RecipeFileEntity> results = recipeFileRepository.findByRecipeId(recipeId);
-        // @Query로 정의된 JPA 쿼리에서 결과가 없을 경우에는 null을 반환하지 않고 비어있는 List를 반환한다.
-        Assertions.assertThat(results).isEmpty();
+        // del_yn은 Y인 조건으로 검색하면 된다.
+        Assertions.assertThat(results.size()).isEqualTo(1);
     }
 
 

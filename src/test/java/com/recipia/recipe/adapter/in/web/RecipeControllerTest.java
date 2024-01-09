@@ -5,6 +5,7 @@ import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDt
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
+import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -43,6 +44,7 @@ class RecipeControllerTest extends TotalTestSupport {
     @MockBean private ReadRecipeUseCase readRecipeUseCase;
     @MockBean CreateRecipeUseCase createRecipeUseCase;
     @MockBean UpdateRecipeUseCase updateRecipeUseCase;
+    @MockBean DeleteRecipeUseCase deleteRecipeUseCase;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 

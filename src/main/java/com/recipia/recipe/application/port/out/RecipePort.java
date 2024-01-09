@@ -1,7 +1,6 @@
 package com.recipia.recipe.application.port.out;
 
 
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.domain.NutritionalInfo;

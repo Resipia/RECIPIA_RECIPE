@@ -4,7 +4,7 @@ import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeFileDto;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
@@ -141,7 +141,7 @@ public class RecipeConverter {
      * 컨트롤러 응답을 위해 도메인 객체를 응답 dto 객체로 변환한다.
      * 이 메서드는 레시피의 상세보기를 위한 전용이기 때문에 다른곳에서 필요해도 사용하면 안된다.
      */
-    public RecipeDetailViewDto domainToResponseDto(Recipe domain) {
+    public RecipeDetailViewResponseDto domainToResponseDto(Recipe domain) {
 
         // 1. 도메인 객체를 dto로 변환한다.
         NutritionalInfoDto nutritionalInfoDto = nutritionalInfoConverter.domainToDto(domain.getNutritionalInfo());
@@ -154,7 +154,7 @@ public class RecipeConverter {
                 .toList();
 
         // 2. 변환된 dto 리스트를 추가시켜 준다.
-        RecipeDetailViewDto recipeDetailViewDto = RecipeDetailViewDto.of(
+        RecipeDetailViewResponseDto recipeDetailViewResponseDto = RecipeDetailViewResponseDto.of(
                 domain.getId(),
                 domain.getRecipeName(),
                 domain.getRecipeDesc(),
@@ -166,9 +166,9 @@ public class RecipeConverter {
                 domain.isBookmarked()
         );
 
-        recipeDetailViewDto.setNutritionalInfoDto(nutritionalInfoDto);
-        recipeDetailViewDto.setSubCategoryDtoList(subCategoryDtoList);
-        recipeDetailViewDto.setRecipeFileDtoList(recipeFileDtoList);
-        return recipeDetailViewDto;
+        recipeDetailViewResponseDto.setNutritionalInfoDto(nutritionalInfoDto);
+        recipeDetailViewResponseDto.setSubCategoryDtoList(subCategoryDtoList);
+        recipeDetailViewResponseDto.setRecipeFileDtoList(recipeFileDtoList);
+        return recipeDetailViewResponseDto;
     }
 }

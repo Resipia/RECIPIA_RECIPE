@@ -7,7 +7,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
@@ -113,7 +113,7 @@ public class RecipeQueryRepository {
     /**
      * 레시피 단건에 대한 정보를 상세조회
      */
-    public Optional<RecipeDetailViewDto> getRecipeDetailView(Long recipeId, Long currentMemberId) {
+    public Optional<RecipeDetailViewResponseDto> getRecipeDetailView(Long recipeId, Long currentMemberId) {
 
         // 북마크 여부 서브쿼리
         JPQLQuery<Boolean> bookmarkSubQuery = JPAExpressions
@@ -123,7 +123,7 @@ public class RecipeQueryRepository {
 
         // 레시피 상세조회
         return Optional.ofNullable(queryFactory
-                .select(Projections.constructor(RecipeDetailViewDto.class,
+                .select(Projections.constructor(RecipeDetailViewResponseDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         recipeEntity.recipeDesc,

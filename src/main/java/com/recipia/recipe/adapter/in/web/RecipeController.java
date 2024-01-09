@@ -2,7 +2,7 @@ package com.recipia.recipe.adapter.in.web;
 
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
@@ -67,14 +67,14 @@ public class RecipeController {
      * 레시피 단건 조회
      */
     @GetMapping("/getRecipeDetail")
-    public ResponseEntity<ResponseDto<RecipeDetailViewDto>> getRecipeDetailView(
+    public ResponseEntity<ResponseDto<RecipeDetailViewResponseDto>> getRecipeDetailView(
             @RequestParam(value = "recipeId") Long recipeId
     ) {
         // 1. recipe 정보를 받아온다.
         Recipe recipe = readRecipeUseCase.getRecipeDetailView(recipeId);
 
         // 2. 도메인을 dto로 변환하여 반환한다.
-        RecipeDetailViewDto responseDto = recipeConverter.domainToResponseDto(recipe);
+        RecipeDetailViewResponseDto responseDto = recipeConverter.domainToResponseDto(recipe);
         return ResponseEntity.ok(ResponseDto.success(responseDto));
     }
 

@@ -2,7 +2,7 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.*;
@@ -146,7 +146,7 @@ public class RecipeAdapter implements RecipePort {
     public Recipe getRecipeDetailView(Long recipeId) {
         // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
         Long currentMemberId = securityUtil.getCurrentMemberId();
-        RecipeDetailViewDto dto = querydslRepository.getRecipeDetailView(recipeId, currentMemberId)
+        RecipeDetailViewResponseDto dto = querydslRepository.getRecipeDetailView(recipeId, currentMemberId)
                 .orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         // 2. 레시피 도메인 객체를 생성해서 반환한다.

@@ -1,6 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
@@ -87,7 +87,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         Long memberId = 1L;
 
         //when
-        Optional<RecipeDetailViewDto> recipeDetailView = sut.getRecipeDetailView(invalidRecipeId, memberId);
+        Optional<RecipeDetailViewResponseDto> recipeDetailView = sut.getRecipeDetailView(invalidRecipeId, memberId);
 
         //then
         Assertions.assertThat(recipeDetailView).isEmpty();

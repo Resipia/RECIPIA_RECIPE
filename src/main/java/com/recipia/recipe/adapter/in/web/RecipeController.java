@@ -6,6 +6,7 @@ import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
+import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
 import com.recipia.recipe.domain.Recipe;
@@ -26,6 +27,8 @@ public class RecipeController {
     private final CreateRecipeUseCase createRecipeUseCase;
     private final ReadRecipeUseCase readRecipeUseCase;
     private final UpdateRecipeUseCase updateRecipeUseCase;
+    private final DeleteRecipeUseCase deleteRecipeUseCase;
+
     private final RecipeConverter recipeConverter;
 
     /**
@@ -90,6 +93,15 @@ public class RecipeController {
         // 3. 레시피 업데이트
         updateRecipeUseCase.updateRecipe(recipe, files);
 
+        return ResponseEntity.ok(ResponseDto.success());
+    }
+
+    /**
+     * 레시피 삭제
+     */
+    @DeleteMapping("/deleteRecipe")
+    public ResponseEntity<ResponseDto<Void>> deleteRecipe(@RequestParam(name = "recipeId") Long recipeId) {
+        deleteRecipeUseCase.deleteRecipeByRecipeId(recipeId);
         return ResponseEntity.ok(ResponseDto.success());
     }
 

@@ -14,7 +14,6 @@ import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
 import com.recipia.recipe.domain.SubCategory;
-import com.recipia.recipe.domain.converter.NutritionalInfoConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,7 +37,6 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     private final RecipePort recipePort;
     private final ApplicationEventPublisher eventPublisher;
     private final ImageS3Service imageS3Service;
-    private final NutritionalInfoConverter nutritionalInfoConverter;
 
     /**
      * [CREATE] - 레시피 생성을 담당하는 메서드

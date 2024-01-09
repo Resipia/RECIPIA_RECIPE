@@ -182,4 +182,14 @@ public class RecipeQueryRepository {
                 .set(recipeFileEntity.delYn, "Y")
                 .execute();
     }
+
+    /**
+     * 레시피를 soft delete 처리한다.
+     */
+    public Long softDeleteRecipeByRecipeId(Long recipeId) {
+        return queryFactory.update(recipeEntity)
+                .where(recipeEntity.id.eq(recipeId))
+                .set(recipeEntity.delYn, "Y")
+                .execute();
+    }
 }

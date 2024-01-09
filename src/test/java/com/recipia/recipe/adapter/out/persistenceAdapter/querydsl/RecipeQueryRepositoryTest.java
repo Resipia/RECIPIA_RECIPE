@@ -5,7 +5,9 @@ import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.NutritionalInfoRepository;
+import com.recipia.recipe.adapter.out.persistenceAdapter.RecipeFileRepository;
 import com.recipia.recipe.adapter.out.persistenceAdapter.RecipeRepository;
 import com.recipia.recipe.config.TotalTestSupport;
 import jakarta.persistence.EntityManager;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -32,6 +35,9 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
 
     @Autowired
     private NutritionalInfoRepository nutritionalInfoRepository;
+
+    @Autowired
+    private RecipeFileRepository recipeFileRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -185,6 +191,73 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         //then
         Assertions.assertThat(updateRecipeId).isEqualTo(0);
     }
+
+    @DisplayName("[happy] 레시피 파일 삭제를 시도하면 Soft Delete에 성공하여 del_yn이 'Y'가 된다.")
+    @Test
+    void softDeleteRecipeFilesByRecipeId_Success() {
+        // given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
+        Long recipeId = savedRecipeEntity.getId();
+
+        RecipeFileEntity recipeFileEntity = RecipeFileEntity.of(savedRecipeEntity, 1, "/", "url", "nm", "nm2", "jpg", 100, "N");
+        RecipeFileEntity savedFileEntity = recipeFileRepository.save(recipeFileEntity);
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        Long result = sut.softDeleteRecipeFilesByRecipeId(recipeId);
+        entityManager.flush();
+        entityManager.clear();
+
+        // then
+        assertThat(result).isGreaterThan(0); // 실제로 업데이트된 행의 수 검증
+        List<RecipeFileEntity> deletedFileList = recipeFileRepository.findAllSoftDeletedFileList(recipeId);
+        Assertions.assertThat(deletedFileList).isNotEmpty();
+        Assertions.assertThat(deletedFileList).allMatch(file -> file.getDelYn().equals("Y"));
+    }
+
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 파일 삭제를 시도하면 업데이트 count로 0을 반환한다.")
+    @Test
+    void softDeleteRecipeFilesByInvalidRecipeId() {
+        // given
+        Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
+
+        // when
+        Long result = sut.softDeleteRecipeFilesByRecipeId(invalidRecipeId);
+
+        // then
+        assertThat(result).isEqualTo(0); // 업데이트된 행이 없어야 함
+    }
+
+    @DisplayName("[happy] 레시피 삭제를 시도하면 Soft Delete에 성공하여 del_yn이 'Y'가 된다.")
+    @Test
+    void softDeleteRecipeByRecipeId_Success() {
+        // given
+        Long recipeId = 1L; // 테스트 대상 레시피 ID
+
+        // when
+        Long result = sut.softDeleteRecipeByRecipeId(recipeId);
+
+        // then
+        assertThat(result).isGreaterThan(0); // 실제로 업데이트된 행의 수 검증
+        Optional<RecipeEntity> deletedRecipe = recipeRepository.findById(recipeId);
+        assertThat(deletedRecipe).isPresent();
+        assertThat(deletedRecipe.get().getDelYn()).isEqualTo("Y");
+    }
+
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 레시피 삭제를 시도하면 0을 반환한다.")
+    @Test
+    void softDeleteRecipeByInvalidRecipeId() {
+        // given
+        Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
+
+        // when
+        Long result = sut.softDeleteRecipeByRecipeId(invalidRecipeId);
+
+        // then
+        assertThat(result).isEqualTo(0); // 업데이트된 행이 없어야 함
+    }
+
 
 
 

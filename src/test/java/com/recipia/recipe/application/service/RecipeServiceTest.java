@@ -153,21 +153,22 @@ class RecipeServiceTest {
         assertThrows(RuntimeException.class, () -> sut.getAllRecipeList(page, size, sortType));
     }
 
-//    @Test
-//    @DisplayName("[happy] 유효한 레시피 ID로 단건 조회시 데이터를 잘 가져온다.")
-//    void getRecipeDetailViewWithValidId() {
-//        // Given
-//        Long validRecipeId = 1L;
-//        RecipeDetailViewDto mockDto = new RecipeDetailViewDto(validRecipeId, "레시피명", "닉네임", "설명", false);
-//        when(recipePort.getRecipeDetailView(validRecipeId)).thenReturn(mockDto);
-//
-//        // When
-//        RecipeDetailViewDto result = sut.getRecipeDetailView(validRecipeId);
-//
-//        // Then
-//        assertThat(result).isNotNull();
-//        assertThat(result.getId()).isEqualTo(validRecipeId);
-//    }
+    @Test
+    @DisplayName("[happy] 유효한 레시피 ID로 단건 조회시 데이터를 잘 가져온다.")
+    void getRecipeDetailViewWithValidId() {
+        // Given
+        Long validRecipeId = 1L;
+        Recipe mockDto = Recipe.of(validRecipeId);
+
+        when(recipePort.getRecipeDetailView(validRecipeId)).thenReturn(mockDto);
+
+        // When
+        Recipe result = sut.getRecipeDetailView(validRecipeId);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(validRecipeId);
+    }
 
     @Test
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 레시피를 단건 조회하면 예외가 발생한다.")
@@ -251,6 +252,35 @@ class RecipeServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_FILE_SAVE_ERROR);
     }
 
+    @DisplayName("[happy] 레시피 소프트 삭제가 성공적으로 수행된다.")
+    @Test
+    void deleteRecipeByRecipeId_Success() {
+        // given
+        Long recipeId = 1L; // 존재하는 레시피 ID
+        when(recipePort.softDeleteRecipeByRecipeId(recipeId)).thenReturn(1L);
+
+        // when
+        Long deletedCount = sut.deleteRecipeByRecipeId(recipeId);
+
+        // Then
+        assertThat(deletedCount).isEqualTo(1L); // 삭제된 행의 수가 1임을 검증
+        then(recipePort).should().softDeleteRecipeByRecipeId(recipeId);
+    }
+
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 삭제 시도 시, 삭제되지 않음을 확인한다.")
+    @Test
+    void deleteRecipeByInvalidRecipeId() {
+        // Given
+        Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
+        given(recipePort.softDeleteRecipeByRecipeId(invalidRecipeId)).willReturn(0L); // 삭제되지 않았다고 가정
+
+        // When
+        Long deletedCount = sut.deleteRecipeByRecipeId(invalidRecipeId);
+
+        // Then
+        assertThat(deletedCount).isEqualTo(0L); // 삭제된 행이 없음을 검증
+        then(recipePort).should().softDeleteRecipeByRecipeId(invalidRecipeId);
+    }
 
     private List<MultipartFile> createMockMultipartFileList() {
         return List.of(

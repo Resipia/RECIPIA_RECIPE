@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface RecipeFileRepository extends JpaRepository<RecipeFileEntity, Long> {
 
-    @Query("SELECT rf FROM RecipeFileEntity rf WHERE rf.recipeEntity.id = :recipeId and rf.delYn = 'Y'")
+    @Query("SELECT rf FROM RecipeFileEntity rf WHERE rf.recipeEntity.id = :recipeId and rf.delYn = 'N'")
     List<RecipeFileEntity> findByRecipeId(@Param("recipeId") Long recipeId);
 
 }

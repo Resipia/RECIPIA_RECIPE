@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.querydsl.core.Tuple;
+import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
@@ -10,10 +11,14 @@ import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.common.utils.SecurityUtil;
+import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
 import com.recipia.recipe.domain.SubCategory;
+import com.recipia.recipe.domain.converter.CategoryConverter;
+import com.recipia.recipe.domain.converter.NutritionalInfoConverter;
 import com.recipia.recipe.domain.converter.RecipeConverter;
+import com.recipia.recipe.domain.converter.RecipeFileConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -34,7 +39,12 @@ import java.util.stream.Collectors;
 public class RecipeAdapter implements RecipePort {
 
     private final SecurityUtil securityUtil;
-    private final RecipeConverter converter;
+
+    private final RecipeConverter recipeConverter;
+    private final NutritionalInfoConverter nutritionalInfoConverter;
+    private final RecipeFileConverter recipeFileConverter;
+    private final CategoryConverter categoryConverter;
+
     private final RecipeQueryRepository querydslRepository;
     private final RecipeRepository recipeRepository;
     private final NutritionalInfoRepository nutritionalInfoRepository;
@@ -70,7 +80,7 @@ public class RecipeAdapter implements RecipePort {
     @Override
     public Long createRecipe(Recipe recipe) {
         // 여기서 memberId는 항상 유효하다
-        RecipeEntity recipeEntity = converter.domainToRecipeEntity(recipe);
+        RecipeEntity recipeEntity = recipeConverter.domainToRecipeEntity(recipe);
         recipeRepository.save(recipeEntity);
         return recipeEntity.getId();
     }
@@ -84,7 +94,7 @@ public class RecipeAdapter implements RecipePort {
         //1. 도메인에 새롭게 저장하려는 레시피의 id추가
         recipe.setId(savedRecipeId);
         //2. 컨버터를 통해 도메인을 영양소 엔티티로 변환
-        NutritionalInfoEntity nutritionalInfoEntity = converter.domainToNutritionalInfoEntity(recipe);
+        NutritionalInfoEntity nutritionalInfoEntity = nutritionalInfoConverter.domainToEntityCreate(recipe);
         //3. 저장을 한다.
         return nutritionalInfoRepository.save(nutritionalInfoEntity).getId();
     }
@@ -99,7 +109,7 @@ public class RecipeAdapter implements RecipePort {
         List<SubCategory> subCategoryList = validSubCategoryNotExist(recipe);
 
         subCategoryList.stream()
-                .map(subCategory -> converter.domainToRecipeCategoryMapEntity(recipe, subCategory))
+                .map(subCategory -> recipeConverter.domainToRecipeCategoryMapEntity(recipe, subCategory))
                 .forEach(recipeCategoryMapRepository::save);
     }
 
@@ -109,41 +119,91 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType) {
-        // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
-        Long currentMemberId = securityUtil.getCurrentMemberId();
-        Page<RecipeMainListResponseDto> recipeList = querydslRepository.getAllRecipeList(currentMemberId, pageable, sortType);
 
-        // 2. 받아온 데이터의 모든 recipeId값을 추출한다.
-        List<Long> selectedRecipeIdList = recipeList.getContent()
+        // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 securityContext에서 id를 꺼내서 사용한다.
+        Long currentMemberId = securityUtil.getCurrentMemberId();
+
+        // 2. 조건에 맞는 모든 레시피 리스트를 가져온다.
+        Page<RecipeMainListResponseDto> recipeResponseDtoList = querydslRepository.getAllRecipeList(currentMemberId, pageable, sortType);
+
+        // 3. 받아온 데이터의 모든 recipeId값을 사용해서 관련된 서브 카테고리정보를 받아온다.
+        List<SubCategoryDto> subCategoryDtoList = recipeResponseDtoList.getContent()
                 .stream()
                 .map(RecipeMainListResponseDto::getId)
+                .flatMap(recipeId -> querydslRepository.findSubCategoryDtoListForRecipeId(recipeId).stream())
                 .toList();
 
-        // 3. recipeId로 관련된 서브 카테고리를 받아온다.
-        List<Tuple> subCategoryNameResults = querydslRepository.findSubCategoriesForRecipe(selectedRecipeIdList);
-        Map<Long, List<String>> subCategoryNameMap = getSubCategoryNameMap(subCategoryNameResults);
-
-        // 4. 결과값 dto에 서브 카테고리를 추가한다.
-        recipeList.getContent().forEach(dto -> dto.setSubCategoryList(subCategoryNameMap.get(dto.getId())));
-        return recipeList;
+        // 4. 응답할 dto에 서브 카테고리 dto 정보를 추가한 후 반환한다.
+        recipeResponseDtoList.getContent().forEach(dto -> dto.setSubCategoryList(subCategoryDtoList));
+        return recipeResponseDtoList;
     }
 
     /**
-     * [READ] - 단건의 레시피 상세조회
+     * [READ] - 레시피 단건 상세조회
      * 유저가 작성한 레시피 정보를 상세조회한다.
      */
     @Override
-    public RecipeDetailViewDto getRecipeDetailView(Long recipeId) {
+    public Recipe getRecipeDetailView(Long recipeId) {
         // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
         Long currentMemberId = securityUtil.getCurrentMemberId();
-        RecipeDetailViewDto recipeDetailViewDto = querydslRepository.getRecipeDetailView(recipeId, currentMemberId)
+        RecipeDetailViewDto dto = querydslRepository.getRecipeDetailView(recipeId, currentMemberId)
                 .orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
-        // 2. recipeId로 관련된 서브 카테고리를 받아온다.
-        List<Tuple> subCategoriesForRecipe = querydslRepository.findSubCategoriesForRecipe(recipeDetailViewDto.getId());
-        List<String> sunCategoryNames = getSubCategoryNameMap(subCategoriesForRecipe).get(recipeDetailViewDto.getId());
-        recipeDetailViewDto.setSubCategoryList(sunCategoryNames);
-        return recipeDetailViewDto;
+        // 2. 레시피 도메인 객체를 생성해서 반환한다.
+        Recipe recipe = Recipe.builder()
+                .id(dto.getId())
+                .recipeName(dto.getRecipeName())
+                .recipeDesc(dto.getRecipeDesc())
+                .nickname(dto.getNickname())
+                .isBookmarked(dto.isBookmarked())
+                .memberId(currentMemberId)
+                .build();
+
+        return recipe;
+    }
+
+    /**
+     * [READ] - 서브 카테고리 조회
+     * recipeId를 통해 관련된 서브 카테고리들을 모두 받아서 그 id값들만 리스트 형태로 반환한다.
+     */
+    @Override
+    public List<SubCategory> getSubCategories(Long recipeId) {
+
+        // 1. 레시피 id로 관련된 서브 카테고리를 모두 찾는다.
+        List<SubCategoryDto> subCategoriesForRecipe = querydslRepository.findSubCategoryDtoListForRecipeId(recipeId);
+
+        List<SubCategory> subCategoryDomainList = subCategoriesForRecipe.stream()
+                .map(categoryConverter::dtoToDomain)
+                .toList();
+
+        return subCategoryDomainList;
+    }
+
+    /**
+     * [READ] - 영양소 조회
+     * recipeId를 통해 관련된 영양소 데이터를 받아온다.
+     */
+    @Override
+    public NutritionalInfo getNutritionalInfo(Long recipeId) {
+
+        NutritionalInfoEntity nutritionalInfoEntity = nutritionalInfoRepository.findById(recipeId).orElseThrow(
+                () -> new RecipeApplicationException(ErrorCode.NUTRITIONAL_INFO_NOT_FOUND)
+        );
+
+        return nutritionalInfoConverter.entityToNutritionalInfo(nutritionalInfoEntity);
+    }
+
+
+    /**
+     * [READ] - 파일(이미지)정보 조회
+     * recipeId를 통해 관련된 파일 정보를 조회한다.
+     */
+    @Override
+    public List<RecipeFile> getRecipeFile(Long recipeId) {
+        List<RecipeFileEntity> resultEntityList = recipeFileRepository.findByRecipeId(recipeId);
+        return resultEntityList.stream()
+                .map(recipeFileConverter::entityToDomain)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -155,7 +215,7 @@ public class RecipeAdapter implements RecipePort {
         try {
             // 1. 도메인을 엔티티로 변환한다.
             List<RecipeFileEntity> recipeFileEntities = recipeFile.stream()
-                    .map(converter::domainToRecipeFileEntity)
+                    .map(recipeConverter::domainToRecipeFileEntity)
                     .collect(Collectors.toList());
 
             // 2. 모든 레시피 파일 엔티티를 RDB에 저장하고 저장된 엔티티를 받아서 id값 리스트로 변환해서 반환한다.
@@ -181,7 +241,7 @@ public class RecipeAdapter implements RecipePort {
         validExistRecipeEntity(recipe);
 
         // 2. 도메인을 엔티티로 변환하고 레시피를 업데이트 한다.
-        RecipeEntity recipeEntity = converter.domainToRecipeEntity(recipe);
+        RecipeEntity recipeEntity = recipeConverter.domainToRecipeEntity(recipe);
         return querydslRepository.updateRecipe(recipeEntity);
     }
 
@@ -202,7 +262,7 @@ public class RecipeAdapter implements RecipePort {
         }
 
         // 3. 업데이트할 값을 엔티티로 변환하고 업데이트 한다.
-        NutritionalInfoEntity updateNutritionalInfoEntity = converter.domainToNutritionalInfoEntityUpdate(recipe);
+        NutritionalInfoEntity updateNutritionalInfoEntity = nutritionalInfoConverter.domainToEntityUpdate(recipe.getNutritionalInfo());
         Long updatedNutritionalInfoId = querydslRepository.updateNutritionalInfo(updateNutritionalInfoEntity);
     }
 
@@ -225,7 +285,7 @@ public class RecipeAdapter implements RecipePort {
         recipeCategoryMapRepository.deleteByRecipeEntityId(recipe.getId());
 
         // 3. 저장을 위해 새로운 카테고리 리스트를 한번 검증하고 다시 반환한다.
-        RecipeEntity recipeEntity = converter.domainToRecipeEntity(recipe);
+        RecipeEntity recipeEntity = recipeConverter.domainToRecipeEntity(recipe);
 
         // 4. 카테고리 매핑을 저장한다.
         subCategoryList.forEach(subCategory ->

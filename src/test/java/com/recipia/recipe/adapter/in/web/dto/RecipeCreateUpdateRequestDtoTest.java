@@ -1,12 +1,14 @@
 package com.recipia.recipe.adapter.in.web.dto;
 
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -308,7 +310,7 @@ class RecipeCreateUpdateRequestDtoTest {
                 .recipeName(recipe)
                 .recipeDesc(recipeDesc)
                 .ingredient(ingredients)
-                .subCategoryList(List.of(1L))
+                .subCategoryDtoList(Arrays.asList(SubCategoryDto.of(1L)))
                 .build();
     }
 
@@ -318,7 +320,7 @@ class RecipeCreateUpdateRequestDtoTest {
                 .recipeName(recipe)
                 .recipeDesc(recipeDesc)
                 .hashtag(hashtag)
-                .subCategoryList(List.of(1L))
+                .subCategoryDtoList(Arrays.asList(SubCategoryDto.of(1L)))
                 .build();
     }
 
@@ -329,7 +331,7 @@ class RecipeCreateUpdateRequestDtoTest {
                 .recipeDesc(recipeDesc)
                 .ingredient(ingredients)
                 .hashtag(hashtag)
-                .subCategoryList(List.of(1L))
+                .subCategoryDtoList(Arrays.asList(SubCategoryDto.of(1L)))
                 .build();
     }
 

@@ -9,6 +9,7 @@ import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.converter.NutritionalInfoConverter;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +27,19 @@ public class RecipeController {
     private final CreateRecipeUseCase createRecipeUseCase;
     private final ReadRecipeUseCase readRecipeUseCase;
     private final UpdateRecipeUseCase updateRecipeUseCase;
-    private final RecipeConverter converter;
+    private final RecipeConverter recipeConverter;
 
     /**
      * 유저가 레시피 생성을 요청하는 컨트롤러
      */
     @PostMapping("/createRecipe")
-    public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @ModelAttribute RecipeCreateUpdateRequestDto recipeCreateUpdateRequestDto) {
+    public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto) {
 
         // 1. dto에서 이미지 파일 리스트 추출
-        List<MultipartFile> files = recipeCreateUpdateRequestDto.getFileList();
+        List<MultipartFile> files = requestDto.getFileList();
 
         // 2. dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
-        Recipe recipe = converter.recipeCreateDtoToDomain(recipeCreateUpdateRequestDto);
+        Recipe recipe = recipeConverter.dtoToDomain(requestDto);
 
         // 3. 레시피 저장
         Long savedRecipeId = createRecipeUseCase.createRecipe(recipe, files);
@@ -67,21 +68,25 @@ public class RecipeController {
     public ResponseEntity<ResponseDto<RecipeDetailViewDto>> getRecipeDetailView(
             @RequestParam(value = "recipeId") Long recipeId
     ) {
-        RecipeDetailViewDto recipeDetailViewDto = readRecipeUseCase.getRecipeDetailView(recipeId);
-        return ResponseEntity.ok(ResponseDto.success(recipeDetailViewDto));
+        // 1. recipe 정보를 받아온다.
+        Recipe recipe = readRecipeUseCase.getRecipeDetailView(recipeId);
+
+        // 2. 도메인을 dto로 변환하여 반환한다.
+        RecipeDetailViewDto responseDto = recipeConverter.domainToResponseDto(recipe);
+        return ResponseEntity.ok(ResponseDto.success(responseDto));
     }
 
     /**
      * 레시피 업데이트
      */
     @PutMapping("/updateRecipe")
-    public ResponseEntity<ResponseDto<Void>> updateRecipe(@Valid @ModelAttribute RecipeCreateUpdateRequestDto recipeCreateUpdateRequestDto) {
+    public ResponseEntity<ResponseDto<Void>> updateRecipe(@Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto) {
 
         // 1. dto에서 이미지 파일 리스트 추출
-        List<MultipartFile> files = recipeCreateUpdateRequestDto.getFileList();
+        List<MultipartFile> files = requestDto.getFileList();
 
         // 2. dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
-        Recipe recipe = converter.recipeCreateDtoToDomain(recipeCreateUpdateRequestDto);
+        Recipe recipe = recipeConverter.dtoToDomain(requestDto);
 
         // 3. 레시피 업데이트
         updateRecipeUseCase.updateRecipe(recipe, files);

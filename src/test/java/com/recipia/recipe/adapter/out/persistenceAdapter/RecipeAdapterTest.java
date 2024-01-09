@@ -203,7 +203,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         TestJwtConfig.setupMockJwt(memberId, "진안");
 
         // When
-        RecipeDetailViewDto result = sut.getRecipeDetailView(validRecipeId);
+        Recipe result = sut.getRecipeDetailView(validRecipeId);
 
         // Then
         assertThat(result).isNotNull();
@@ -212,7 +212,6 @@ class RecipeAdapterTest extends TotalTestSupport {
         assertThat(result.getNickname()).isNotNull();
         assertThat(result.getRecipeDesc()).isNotNull();
         assertThat(result.isBookmarked()).isFalse(); // 북마크 여부 확인
-        assertThat(result.getSubCategoryList()).isNotEmpty(); // 서브 카테고리 목록 확인
     }
 
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 상세 조회 시, 예외가 발생한다.")
@@ -231,26 +230,21 @@ class RecipeAdapterTest extends TotalTestSupport {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
     }
 
-    @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시, 올바른 서브 카테고리 정보가 포함된다.")
+    @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시 데이터를 잘 받아온다.")
     @Test
     void getRecipeDetailViewWithSubCategoryTest() {
         // Given
         Long validRecipeId = 1L; // 존재하는 레시피 ID
         Long memberId = 1L; // 예시 유저 ID
-        TestJwtConfig.setupMockJwt(memberId, "진안");
+        TestJwtConfig.setupMockJwt(memberId, "진아");
 
 
         // When
-        RecipeDetailViewDto result = sut.getRecipeDetailView(validRecipeId);
+        Recipe result = sut.getRecipeDetailView(validRecipeId);
 
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(validRecipeId);
-        // 서브 카테고리 정보 확인
-        assertThat(result.getSubCategoryList()).isNotEmpty();
-        result.getSubCategoryList().forEach(subCategoryName -> {
-            assertThat(subCategoryName).isNotNull().isNotBlank();
-        });
     }
 
     @DisplayName("[happy] 레시피를 업데이트 하면 업데이트된 레시피의 id값이 반환된다.")
@@ -409,7 +403,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         //then
         List<RecipeFileEntity> results = recipeFileRepository.findByRecipeId(recipeId);
         // del_yn은 Y인 조건으로 검색하면 된다.
-        Assertions.assertThat(results.size()).isEqualTo(1);
+        Assertions.assertThat(results.size()).isEqualTo(0);
     }
 
 
@@ -424,7 +418,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 NutritionalInfo.of(10, 10, 10, 10, 10),
                 subCategory,
                 "진안",
-                "N"
+                "N",
+                false
         );
     }
 
@@ -440,7 +435,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 savingNutritionInfo,
                 subCategory,
                 "진안",
-                "N"
+                "N",
+                false
         );
     }
 

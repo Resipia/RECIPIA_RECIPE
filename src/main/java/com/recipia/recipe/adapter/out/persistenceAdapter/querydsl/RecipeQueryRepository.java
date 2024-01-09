@@ -135,7 +135,7 @@ public class RecipeQueryRepository {
                         ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
                 ))
                 .from(recipeEntity)
-                .where(recipeEntity.id.eq(recipeId), recipeEntity.memberId.eq(currentMemberId), recipeEntity.delYn.eq("N"))
+                .where(recipeEntity.id.eq(recipeId), recipeEntity.delYn.eq("N"))
                 .fetchOne());
     }
 

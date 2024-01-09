@@ -143,10 +143,9 @@ public class RecipeAdapter implements RecipePort {
      * 유저가 작성한 레시피 정보를 상세조회한다.
      */
     @Override
-    public Recipe getRecipeDetailView(Long recipeId) {
+    public Recipe getRecipeDetailView(Recipe domain) {
         // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
-        Long currentMemberId = securityUtil.getCurrentMemberId();
-        RecipeDetailViewResponseDto dto = querydslRepository.getRecipeDetailView(recipeId, currentMemberId)
+        RecipeDetailViewResponseDto dto = querydslRepository.getRecipeDetailView(domain.getId(), domain.getMemberId())
                 .orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         // 2. 레시피 도메인 객체를 생성해서 반환한다.
@@ -156,7 +155,7 @@ public class RecipeAdapter implements RecipePort {
                 .recipeDesc(dto.getRecipeDesc())
                 .nickname(dto.getNickname())
                 .isBookmarked(dto.isBookmarked())
-                .memberId(currentMemberId)
+                .memberId(domain.getMemberId())
                 .build();
 
         return recipe;

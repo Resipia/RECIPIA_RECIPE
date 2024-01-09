@@ -79,7 +79,7 @@ public class RecipeController {
         Recipe recipe = readRecipeUseCase.getRecipeDetailView(domain);
 
         // 3. 조회 결과를 dto로 변환하여 클라이언트한테 반환
-        RecipeDetailViewResponseDto responseDto = recipeConverter.domainToResponseDto(recipe);
+        RecipeDetailViewResponseDto responseDto = recipeConverter.domainToDetailViewResponseDto(recipe);
         return ResponseEntity.ok(ResponseDto.success(responseDto));
     }
 

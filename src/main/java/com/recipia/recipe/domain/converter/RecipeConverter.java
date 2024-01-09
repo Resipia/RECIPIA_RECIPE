@@ -141,7 +141,7 @@ public class RecipeConverter {
      * 컨트롤러 응답을 위해 도메인 객체를 응답 dto 객체로 변환한다.
      * 이 메서드는 레시피의 상세보기를 위한 전용이기 때문에 다른곳에서 필요해도 사용하면 안된다.
      */
-    public RecipeDetailViewResponseDto domainToResponseDto(Recipe domain) {
+    public RecipeDetailViewResponseDto domainToDetailViewResponseDto(Recipe domain) {
 
         // 1. 도메인 객체를 dto로 변환한다.
         NutritionalInfoDto nutritionalInfoDto = nutritionalInfoConverter.domainToDto(domain.getNutritionalInfo());
@@ -153,7 +153,7 @@ public class RecipeConverter {
                 .map(recipeFileConverter::domainToDto)
                 .toList();
 
-        // 2. 변환된 dto 리스트를 추가시켜 준다.
+        // 2. 변환된 dto 리스트를 추가시켜 준다. (쿼리 Projection을 위해서 setter로 따로 추가)
         RecipeDetailViewResponseDto recipeDetailViewResponseDto = RecipeDetailViewResponseDto.of(
                 domain.getId(),
                 domain.getRecipeName(),

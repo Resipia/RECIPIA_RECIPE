@@ -28,9 +28,6 @@ public class Comment {
         return new Comment(id, recipeId, memberId, commentText, delYn);
     }
 
-    public static Comment of(Long recipeId, Long memberId, String commentText, String delYn) {
-        return new Comment(null, recipeId, memberId, commentText, delYn);
-    }
 
 
 }

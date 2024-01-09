@@ -2,6 +2,8 @@ package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.application.port.in.CommentUseCase;
 import com.recipia.recipe.application.port.out.CommentPort;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.domain.Comment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,16 @@ public class CommentService implements CommentUseCase {
     @Override
     public Long createComment(Comment comment) {
         return commentPort.createComment(comment);
+    }
+
+    @Override
+    public Long updateComment(Comment comment) {
+        boolean isCommentExist = commentPort.checkIsCommentExist(comment);
+        if(isCommentExist) {
+            return commentPort.updateComment(comment);
+        } else {
+            throw new RecipeApplicationException(ErrorCode.COMMENT_NOT_FOUND);
+        }
     }
 
 }

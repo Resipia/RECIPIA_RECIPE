@@ -30,6 +30,9 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "존재하지 않는 카테고리입니다."),
     RECIPE_FILE_SAVE_ERROR(500, "RECIPE_FILE_SAVE_ERROR", "데이터 베이스에 파일을 저장하던중 예외가 발생했습니다."),
 
+    // 댓글 관련 에러
+    COMMENT_NOT_FOUND(404, "COMMENT_NOT_FOUND", "댓글이 존재하지 않습니다."),
+
     // S3 관련 에러
     S3_UPLOAD_ERROR(500, "S3_UPLOAD_ERROR", "AWS S3 서비스 에러"),
     S3_UPLOAD_FILE_NOT_FOUND(404, "S3_UPLOAD_FILE_NOT_FOUND", "업로드할 파일이 존재하지 않습니다."),

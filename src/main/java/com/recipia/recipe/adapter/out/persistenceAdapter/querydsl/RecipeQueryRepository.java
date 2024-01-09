@@ -6,9 +6,14 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
+import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfoEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +25,7 @@ import java.util.*;
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeFileEntity.recipeFileEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QSubCategoryEntity.subCategoryEntity;
 
 
@@ -61,7 +67,7 @@ public class RecipeQueryRepository {
                         ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
                 ))
                 .from(recipeEntity)
-                .where(recipeEntity.delYn.eq("N"));
+                .where(recipeEntity.delYn.eq("N")); // 삭제여부 검증 필수
 
         // 정렬 조건(sortType) 적용
         query = switch (sortType) {
@@ -90,33 +96,22 @@ public class RecipeQueryRepository {
     }
 
     /**
-     * 매게변수로 받은 recipeId들을 사용하여 연관된 서브 카테고리 값들을 List<Tuple> 형태로 반환한다.
+     * 서브 카테고리 정보를 dto로 받아온다.
+     * N+1을 방지하기 위해 대 카테고리의 정보는 받아오지 않는다.
      */
-    public List<Tuple> findSubCategoriesForRecipe(List<Long> recipeIdList) {
+    public List<SubCategoryDto> findSubCategoryDtoListForRecipeId(Long recipeId) {
         return queryFactory
-                .select(recipeEntity.id.as("id"), subCategoryEntity.subCategoryNm.as("subCategoryNm"))
-                .from(recipeEntity)
-                .join(recipeCategoryMapEntity).on(recipeEntity.id.eq(recipeCategoryMapEntity.recipeEntity.id))
-                .join(recipeCategoryMapEntity.subCategoryEntity, subCategoryEntity)
-                .where(recipeEntity.id.in(recipeIdList), recipeEntity.delYn.eq("N"))
+                .select(Projections.constructor(SubCategoryDto.class,
+                        recipeCategoryMapEntity.subCategoryEntity.id,
+                        recipeCategoryMapEntity.subCategoryEntity.subCategoryNm
+                ))
+                .from(recipeCategoryMapEntity)
+                .where(recipeCategoryMapEntity.recipeEntity.id.eq(recipeId))
                 .fetch();
     }
 
     /**
-     * 매게변수로 받은 recipeId들을 사용하여 연관된 서브 카테고리 값들을 List<Tuple> 형태로 반환한다.
-     */
-    public List<Tuple> findSubCategoriesForRecipe(Long recipeId) {
-        return queryFactory
-                .select(recipeEntity.id.as("id"), subCategoryEntity.subCategoryNm.as("subCategoryNm"))
-                .from(recipeEntity)
-                .join(recipeCategoryMapEntity).on(recipeEntity.id.eq(recipeCategoryMapEntity.recipeEntity.id))
-                .join(recipeCategoryMapEntity.subCategoryEntity, subCategoryEntity)
-                .where(recipeEntity.id.eq(recipeId), recipeEntity.delYn.eq("N"))
-                .fetch();
-    }
-
-    /**
-     * 단건 레시피를 상세조회
+     * 레시피 단건에 대한 정보를 상세조회
      */
     public Optional<RecipeDetailViewDto> getRecipeDetailView(Long recipeId, Long currentMemberId) {
 
@@ -131,12 +126,60 @@ public class RecipeQueryRepository {
                 .select(Projections.constructor(RecipeDetailViewDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
-                        recipeEntity.nickname,
                         recipeEntity.recipeDesc,
+                        recipeEntity.timeTaken,
+                        recipeEntity.ingredient,
+                        recipeEntity.hashtag,
+                        recipeEntity.nickname,
+                        recipeEntity.delYn,
                         ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
                 ))
                 .from(recipeEntity)
-                .where(recipeEntity.id.eq(recipeId))
+                .where(recipeEntity.id.eq(recipeId), recipeEntity.memberId.eq(currentMemberId), recipeEntity.delYn.eq("N"))
                 .fetchOne());
+    }
+
+    /**
+     * 레시피 업데이트
+     * 이름, 내용, 재료, 해시태그를 업데이트 한다.
+     */
+    public Long updateRecipe(RecipeEntity recipeEntity) {
+        QRecipeEntity qRecipe = QRecipeEntity.recipeEntity;
+
+        return queryFactory.update(qRecipe)
+                .where(qRecipe.id.eq(recipeEntity.getId()))
+                .set(qRecipe.recipeName, recipeEntity.getRecipeName())
+                .set(qRecipe.recipeDesc, recipeEntity.getRecipeDesc())
+                .set(qRecipe.ingredient, recipeEntity.getIngredient())
+                .set(qRecipe.hashtag, recipeEntity.getHashtag())
+                .execute();
+    }
+
+    /**
+     * 영양소 업데이트
+     * 모든 정보를 한번에 업데이트 한다.
+     */
+    public Long updateNutritionalInfo(NutritionalInfoEntity nutritionalInfoEntity) {
+        QNutritionalInfoEntity qNutritionalInfo = QNutritionalInfoEntity.nutritionalInfoEntity;
+
+        return queryFactory.update(qNutritionalInfo)
+                .where(qNutritionalInfo.id.eq(nutritionalInfoEntity.getId()))
+                .set(qNutritionalInfo.carbohydrates, nutritionalInfoEntity.getCarbohydrates())
+                .set(qNutritionalInfo.protein, nutritionalInfoEntity.getProtein())
+                .set(qNutritionalInfo.fat, nutritionalInfoEntity.getFat())
+                .set(qNutritionalInfo.vitamins, nutritionalInfoEntity.getVitamins())
+                .set(qNutritionalInfo.minerals, nutritionalInfoEntity.getMinerals())
+                .execute();
+    }
+
+    /**
+     * 레시피와 연관된 파일을 soft delete 처리한다.
+     * 업데이트된 엔티티의 개수를 반환한다.
+     */
+    public Long softDeleteRecipeFilesByRecipeId(Long recipeId) {
+        return queryFactory.update(recipeFileEntity)
+                .where(recipeFileEntity.recipeEntity.id.eq(recipeId))
+                .set(recipeFileEntity.delYn, "Y")
+                .execute();
     }
 }

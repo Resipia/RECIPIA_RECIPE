@@ -58,6 +58,11 @@ public class NutritionalInfoEntity {
         return new NutritionalInfoEntity(null, carbohydrates, protein, fat, vitamins, minerals, recipe);
     }
 
+    // 영양소 업데이트에서 사용
+    public static NutritionalInfoEntity of(Long id, Integer carbohydrates, Integer protein, Integer fat, Integer vitamins, Integer minerals) {
+        return new NutritionalInfoEntity(id, carbohydrates, protein, fat, vitamins, minerals, null);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

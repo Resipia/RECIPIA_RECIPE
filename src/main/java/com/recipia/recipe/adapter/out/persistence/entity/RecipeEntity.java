@@ -86,9 +86,6 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
         return Objects.hash(getId());
     }
 
-    public void changeNickname(String nickname) {
-        this.nickname = nickname;
-    }
 
 //    // 수정할 때 삭제한 이미지의 url을 전부 제거
 //    public void changeRecipe(RecipeModifyRequestDto dto) {

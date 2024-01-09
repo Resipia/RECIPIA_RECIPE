@@ -17,7 +17,9 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class RecipeCreateRequestDto {
+public class RecipeCreateUpdateRequestDto {
+
+    private Long id;
 
     @NotBlank(message = "레시피 이름은 필수입니다.")
     @Size(max = 100, message = "레시피 이름은 100자를 초과할 수 없습니다.")
@@ -38,42 +40,47 @@ public class RecipeCreateRequestDto {
     private NutritionalInfoDto nutritionalInfo;   // 영양소 dto
 
     @NotNull
-    private List<Long> subCategoryList;   // 카테고리
+    private List<SubCategoryDto> subCategoryDtoList;   // 카테고리
 
     private List<MultipartFile> fileList; // 이미지 파일들
 
 
     @Builder
-    private RecipeCreateRequestDto(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList, List<MultipartFile> fileList) {
+    public RecipeCreateUpdateRequestDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<SubCategoryDto> subCategoryDtoList, List<MultipartFile> fileList) {
+        this.id = id;
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
         this.timeTaken = timeTaken;
         this.ingredient = ingredient;
         this.hashtag = hashtag;
         this.nutritionalInfo = nutritionalInfo;
-        this.subCategoryList = subCategoryList;
+        this.subCategoryDtoList = subCategoryDtoList;
         this.fileList = fileList;
     }
 
     /**
      * 이미지가 존재할 때 팩토리 메서드
      */
-    public static RecipeCreateRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList, List<MultipartFile> images) {
-        return new RecipeCreateRequestDto(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList, images);
+    public static RecipeCreateUpdateRequestDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<SubCategoryDto> subCategoryList, List<MultipartFile> images) {
+        return new RecipeCreateUpdateRequestDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList, images);
+    }
+
+    public static RecipeCreateUpdateRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<SubCategoryDto> subCategoryList, List<MultipartFile> images) {
+        return new RecipeCreateUpdateRequestDto(null, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList, images);
     }
 
     /**
      * 이미지가 존재하지 않을때 팩토리 메서드
      */
-    public static RecipeCreateRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<Long> subCategoryList) {
-        return new RecipeCreateRequestDto(recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList, Collections.emptyList());
+    public static RecipeCreateUpdateRequestDto of(String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfoDto nutritionalInfo, List<SubCategoryDto> subCategoryList) {
+        return new RecipeCreateUpdateRequestDto(null, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategoryList, Collections.emptyList());
     }
 
     /**
      * 테스트용
      */
-    public static RecipeCreateRequestDto of(String recipeName, String recipeDesc) {
-        return new RecipeCreateRequestDto(recipeName, recipeDesc, null, null, null, null, List.of(1L), Collections.emptyList());
+    public static RecipeCreateUpdateRequestDto of(String recipeName, String recipeDesc) {
+        return new RecipeCreateUpdateRequestDto(null, recipeName, recipeDesc, null, null, null, null, List.of(SubCategoryDto.of(1L)), Collections.emptyList());
     }
 
 }

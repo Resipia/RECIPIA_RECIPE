@@ -9,7 +9,6 @@ import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
 import com.recipia.recipe.domain.Recipe;
-import com.recipia.recipe.domain.converter.NutritionalInfoConverter;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

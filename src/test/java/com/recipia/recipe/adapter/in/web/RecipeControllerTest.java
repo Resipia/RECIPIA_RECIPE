@@ -3,7 +3,6 @@ package com.recipia.recipe.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;

@@ -1,7 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.*;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -20,13 +20,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeFileEntity.recipeFileEntity;
-import static com.recipia.recipe.adapter.out.persistence.entity.QSubCategoryEntity.subCategoryEntity;
 
 
 @RequiredArgsConstructor

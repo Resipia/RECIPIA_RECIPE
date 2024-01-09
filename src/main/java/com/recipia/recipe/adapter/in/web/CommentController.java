@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.in.web;
 
-import com.recipia.recipe.adapter.in.web.dto.request.CommentRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
 import com.recipia.recipe.domain.converter.CommentConverter;
@@ -24,11 +25,20 @@ public class CommentController {
     private final CommentConverter commentConverter;
 
     @PostMapping("/regist/comment")
-    public ResponseEntity<ResponseDto<Long>> registComment(@Valid @RequestBody CommentRequestDto requestDto) {
-        Long createdCommentId = commentUseCase.createComment(commentConverter.dtoToDomain(requestDto));
+    public ResponseEntity<ResponseDto<Long>> registComment(@Valid @RequestBody CommentRegistRequestDto requestDto) {
+        Long createdCommentId = commentUseCase.createComment(commentConverter.registRequestDtoToDomain(requestDto));
         return ResponseEntity.ok(
                 ResponseDto.success(createdCommentId)
         );
+    }
+
+    @PostMapping("/update/comment")
+    public ResponseEntity<ResponseDto<Void>> updateComment(@Valid @RequestBody CommentUpdateRequestDto requestDto) {
+        commentUseCase.updateComment(commentConverter.updateRequestDtoToDomain(requestDto));
+        return ResponseEntity.ok(
+                ResponseDto.success()
+        );
+
     }
 
 }

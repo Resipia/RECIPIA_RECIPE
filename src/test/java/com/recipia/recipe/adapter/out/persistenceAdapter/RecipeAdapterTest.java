@@ -197,16 +197,16 @@ class RecipeAdapterTest extends TotalTestSupport {
     @Test
     void getRecipeDetailViewWithValidRecipeIdTest() {
         // Given
-        Long validRecipeId = 1L; // 존재하는 레시피 ID
+        Recipe domain = Recipe.of(1L, 1L);
         Long memberId = 1L; // 예시 유저 ID
         TestJwtConfig.setupMockJwt(memberId, "진안");
 
         // When
-        Recipe result = sut.getRecipeDetailView(validRecipeId);
+        Recipe result = sut.getRecipeDetailView(domain);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(validRecipeId);
+        assertThat(result.getId()).isEqualTo(domain.getId());
         assertThat(result.getRecipeName()).isNotNull();
         assertThat(result.getNickname()).isNotNull();
         assertThat(result.getRecipeDesc()).isNotNull();
@@ -215,35 +215,51 @@ class RecipeAdapterTest extends TotalTestSupport {
 
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 상세 조회 시, 예외가 발생한다.")
     @Test
-    void getRecipeDetailViewWithInvalidRecipeIdTest() {
+    void getRecipeDetailViewException1() {
         // Given
-        Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
         Long memberId = 1L; // 예시 유저 ID
+        Recipe domain = Recipe.of(9999L, memberId);
         TestJwtConfig.setupMockJwt(memberId, "진안");
 
 
         // When & Then
-        assertThatThrownBy(() -> sut.getRecipeDetailView(invalidRecipeId))
+        assertThatThrownBy(() -> sut.getRecipeDetailView(domain))
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("레시피가 존재하지 않습니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
     }
 
+    //todo: 테스트 통과시키기
+//    @DisplayName("[bad] 레시피 ID는 존재하지만 멤버 ID가 존재하지 잘못 상태로 상세 조회 시, 예외가 발생한다.")
+//    @Test
+//    void getRecipeDetailViewException2() {
+//        // Given
+//        Long memberId = 3333L; // 예시 유저 ID
+//        Recipe domain = Recipe.of(1L, memberId);
+//        TestJwtConfig.setupMockJwt(memberId, "진안");
+//
+//
+//        // When & Then
+//        assertThatThrownBy(() -> sut.getRecipeDetailView(domain))
+//                .isInstanceOf(RecipeApplicationException.class)
+//                .hasMessageContaining("레시피가 존재하지 않습니다.")
+//                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
+//    }
+
     @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시 데이터를 잘 받아온다.")
     @Test
     void getRecipeDetailViewWithSubCategoryTest() {
         // Given
-        Long validRecipeId = 1L; // 존재하는 레시피 ID
         Long memberId = 1L; // 예시 유저 ID
+        Recipe domain = Recipe.of(1L, memberId);
         TestJwtConfig.setupMockJwt(memberId, "진아");
 
-
         // When
-        Recipe result = sut.getRecipeDetailView(validRecipeId);
+        Recipe result = sut.getRecipeDetailView(domain);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(validRecipeId);
+        assertThat(result.getId()).isEqualTo(domain.getId());
     }
 
     @DisplayName("[happy] 레시피를 업데이트 하면 업데이트된 레시피의 id값이 반환된다.")

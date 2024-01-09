@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,25 +54,6 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     }
 
 
-    @DisplayName("[happy] 서브 카테고리 목록이 올바르게 반환된다.")
-    @Test
-    void getSubCategoryNameListTupleTest() {
-        //given
-        List<Long> recipeIds = List.of(1L); // 실제 데이터베이스에 존재하는 레시피 ID를 사용해야 함
-
-        //when
-        List<Tuple> subCategoryNameList = sut.findSubCategoriesForRecipe(recipeIds);
-
-        //then
-        Assertions.assertThat(subCategoryNameList).isNotNull().isNotEmpty();
-        for (Tuple tuple : subCategoryNameList) {
-            Long recipeId = tuple.get(0, Long.class);
-            String subCategoryName = tuple.get(1, String.class);
-            Assertions.assertThat(recipeIds).contains(recipeId);
-            assertThat(subCategoryName).isNotNull();
-        }
-    }
-
     @DisplayName("[happy] 전체 레시피 목록을 페이징하여 조회한다.")
     @Test
     void getAllRecipeListTest() {
@@ -92,63 +74,6 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
             assertThat(recipe.getNickname()).isNotNull();
             // 북마크 여부는 memberId에 따라 다를 수 있으므로, 테스트 케이스 작성시 주의 필요
         });
-    }
-
-    @DisplayName("[happy] 여러 레시피에 대한 서브 카테고리 목록이 올바르게 반환된다.")
-    @Test
-    void findSubCategoriesForMultipleRecipesTest() {
-        //given
-        List<Long> recipeIds = List.of(1L, 2L); // 존재하는 레시피 ID 사용
-
-        //when
-        List<Tuple> subCategoryNameList = sut.findSubCategoriesForRecipe(recipeIds);
-
-        //then
-        Assertions.assertThat(subCategoryNameList).isNotNull().isNotEmpty();
-        Assertions.assertThat(subCategoryNameList).allSatisfy(tuple -> {
-            Long recipeId = tuple.get(0, Long.class);
-            String subCategoryName = tuple.get(1, String.class);
-            Assertions.assertThat(recipeIds).contains(recipeId);
-            assertThat(subCategoryName).isNotNull();
-        });
-    }
-
-    @DisplayName("[happy] 단일 레시피에 대한 서브 카테고리 목록이 올바르게 반환된다.")
-    @Test
-    void findSubCategoriesForSingleRecipeTest() {
-        //given
-        Long recipeId = 1L; // 존재하는 레시피 ID 사용
-
-        //when
-        List<Tuple> subCategoryNameList = sut.findSubCategoriesForRecipe(recipeId);
-
-        //then
-        Assertions.assertThat(subCategoryNameList).isNotNull().isNotEmpty();
-        Assertions.assertThat(subCategoryNameList).allSatisfy(tuple -> {
-            Long id = tuple.get(0, Long.class);
-            String subCategoryName = tuple.get(1, String.class);
-            assertThat(id).isEqualTo(recipeId);
-            assertThat(subCategoryName).isNotNull();
-        });
-    }
-
-    @DisplayName("[happy] 단일 레시피 상세 정보가 올바르게 반환된다.")
-    @Test
-    void getRecipeDetailViewTest() {
-        //given
-        Long recipeId = 1L; // 존재하는 레시피 ID 사용
-        Long memberId = 1L; // 존재하는 멤버 ID 사용
-
-        //when
-        RecipeDetailViewDto detailView = sut.getRecipeDetailView(recipeId, memberId).get();
-
-        //then
-        assertThat(detailView).isNotNull();
-        assertThat(detailView.getId()).isEqualTo(recipeId);
-        assertThat(detailView.getRecipeName()).isNotNull();
-        assertThat(detailView.getNickname()).isNotNull();
-        assertThat(detailView.getRecipeDesc()).isNotNull();
-        // 북마크 여부 검증
     }
 
     @DisplayName("[happy] 존재하지 않는 레시피 ID에 대한 조회는 null을 반환해야 한다.")

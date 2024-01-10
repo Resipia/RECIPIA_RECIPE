@@ -31,6 +31,7 @@ public enum ErrorCode {
 
     // 댓글 관련 에러
     COMMENT_NOT_FOUND(404, "COMMENT_NOT_FOUND", "댓글이 존재하지 않습니다."),
+    COMMENT_IS_NOT_MINE(404, "COMMENT_IS_NOT_MINE", "요청자가 작성한 댓글이 아닙니다."),
 
     // S3 관련 에러
     S3_UPLOAD_ERROR(500, "S3_UPLOAD_ERROR", "AWS S3 서비스 에러"),

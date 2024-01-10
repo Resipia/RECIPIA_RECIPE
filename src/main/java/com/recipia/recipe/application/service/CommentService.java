@@ -22,11 +22,10 @@ public class CommentService implements CommentUseCase {
     @Override
     public Long updateComment(Comment comment) {
         boolean isCommentExist = commentPort.checkIsCommentExist(comment);
-        if(isCommentExist) {
-            return commentPort.updateComment(comment);
-        } else {
-            throw new RecipeApplicationException(ErrorCode.COMMENT_NOT_FOUND);
+        if(!isCommentExist) {
+            throw new RecipeApplicationException(ErrorCode.COMMENT_IS_NOT_MINE);
         }
+        return commentPort.updateComment(comment);
     }
 
 }

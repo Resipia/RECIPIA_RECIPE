@@ -216,7 +216,7 @@ class RecipeServiceTest {
         Long updatedRecipeId = 1L; // 업데이트된 id
         List<Long> savedFileIdList = List.of(1L, 2L, 3L); // 저장된 파일 id 리스트
 
-        when(recipePort.checkIsRecipeExist(recipe)).thenReturn(true);
+        when(recipePort.checkIsRecipeMineExist(recipe)).thenReturn(true);
         when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
         when(recipePort.softDeleteRecipeFilesByRecipeId(updatedRecipeId)).thenReturn(3L);
         when(imageS3Service.createRecipeFile(any(MultipartFile.class), anyInt(), eq(updatedRecipeId)))
@@ -243,7 +243,7 @@ class RecipeServiceTest {
         Long updatedRecipeId = 1L;  // 가정하는 업데이트된 ID
 
         //when
-        when(recipePort.checkIsRecipeExist(recipe)).thenReturn(true);
+        when(recipePort.checkIsRecipeMineExist(recipe)).thenReturn(true);
         when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
         when(recipePort.softDeleteRecipeFilesByRecipeId(updatedRecipeId)).thenReturn(3L);
         when(recipePort.saveRecipeFile(anyList())).thenReturn(Collections.emptyList());
@@ -260,7 +260,7 @@ class RecipeServiceTest {
     void deleteRecipeByRecipeId_Success() {
         // given
         Recipe domain = Recipe.of(1L);
-        when(recipePort.checkIsRecipeExist(domain)).thenReturn(true);
+        when(recipePort.checkIsRecipeMineExist(domain)).thenReturn(true);
         when(recipePort.softDeleteByRecipeId(domain)).thenReturn(1L);
 
         // when
@@ -276,7 +276,7 @@ class RecipeServiceTest {
     void deleteRecipeByInvalidRecipeId() {
         // Given
         Recipe invalidDomain = Recipe.of(9999L); // 존재하지 않는 레시피 ID
-        when(recipePort.checkIsRecipeExist(invalidDomain)).thenReturn(true);
+        when(recipePort.checkIsRecipeMineExist(invalidDomain)).thenReturn(true);
         given(recipePort.softDeleteByRecipeId(invalidDomain)).willReturn(0L); // 삭제되지 않았다고 가정
 
         // When

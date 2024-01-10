@@ -40,11 +40,11 @@ public class CommentAdapter implements CommentPort {
     }
 
     /**
-     * [READ] commentId, memberId로 댓글 검색
+     * [READ] commentId, memberId, del_yn으로 댓글 검색
      * 조건에 해당하는 댓글을 검색해서 댓글이 존재하면 true, 존재하지 않으면 false를 반환한다.
      */
     @Override
-    public boolean checkIsCommentExist(Comment comment) {
+    public boolean checkIsCommentExistAndMine(Comment comment) {
         Optional<CommentEntity> commentEntity = commentRepository.findByIdAndMemberIdAndDelYn(comment.getId(), comment.getMemberId(), comment.getDelYn());
         return commentEntity.isPresent();
     }

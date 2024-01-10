@@ -12,4 +12,6 @@ public interface RecipeRepository extends JpaRepository<RecipeEntity, Long> {
 
     Optional<RecipeEntity> findByIdAndDelYn(Long id, String delYn);
 
+    Optional<RecipeEntity> findByIdAndMemberIdAndDelYn(Long id, Long memberId, String delYn);
+
 }

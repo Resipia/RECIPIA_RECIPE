@@ -32,4 +32,16 @@ class CommentQueryRepositoryTest extends TotalTestSupport {
         assertThat(updatedComment.getCommentText()).isEqualTo(comment.getCommentText());
 
     }
+
+    @DisplayName("[happy] 댓글이 성공적으로 삭제처리(del_yn = 'Y') 된다.")
+    @Test
+    void softDeleteCommentSuccess() {
+        // given
+        Long commentId = 1L;
+        // when
+        sut.softDeleteComment(commentId);
+        // then
+        CommentEntity updatedComment = commentRepository.findById(commentId).orElseThrow();
+        assertThat(updatedComment.getDelYn()).isEqualTo("Y");
+    }
 }

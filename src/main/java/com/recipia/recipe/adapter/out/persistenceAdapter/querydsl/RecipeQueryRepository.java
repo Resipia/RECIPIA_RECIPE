@@ -1,13 +1,13 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.*;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
@@ -20,13 +20,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeFileEntity.recipeFileEntity;
-import static com.recipia.recipe.adapter.out.persistence.entity.QSubCategoryEntity.subCategoryEntity;
 
 
 @RequiredArgsConstructor
@@ -113,7 +113,7 @@ public class RecipeQueryRepository {
     /**
      * 레시피 단건에 대한 정보를 상세조회
      */
-    public Optional<RecipeDetailViewDto> getRecipeDetailView(Long recipeId, Long currentMemberId) {
+    public Optional<RecipeDetailViewResponseDto> getRecipeDetailView(Long recipeId, Long currentMemberId) {
 
         // 북마크 여부 서브쿼리
         JPQLQuery<Boolean> bookmarkSubQuery = JPAExpressions
@@ -123,7 +123,7 @@ public class RecipeQueryRepository {
 
         // 레시피 상세조회
         return Optional.ofNullable(queryFactory
-                .select(Projections.constructor(RecipeDetailViewDto.class,
+                .select(Projections.constructor(RecipeDetailViewResponseDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         recipeEntity.recipeDesc,
@@ -135,7 +135,7 @@ public class RecipeQueryRepository {
                         ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
                 ))
                 .from(recipeEntity)
-                .where(recipeEntity.id.eq(recipeId), recipeEntity.memberId.eq(currentMemberId), recipeEntity.delYn.eq("N"))
+                .where(recipeEntity.id.eq(recipeId), recipeEntity.delYn.eq("N"))
                 .fetchOne());
     }
 
@@ -180,6 +180,16 @@ public class RecipeQueryRepository {
         return queryFactory.update(recipeFileEntity)
                 .where(recipeFileEntity.recipeEntity.id.eq(recipeId))
                 .set(recipeFileEntity.delYn, "Y")
+                .execute();
+    }
+
+    /**
+     * 레시피를 soft delete 처리한다.
+     */
+    public Long softDeleteRecipeByRecipeId(Long recipeId) {
+        return queryFactory.update(recipeEntity)
+                .where(recipeEntity.id.eq(recipeId))
+                .set(recipeEntity.delYn, "Y")
                 .execute();
     }
 }

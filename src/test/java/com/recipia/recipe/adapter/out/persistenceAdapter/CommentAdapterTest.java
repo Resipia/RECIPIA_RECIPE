@@ -47,15 +47,27 @@ class CommentAdapterTest extends TotalTestSupport {
         assertThat(updatedCount).isGreaterThan(0);
     }
 
-    @DisplayName("[happy] commentId, memberId에 해당하는 댓글이 존재할때 true를 반환한다.")
+    @DisplayName("[happy] commentId, memberId, delYn에 해당하는 댓글이 존재할때 true를 반환한다.")
     @Test
     void whenCommentExistReturnTrue() {
         // given
         Comment comment = Comment.of(1L, null, 1L, "update-comment", "N");
         // when
-        boolean isCommentExist = commentAdapter.checkIsCommentExist(comment);
+        boolean isCommentExist = commentAdapter.checkIsCommentExistAndMine(comment);
         // then
         assertTrue(isCommentExist);
+    }
+
+    @DisplayName("[happy] 댓글을 soft delete 처리(del_yn = 'Y')해주고 업데이트된 row의 갯수를 반환한다.")
+    @Test
+    void deleteCommentSuccess() {
+        // given
+        Comment comment = Comment.of(1L, 1L, 1L, null, "N");
+        // when
+        Long updatedCount = commentAdapter.softDeleteComment(comment);
+        // then
+        assertThat(updatedCount).isNotNull();
+        assertThat(updatedCount).isGreaterThan(0);
     }
 
 }

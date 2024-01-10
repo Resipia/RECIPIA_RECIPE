@@ -12,7 +12,10 @@ import java.util.List;
 public interface RecipeFileRepository extends JpaRepository<RecipeFileEntity, Long> {
 
     @Query("SELECT rf FROM RecipeFileEntity rf WHERE rf.recipeEntity.id = :recipeId and rf.delYn = 'N'")
-    List<RecipeFileEntity> findByRecipeId(@Param("recipeId") Long recipeId);
+    List<RecipeFileEntity> findAllByRecipeId(@Param("recipeId") Long recipeId);
+
+    @Query("SELECT rf FROM RecipeFileEntity rf WHERE rf.recipeEntity.id = :recipeId and rf.delYn = 'Y'")
+    List<RecipeFileEntity> findAllSoftDeletedFileList(@Param("recipeId") Long recipeId);
 
 }
 

@@ -1,7 +1,6 @@
 package com.recipia.recipe.application.port.out;
 
 
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.domain.NutritionalInfo;
@@ -28,7 +27,7 @@ public interface RecipePort {
 
     Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType);
 
-    Recipe getRecipeDetailView(Long recipeId);
+    Recipe getRecipeDetailView(Recipe domain);
 
     List<SubCategory> getSubCategories(Long recipeId);
 
@@ -45,4 +44,10 @@ public interface RecipePort {
     NutritionalInfo getNutritionalInfo(Long recipeId);
 
     List<RecipeFile> getRecipeFile(Long recipeId);
+
+    Long softDeleteByRecipeId(Recipe domain);
+
+    boolean checkIsRecipeMineExist(Recipe recipe);
+
+    boolean checkIsRecipeExist(Recipe recipe);
 }

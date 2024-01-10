@@ -7,5 +7,7 @@ public interface CommentPort {
 
     Long updateComment(Comment comment);
 
-    boolean checkIsCommentExist(Comment comment);
+    boolean checkIsCommentExistAndMine(Comment comment);
+
+    Long softDeleteComment(Comment comment);
 }

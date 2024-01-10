@@ -2,7 +2,6 @@ package com.recipia.recipe.domain.converter;
 
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeFileDto;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
-import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

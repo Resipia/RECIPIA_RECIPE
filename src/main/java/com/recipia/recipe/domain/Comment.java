@@ -1,5 +1,6 @@
 package com.recipia.recipe.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +17,7 @@ public class Comment {
     private String commentText;
     private String delYn;
 
+    @Builder
     private Comment(Long id, Long recipeId, Long memberId, String commentText, String delYn) {
         this.id = id;
         this.recipeId = recipeId;
@@ -26,6 +28,10 @@ public class Comment {
 
     public static Comment of(Long id, Long recipeId, Long memberId, String commentText, String delYn) {
         return new Comment(id, recipeId, memberId, commentText, delYn);
+    }
+
+    public static Comment of(Long id, Long memberId) {
+        return new Comment(id, null, memberId, null, null);
     }
 
 

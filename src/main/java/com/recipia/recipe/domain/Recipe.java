@@ -80,5 +80,10 @@ public class Recipe {
         return new Recipe(id, null, null, null, null, null, null, null, null, null, null, null, false);
     }
 
-
+    /**
+     * 상세조회에서 도메인 객체를 만들때 사용
+     */
+    public static Recipe of(Long recipeId, Long currentMemberId) {
+        return new Recipe(recipeId, currentMemberId, null, null, null, null, null, null, null, null, null, null, false);
+    }
 }

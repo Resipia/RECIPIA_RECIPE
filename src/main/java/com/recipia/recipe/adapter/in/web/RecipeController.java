@@ -2,14 +2,15 @@ package com.recipia.recipe.adapter.in.web;
 
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
+import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
+import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.Recipe;
-import com.recipia.recipe.domain.converter.NutritionalInfoConverter;
 import com.recipia.recipe.domain.converter.RecipeConverter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,18 @@ public class RecipeController {
     private final CreateRecipeUseCase createRecipeUseCase;
     private final ReadRecipeUseCase readRecipeUseCase;
     private final UpdateRecipeUseCase updateRecipeUseCase;
+    private final DeleteRecipeUseCase deleteRecipeUseCase;
+
+    private final SecurityUtil securityUtil;
     private final RecipeConverter recipeConverter;
 
     /**
      * 유저가 레시피 생성을 요청하는 컨트롤러
      */
     @PostMapping("/createRecipe")
-    public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<Long>> createRecipe(
+            @Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto
+    ) {
 
         // 1. dto에서 이미지 파일 리스트 추출
         List<MultipartFile> files = requestDto.getFileList();
@@ -65,14 +71,17 @@ public class RecipeController {
      * 레시피 단건 조회
      */
     @GetMapping("/getRecipeDetail")
-    public ResponseEntity<ResponseDto<RecipeDetailViewDto>> getRecipeDetailView(
+    public ResponseEntity<ResponseDto<RecipeDetailViewResponseDto>> getRecipeDetailView(
             @RequestParam(value = "recipeId") Long recipeId
     ) {
-        // 1. recipe 정보를 받아온다.
-        Recipe recipe = readRecipeUseCase.getRecipeDetailView(recipeId);
+        // 1. securityContext에서 memberId를 가져와서 recipeId와 조립하여 도메인 객체를 만든다.
+        Recipe domain = Recipe.of(recipeId, securityUtil.getCurrentMemberId());
 
-        // 2. 도메인을 dto로 변환하여 반환한다.
-        RecipeDetailViewDto responseDto = recipeConverter.domainToResponseDto(recipe);
+        // 2. 레시피 상세정보 조회
+        Recipe recipe = readRecipeUseCase.getRecipeDetailView(domain);
+
+        // 3. 조회 결과를 dto로 변환하여 클라이언트한테 반환
+        RecipeDetailViewResponseDto responseDto = recipeConverter.domainToDetailViewResponseDto(recipe);
         return ResponseEntity.ok(ResponseDto.success(responseDto));
     }
 
@@ -80,7 +89,9 @@ public class RecipeController {
      * 레시피 업데이트
      */
     @PutMapping("/updateRecipe")
-    public ResponseEntity<ResponseDto<Void>> updateRecipe(@Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<Void>> updateRecipe(
+            @Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto
+    ) {
 
         // 1. dto에서 이미지 파일 리스트 추출
         List<MultipartFile> files = requestDto.getFileList();
@@ -91,6 +102,22 @@ public class RecipeController {
         // 3. 레시피 업데이트
         updateRecipeUseCase.updateRecipe(recipe, files);
 
+        return ResponseEntity.ok(ResponseDto.success());
+    }
+
+    /**
+     * 레시피 삭제
+     */
+    @DeleteMapping("/deleteRecipe")
+    public ResponseEntity<ResponseDto<Void>> deleteRecipe(
+            @RequestParam(name = "recipeId") Long recipeId
+    ) {
+
+        // 1. securityContext에서 memberId를 가져와서 recipeId와 조립하여 도메인 객체를 만든다.
+        Recipe domain = Recipe.of(recipeId, securityUtil.getCurrentMemberId());
+
+        // 2. 레시피 삭제를 시도한다.
+        deleteRecipeUseCase.deleteRecipeByRecipeId(domain);
         return ResponseEntity.ok(ResponseDto.success());
     }
 

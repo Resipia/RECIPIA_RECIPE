@@ -2,7 +2,7 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.*;
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -143,10 +144,9 @@ public class RecipeAdapter implements RecipePort {
      * 유저가 작성한 레시피 정보를 상세조회한다.
      */
     @Override
-    public Recipe getRecipeDetailView(Long recipeId) {
+    public Recipe getRecipeDetailView(Recipe domain) {
         // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
-        Long currentMemberId = securityUtil.getCurrentMemberId();
-        RecipeDetailViewDto dto = querydslRepository.getRecipeDetailView(recipeId, currentMemberId)
+        RecipeDetailViewResponseDto dto = querydslRepository.getRecipeDetailView(domain.getId(), domain.getMemberId())
                 .orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         // 2. 레시피 도메인 객체를 생성해서 반환한다.
@@ -156,7 +156,7 @@ public class RecipeAdapter implements RecipePort {
                 .recipeDesc(dto.getRecipeDesc())
                 .nickname(dto.getNickname())
                 .isBookmarked(dto.isBookmarked())
-                .memberId(currentMemberId)
+                .memberId(domain.getMemberId())
                 .build();
 
         return recipe;
@@ -200,10 +200,54 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public List<RecipeFile> getRecipeFile(Long recipeId) {
-        List<RecipeFileEntity> resultEntityList = recipeFileRepository.findByRecipeId(recipeId);
+        List<RecipeFileEntity> resultEntityList = recipeFileRepository.findAllByRecipeId(recipeId);
         return resultEntityList.stream()
                 .map(recipeFileConverter::entityToDomain)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * [DELETE] - 레시피를 soft delete 방식으로 삭제한다.
+     * 사용자로부터 받아온 recipeId로 삭제를 시도한다.
+     * 사용자에게 복구기간을 1주일 주고 기간이 지날 시 배치를 통해 del_yn이 Y인 데이터를 진짜 삭제한다.
+     */
+    @Override
+    public Long softDeleteByRecipeId(Recipe domain) {
+
+        // 1. soft delete로 del_yn을 모두 "Y"로 변경한다.
+        Long softDeletedRecipeCount = querydslRepository
+                .softDeleteRecipeByRecipeId(domain.getId());
+
+        // 2. 로그를 남겨서 삭제 여부를 확인할 수 있도록 한다.
+        log.info("recipeId : {}, softDeletedRecipeCount : {}", domain.getId(), softDeletedRecipeCount);
+        return softDeletedRecipeCount;
+    }
+
+    /**
+     * [READ] - 조건에 맞는 레시피를 가져와서 true/false로 반환한다.
+     */
+    @Override
+    public boolean checkIsRecipeMineExist(Recipe domain) {
+
+        // 1. 레시피id, 멤버id, del_yn을 조건으로 수정/삭제하려는 레시피의 주인이 맞는지 검색한다.
+        Optional<RecipeEntity> optionalRecipeEntity = recipeRepository.
+                findByIdAndMemberIdAndDelYn(domain.getId(), domain.getMemberId(), "N");
+
+        // 2. 존재하면 true 없으면 false
+        return optionalRecipeEntity.isPresent();
+    }
+
+    /**
+     * [READ] - recipeId에 해당하는 레시피가 존재하면 true, 존재하지 않고 삭제된 레시피면 false를 반환한다.
+     */
+    @Override
+    public boolean checkIsRecipeExist(Recipe domain) {
+        // 1. 레시피id, del_yn을 조건으로 레시피를 가져온다
+        Optional<RecipeEntity> optionalRecipeEntity = recipeRepository.
+                findByIdAndDelYn(domain.getId(), "N");
+
+        // 2. 존재하면 true 없으면 false
+        return optionalRecipeEntity.isPresent();
     }
 
     /**

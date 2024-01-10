@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
+import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.CommentQueryRepository;
 import com.recipia.recipe.application.port.out.CommentPort;
@@ -7,9 +8,15 @@ import com.recipia.recipe.domain.Comment;
 import com.recipia.recipe.domain.converter.CommentConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,6 +63,28 @@ public class CommentAdapter implements CommentPort {
     @Override
     public Long softDeleteComment(Comment comment) {
         return commentQueryRepository.softDeleteComment(comment.getId());
+    }
+
+    /**
+     * [READ] recipeId에 해당하는 댓글 목록 조회
+     * querydsl을 사용해서 댓글 목록 조회 최적화 (목록, count)
+     */
+    @Override
+    public Page<CommentListResponseDto> getCommentList(Long recipeId, Pageable pageable, String sortType) {
+        Page<CommentEntity> commentEntities = commentQueryRepository.getCommentEntityList(recipeId, pageable, sortType);
+
+        List<CommentListResponseDto> dtoList = commentEntities.getContent().stream()
+                .map(entity -> CommentListResponseDto.of(
+                        entity.getId(),
+                        entity.getMemberId(),
+                        null,
+                        entity.getCommentText(),
+                        entity.getCreateDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                        !entity.getCreateDateTime().isEqual(entity.getUpdateDateTime())
+                ))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(dtoList, pageable, commentEntities.getTotalElements());
     }
 
 }

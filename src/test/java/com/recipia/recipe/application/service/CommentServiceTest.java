@@ -48,7 +48,7 @@ class CommentServiceTest {
         // given
         Comment comment = Comment.of(1L, null, 1L, "update-comment", "N");
         when(recipePort.checkIsRecipeExist(any(Recipe.class))).thenReturn(true);
-        when(commentPort.checkIsCommentExist(comment)).thenReturn(true);
+        when(commentPort.checkIsCommentExistAndMine(comment)).thenReturn(true);
         when(commentPort.updateComment(comment)).thenReturn(1L);
         // when
         Long updatedCount = sut.updateComment(comment);
@@ -63,7 +63,7 @@ class CommentServiceTest {
         // given
         Comment comment = Comment.of(1L, null, 1L, "delete-comment", "N");
         when(recipePort.checkIsRecipeExist(any(Recipe.class))).thenReturn(true);
-        when(commentPort.checkIsCommentExist(comment)).thenReturn(true);
+        when(commentPort.checkIsCommentExistAndMine(comment)).thenReturn(true);
         when(commentPort.softDeleteComment(comment)).thenReturn(1L);
 
         // when

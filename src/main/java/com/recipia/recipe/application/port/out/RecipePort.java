@@ -45,5 +45,7 @@ public interface RecipePort {
 
     List<RecipeFile> getRecipeFile(Long recipeId);
 
-    Long softDeleteRecipeByRecipeId(Long recipeId);
+    Long softDeleteByRecipeId(Recipe domain);
+
+    boolean checkIsRecipeExist(Recipe recipe);
 }

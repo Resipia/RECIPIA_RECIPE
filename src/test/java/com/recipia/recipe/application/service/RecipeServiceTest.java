@@ -216,6 +216,7 @@ class RecipeServiceTest {
         Long updatedRecipeId = 1L; // 업데이트된 id
         List<Long> savedFileIdList = List.of(1L, 2L, 3L); // 저장된 파일 id 리스트
 
+        when(recipePort.checkIsRecipeExist(recipe)).thenReturn(true);
         when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
         when(recipePort.softDeleteRecipeFilesByRecipeId(updatedRecipeId)).thenReturn(3L);
         when(imageS3Service.createRecipeFile(any(MultipartFile.class), anyInt(), eq(updatedRecipeId)))
@@ -242,6 +243,7 @@ class RecipeServiceTest {
         Long updatedRecipeId = 1L;  // 가정하는 업데이트된 ID
 
         //when
+        when(recipePort.checkIsRecipeExist(recipe)).thenReturn(true);
         when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
         when(recipePort.softDeleteRecipeFilesByRecipeId(updatedRecipeId)).thenReturn(3L);
         when(recipePort.saveRecipeFile(anyList())).thenReturn(Collections.emptyList());
@@ -257,30 +259,32 @@ class RecipeServiceTest {
     @Test
     void deleteRecipeByRecipeId_Success() {
         // given
-        Long recipeId = 1L; // 존재하는 레시피 ID
-        when(recipePort.softDeleteRecipeByRecipeId(recipeId)).thenReturn(1L);
+        Recipe domain = Recipe.of(1L);
+        when(recipePort.checkIsRecipeExist(domain)).thenReturn(true);
+        when(recipePort.softDeleteByRecipeId(domain)).thenReturn(1L);
 
         // when
-        Long deletedCount = sut.deleteRecipeByRecipeId(recipeId);
+        Long deletedCount = sut.deleteRecipeByRecipeId(domain);
 
         // Then
         assertThat(deletedCount).isEqualTo(1L); // 삭제된 행의 수가 1임을 검증
-        then(recipePort).should().softDeleteRecipeByRecipeId(recipeId);
+        then(recipePort).should().softDeleteByRecipeId(domain);
     }
 
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 삭제 시도 시, 삭제되지 않음을 확인한다.")
     @Test
     void deleteRecipeByInvalidRecipeId() {
         // Given
-        Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
-        given(recipePort.softDeleteRecipeByRecipeId(invalidRecipeId)).willReturn(0L); // 삭제되지 않았다고 가정
+        Recipe invalidDomain = Recipe.of(9999L); // 존재하지 않는 레시피 ID
+        when(recipePort.checkIsRecipeExist(invalidDomain)).thenReturn(true);
+        given(recipePort.softDeleteByRecipeId(invalidDomain)).willReturn(0L); // 삭제되지 않았다고 가정
 
         // When
-        Long deletedCount = sut.deleteRecipeByRecipeId(invalidRecipeId);
+        Long deletedCount = sut.deleteRecipeByRecipeId(invalidDomain);
 
         // Then
         assertThat(deletedCount).isEqualTo(0L); // 삭제된 행이 없음을 검증
-        then(recipePort).should().softDeleteRecipeByRecipeId(invalidRecipeId);
+        then(recipePort).should().softDeleteByRecipeId(invalidDomain);
     }
 
     private List<MultipartFile> createMockMultipartFileList() {

@@ -125,35 +125,38 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      */
     @Transactional
     @Override
-    public void updateRecipe(Recipe recipe, List<MultipartFile> files) {
+    public void updateRecipe(Recipe domain, List<MultipartFile> files) {
 
-        // 1. 레시피, 영양소, 카테고리 매핑 업데이트
-        Long recipeId = recipePort.updateRecipe(recipe);
-        recipePort.updateNutritionalInfo(recipe);
-        recipePort.updateCategoryMapping(recipe);
+        // 1. 레시피가 존재하고 업데이트하려는 유저가 작성한 것이 맞는지 체크한다. (예외처리)
+        checkIsRecipeExistAndMine(domain);
 
-        // 2. 파일이 null이면 저장을 하지 않는다.
+        // 2. 레시피, 영양소, 카테고리 매핑 업데이트
+        Long recipeId = recipePort.updateRecipe(domain);
+        recipePort.updateNutritionalInfo(domain);
+        recipePort.updateCategoryMapping(domain);
+
+        // 3. 파일이 null이면 저장을 하지 않는다.
         if (!files.isEmpty()) {
 
-            // 2-1. 기존 파일 전부 soft delete 처리
+            // 3-1. 기존 파일 전부 soft delete 처리
             recipePort.softDeleteRecipeFilesByRecipeId(recipeId);
 
-            // 2-2. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
+            // 3-2. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
             List<RecipeFile> recipeFileList = IntStream.range(0, files.size())
                     .mapToObj(fileOrder -> imageS3Service.createRecipeFile(files.get(fileOrder), fileOrder, recipeId))
                     .collect(Collectors.toList());
 
-            // 2-3. rdb에 레시피 파일(이미지)을 저장
+            // 3-3. rdb에 레시피 파일(이미지)을 저장
             List<Long> savedFileIdList = recipePort.saveRecipeFile(recipeFileList);
 
-            // 2-4. 만약 저장 후 반환받은 id값이 없다면 예외처리
+            // 3-4. 만약 저장 후 반환받은 id값이 없다면 예외처리
             if (savedFileIdList.isEmpty()) {
                 throw new RecipeApplicationException(ErrorCode.RECIPE_FILE_SAVE_ERROR);
             }
         }
 
-        // 3. 비관심사: 스프링 이벤트 발행 (몽고db: 재료, 해시태그 저장)
-        eventPublisher.publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
+        // 4. 비관심사: 스프링 이벤트 발행 (몽고db: 재료, 해시태그 저장)
+        eventPublisher.publishEvent(new RecipeCreationEvent(domain.getIngredient(), domain.getHashtag()));
     }
 
     /**
@@ -161,8 +164,22 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      * soft delete 방식을 적용하였으며 del_yn을 "Y" 로 변경한다.
      */
     @Transactional
-    public Long deleteRecipeByRecipeId(Long recipeId) {
-        return recipePort.softDeleteRecipeByRecipeId(recipeId);
+    public Long deleteRecipeByRecipeId(Recipe domain) {
+
+        // 1. 레시피가 존재하고 업데이트하려는 유저가 작성한 것이 맞는지 체크한다. (예외처리)
+        checkIsRecipeExistAndMine(domain);
+
+        return recipePort.softDeleteByRecipeId(domain);
+    }
+
+    /**
+     * 레시피 도메인에서 recipeId, memberId, del_yn을 준비한다.
+     */
+    private void checkIsRecipeExistAndMine(Recipe recipe) {
+        boolean isRecipeExist = recipePort.checkIsRecipeExist(recipe);
+        if (!isRecipeExist) {
+            throw new RecipeApplicationException(ErrorCode.RECIPE_IS_NOT_MINE);
+        }
     }
 
 }

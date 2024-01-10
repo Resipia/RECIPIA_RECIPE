@@ -59,12 +59,7 @@ public class CommentController {
     }
 
     /**
-     * 레시피 상세조회에서 recipeId에 해당하는
-     * @param recipeId
-     * @param page
-     * @param size
-     * @param sortType
-     * @return
+     * 레시피 상세조회에서 recipeId에 해당하는 댓글 목록 조회
      */
     @GetMapping("/getAllCommentList")
     public ResponseEntity<PagingResponseDto<CommentListResponseDto>> getAllCommentList(

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -211,11 +212,29 @@ public class RecipeAdapter implements RecipePort {
      * 사용자에게 복구기간을 1주일 주고 기간이 지날 시 배치를 통해 del_yn이 Y인 데이터를 진짜 삭제한다.
      */
     @Override
-    public Long softDeleteRecipeByRecipeId(Long recipeId) {
-        // soft delete로 del_yn을 모두 "Y"로 변경한다.
-        Long softDeletedRecipeCount = querydslRepository.softDeleteRecipeByRecipeId(recipeId);
-        log.info("recipeId : {}, softDeletedRecipeCount : {}", recipeId, softDeletedRecipeCount);
+    public Long softDeleteByRecipeId(Recipe domain) {
+
+        // 1. soft delete로 del_yn을 모두 "Y"로 변경한다.
+        Long softDeletedRecipeCount = querydslRepository
+                .softDeleteRecipeByRecipeId(domain.getId());
+
+        // 2. 로그를 남겨서 삭제 여부를 확인할 수 있도록 한다.
+        log.info("recipeId : {}, softDeletedRecipeCount : {}", domain.getId(), softDeletedRecipeCount);
         return softDeletedRecipeCount;
+    }
+
+    /**
+     * [READ] - 조건에 맞는 레시피를 가져와서 true/false로 반환한다.
+     */
+    @Override
+    public boolean checkIsRecipeExist(Recipe recipe) {
+
+        // 1. 레시피id, 멤버id, del_yn을 조건으로 수정/삭제하려는 레시피의 주인이 맞는지 검색한다.
+        Optional<RecipeEntity> optionalRecipeEntity = recipeRepository.
+                findByIdAndMemberIdAndDelYn(recipe.getId(), recipe.getMemberId(), "N");
+
+        // 2. 존재하면 true 없으면 false
+        return optionalRecipeEntity.isPresent();
     }
 
     /**

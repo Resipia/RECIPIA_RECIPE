@@ -426,9 +426,10 @@ class RecipeAdapterTest extends TotalTestSupport {
         //given
         RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
         Long recipeId = savedRecipeEntity.getId();
+        Recipe recipe = Recipe.of(recipeId);
 
         //when
-        Long deleteCount = sut.softDeleteRecipeByRecipeId(recipeId);
+        Long deleteCount = sut.softDeleteByRecipeId(recipe);
         entityManager.flush();
         entityManager.clear();
 

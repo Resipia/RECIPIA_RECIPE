@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.recipia.recipe.adapter.in.web.dto.request.CommentDeleteRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
@@ -63,6 +64,25 @@ class CommentControllerTest extends TotalTestSupport {
 
         //when & then
         mockMvc.perform(post("/recipe/update/comment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(dto)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @DisplayName("[happy] 유저가 댓글 삭제 요청 시 정상적으로 삭제하고 성공 응답을 반환한다.")
+    @Test
+    void ifUserDeleteCommentShouldComplete() throws Exception {
+        // given
+        CommentDeleteRequestDto dto = CommentDeleteRequestDto.of(1L, 1L);
+        Comment domain = Comment.of(dto.getId(), dto.getRecipeId(), null, null, "Y");
+
+        when(commentConverter.deleteRequestDtoToDomain(dto)).thenReturn(domain);
+        when(commentUseCase.softDeleteComment(domain)).thenReturn(1L);
+
+        //when & then
+        mockMvc.perform(post("/recipe/delete/comment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(dto)))
                 .andExpect(status().isOk())

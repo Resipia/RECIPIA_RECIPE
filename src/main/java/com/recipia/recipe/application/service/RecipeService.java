@@ -176,7 +176,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      * 레시피 도메인에서 recipeId, memberId, del_yn을 준비한다.
      */
     private void checkIsRecipeExistAndMine(Recipe recipe) {
-        boolean isRecipeExist = recipePort.checkIsRecipeExist(recipe);
+        boolean isRecipeExist = recipePort.checkIsRecipeMineExist(recipe);
         if (!isRecipeExist) {
             throw new RecipeApplicationException(ErrorCode.RECIPE_IS_NOT_MINE);
         }

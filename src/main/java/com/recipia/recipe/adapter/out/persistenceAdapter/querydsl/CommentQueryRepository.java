@@ -21,4 +21,11 @@ public class CommentQueryRepository {
                 .execute();
     }
 
+    public Long softDeleteComment(Long commentId) {
+        return queryFactory
+                .update(commentEntity)
+                .set(commentEntity.delYn, "Y")
+                .where(commentEntity.id.eq(commentId))
+                .execute();
+    }
 }

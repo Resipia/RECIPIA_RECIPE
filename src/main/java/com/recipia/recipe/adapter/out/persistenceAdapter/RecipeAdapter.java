@@ -227,11 +227,24 @@ public class RecipeAdapter implements RecipePort {
      * [READ] - 조건에 맞는 레시피를 가져와서 true/false로 반환한다.
      */
     @Override
-    public boolean checkIsRecipeExist(Recipe recipe) {
+    public boolean checkIsRecipeMineExist(Recipe domain) {
 
         // 1. 레시피id, 멤버id, del_yn을 조건으로 수정/삭제하려는 레시피의 주인이 맞는지 검색한다.
         Optional<RecipeEntity> optionalRecipeEntity = recipeRepository.
-                findByIdAndMemberIdAndDelYn(recipe.getId(), recipe.getMemberId(), "N");
+                findByIdAndMemberIdAndDelYn(domain.getId(), domain.getMemberId(), "N");
+
+        // 2. 존재하면 true 없으면 false
+        return optionalRecipeEntity.isPresent();
+    }
+
+    /**
+     * [READ] - recipeId에 해당하는 레시피가 존재하면 true, 존재하지 않고 삭제된 레시피면 false를 반환한다.
+     */
+    @Override
+    public boolean checkIsRecipeExist(Recipe domain) {
+        // 1. 레시피id, del_yn을 조건으로 레시피를 가져온다
+        Optional<RecipeEntity> optionalRecipeEntity = recipeRepository.
+                findByIdAndDelYn(domain.getId(), "N");
 
         // 2. 존재하면 true 없으면 false
         return optionalRecipeEntity.isPresent();

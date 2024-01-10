@@ -47,5 +47,7 @@ public interface RecipePort {
 
     Long softDeleteByRecipeId(Recipe domain);
 
+    boolean checkIsRecipeMineExist(Recipe recipe);
+
     boolean checkIsRecipeExist(Recipe recipe);
 }

@@ -3,17 +3,15 @@ package com.recipia.recipe.adapter.in.web;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentDeleteRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
-import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.converter.CommentConverter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 댓글 컨트롤러
@@ -25,13 +23,13 @@ public class CommentController {
 
     private final CommentUseCase commentUseCase;
     private final CommentConverter commentConverter;
-    private final SecurityUtil securityUtil;
 
     /**
      * 댓글 등록
      */
     @PostMapping("/regist/comment")
     public ResponseEntity<ResponseDto<Long>> registComment(@Valid @RequestBody CommentRegistRequestDto requestDto) {
+        // todo: member nickname까지 저장하기
         Long createdCommentId = commentUseCase.createComment(commentConverter.registRequestDtoToDomain(requestDto));
         return ResponseEntity.ok(
                 ResponseDto.success(createdCommentId)
@@ -59,5 +57,25 @@ public class CommentController {
                 ResponseDto.success()
         );
     }
+
+    /**
+     * 레시피 상세조회에서 recipeId에 해당하는
+     * @param recipeId
+     * @param page
+     * @param size
+     * @param sortType
+     * @return
+     */
+    @GetMapping("/getAllCommentList")
+    public ResponseEntity<PagingResponseDto<CommentListResponseDto>> getAllCommentList(
+            @RequestParam(value = "recipeId") Long recipeId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortType", defaultValue = "new") String sortType
+    ) {
+        PagingResponseDto<CommentListResponseDto> commentList = commentUseCase.getCommentList(recipeId, page, size, sortType);
+        return ResponseEntity.ok(commentList);
+    }
+
 
 }

@@ -27,6 +27,9 @@ public class CommentController {
     private final CommentConverter commentConverter;
     private final SecurityUtil securityUtil;
 
+    /**
+     * 댓글 등록
+     */
     @PostMapping("/regist/comment")
     public ResponseEntity<ResponseDto<Long>> registComment(@Valid @RequestBody CommentRegistRequestDto requestDto) {
         Long createdCommentId = commentUseCase.createComment(commentConverter.registRequestDtoToDomain(requestDto));
@@ -35,6 +38,9 @@ public class CommentController {
         );
     }
 
+    /**
+     * 댓글 수정
+     */
     @PostMapping("/update/comment")
     public ResponseEntity<ResponseDto<Void>> updateComment(@Valid @RequestBody CommentUpdateRequestDto requestDto) {
         commentUseCase.updateComment(commentConverter.updateRequestDtoToDomain(requestDto));
@@ -43,6 +49,9 @@ public class CommentController {
         );
     }
 
+    /**
+     * 댓글 삭제
+     */
     @PostMapping("/delete/comment")
     public ResponseEntity<ResponseDto<Void>> softDeleteComment(@Valid @RequestBody CommentDeleteRequestDto requestDto) {
         commentUseCase.softDeleteComment(commentConverter.deleteRequestDtoToDomain(requestDto));

@@ -18,7 +18,7 @@ public enum ErrorCode {
     EXPIRED_JWT(401, "EXPIRED_JWT", "JWT 토큰이 만료되었습니다."),
     MISSING_JWT(401, "MISSING_JWT", "JWT 토큰이 누락되었습니다."),
 
-    // RECIPE Create 에러
+    // 레시피 생성 에러
     REQUIRED_MEMBER_ID(404, "MISSING_MEMBER_ID", "회원 ID는 필수 항목입니다."),
     REQUIRED_RECIPE_NAME(404, "REQUIRED_RECIPE_NAME", "레시피 이름은 필수 항목입니다."),
     REQUIRED_RECIPE_DESCRIPTION(404, "REQUIRED_RECIPE_NAME", "레시피 설명은 필수 항목입니다."),
@@ -28,6 +28,9 @@ public enum ErrorCode {
     INVALID_HASHTAGS(404, "INVALID_HASHTAGS", "해시태그가 유효하지 않습니다."),
     CATEGORY_NOT_FOUND(404, "CATEGORY_NOT_FOUND", "존재하지 않는 카테고리입니다."),
     RECIPE_FILE_SAVE_ERROR(500, "RECIPE_FILE_SAVE_ERROR", "데이터 베이스에 파일을 저장하던중 예외가 발생했습니다."),
+
+    // 레시피 수정/삭제 에러
+    RECIPE_IS_NOT_MINE(404, "RECIPE_IS_NOT_MINE", "레시피 수정/삭제를 시도한 유저가 주인이 아닙니다."),
 
     // S3 관련 에러
     S3_UPLOAD_ERROR(500, "S3_UPLOAD_ERROR", "AWS S3 서비스 에러"),

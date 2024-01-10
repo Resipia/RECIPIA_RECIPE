@@ -5,8 +5,6 @@ import com.recipia.recipe.domain.SubCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Component
 public class CategoryConverter {

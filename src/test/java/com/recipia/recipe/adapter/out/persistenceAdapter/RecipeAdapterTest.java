@@ -1,7 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
@@ -198,16 +197,16 @@ class RecipeAdapterTest extends TotalTestSupport {
     @Test
     void getRecipeDetailViewWithValidRecipeIdTest() {
         // Given
-        Long validRecipeId = 1L; // 존재하는 레시피 ID
+        Recipe domain = Recipe.of(1L, 1L);
         Long memberId = 1L; // 예시 유저 ID
         TestJwtConfig.setupMockJwt(memberId, "진안");
 
         // When
-        Recipe result = sut.getRecipeDetailView(validRecipeId);
+        Recipe result = sut.getRecipeDetailView(domain);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(validRecipeId);
+        assertThat(result.getId()).isEqualTo(domain.getId());
         assertThat(result.getRecipeName()).isNotNull();
         assertThat(result.getNickname()).isNotNull();
         assertThat(result.getRecipeDesc()).isNotNull();
@@ -216,35 +215,51 @@ class RecipeAdapterTest extends TotalTestSupport {
 
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 상세 조회 시, 예외가 발생한다.")
     @Test
-    void getRecipeDetailViewWithInvalidRecipeIdTest() {
+    void getRecipeDetailViewException1() {
         // Given
-        Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
         Long memberId = 1L; // 예시 유저 ID
+        Recipe domain = Recipe.of(9999L, memberId);
         TestJwtConfig.setupMockJwt(memberId, "진안");
 
 
         // When & Then
-        assertThatThrownBy(() -> sut.getRecipeDetailView(invalidRecipeId))
+        assertThatThrownBy(() -> sut.getRecipeDetailView(domain))
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("레시피가 존재하지 않습니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
     }
 
+    //todo: 테스트 통과시키기
+//    @DisplayName("[bad] 레시피 ID는 존재하지만 멤버 ID가 존재하지 잘못 상태로 상세 조회 시, 예외가 발생한다.")
+//    @Test
+//    void getRecipeDetailViewException2() {
+//        // Given
+//        Long memberId = 3333L; // 예시 유저 ID
+//        Recipe domain = Recipe.of(1L, memberId);
+//        TestJwtConfig.setupMockJwt(memberId, "진안");
+//
+//
+//        // When & Then
+//        assertThatThrownBy(() -> sut.getRecipeDetailView(domain))
+//                .isInstanceOf(RecipeApplicationException.class)
+//                .hasMessageContaining("레시피가 존재하지 않습니다.")
+//                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
+//    }
+
     @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시 데이터를 잘 받아온다.")
     @Test
     void getRecipeDetailViewWithSubCategoryTest() {
         // Given
-        Long validRecipeId = 1L; // 존재하는 레시피 ID
         Long memberId = 1L; // 예시 유저 ID
+        Recipe domain = Recipe.of(1L, memberId);
         TestJwtConfig.setupMockJwt(memberId, "진아");
 
-
         // When
-        Recipe result = sut.getRecipeDetailView(validRecipeId);
+        Recipe result = sut.getRecipeDetailView(domain);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(validRecipeId);
+        assertThat(result.getId()).isEqualTo(domain.getId());
     }
 
     @DisplayName("[happy] 레시피를 업데이트 하면 업데이트된 레시피의 id값이 반환된다.")
@@ -383,7 +398,7 @@ class RecipeAdapterTest extends TotalTestSupport {
     }
 
 
-    @DisplayName("[happy] 레시피를 업데이트할 때 이미지가 업데이트 된다면 관련된 이미지에 대한 테이블이 모두 삭제된다.")
+    @DisplayName("[happy] 이미지를 삭제하면 테이블 내부의 del_yn 컬럼이 모두 'Y'로 변경된다.")
     @Test
     void deleteRecipeFilesByRecipeIdHappy() {
         //given
@@ -391,7 +406,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         Long recipeId = savedRecipeEntity.getId();
 
         RecipeFileEntity recipeFileEntity = RecipeFileEntity.of(savedRecipeEntity, 1, "/", "url", "nm", "nm2", "jpg", 100, "N");
-        recipeFileRepository.save(recipeFileEntity);
+        RecipeFileEntity savedFileEntity = recipeFileRepository.save(recipeFileEntity);
         entityManager.flush();
         entityManager.clear();
 
@@ -401,9 +416,28 @@ class RecipeAdapterTest extends TotalTestSupport {
         entityManager.clear();
 
         //then
-        List<RecipeFileEntity> results = recipeFileRepository.findByRecipeId(recipeId);
+        RecipeFileEntity result = recipeFileRepository.findById(savedFileEntity.getId()).orElseThrow();
+        Assertions.assertThat(result.getDelYn()).isEqualTo("Y");
+    }
+
+    @DisplayName("[happy] 레시피를 삭제하면 soft delete가 적용되어 del_yn이 'Y'로 변경된다.")
+    @Test
+    void softDeleteRecipeByRecipeIdHappy() {
+        //given
+        RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
+        Long recipeId = savedRecipeEntity.getId();
+        Recipe recipe = Recipe.of(recipeId);
+
+        //when
+        Long deleteCount = sut.softDeleteByRecipeId(recipe);
+        entityManager.flush();
+        entityManager.clear();
+
+        //then
+        RecipeEntity result = recipeRepository.findById(savedRecipeEntity.getId()).orElseThrow();
         // del_yn은 Y인 조건으로 검색하면 된다.
-        Assertions.assertThat(results.size()).isEqualTo(0);
+        Assertions.assertThat(result.getDelYn()).isEqualTo("Y");
+        Assertions.assertThat(deleteCount).isEqualTo(1);
     }
 
 

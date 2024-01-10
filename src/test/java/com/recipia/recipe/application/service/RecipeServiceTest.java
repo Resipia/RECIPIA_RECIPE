@@ -1,7 +1,6 @@
 package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
@@ -154,43 +153,45 @@ class RecipeServiceTest {
         assertThrows(RuntimeException.class, () -> sut.getAllRecipeList(page, size, sortType));
     }
 
-//    @Test
-//    @DisplayName("[happy] 유효한 레시피 ID로 단건 조회시 데이터를 잘 가져온다.")
-//    void getRecipeDetailViewWithValidId() {
-//        // Given
-//        Long validRecipeId = 1L;
-//        RecipeDetailViewDto mockDto = new RecipeDetailViewDto(validRecipeId, "레시피명", "닉네임", "설명", false);
-//        when(recipePort.getRecipeDetailView(validRecipeId)).thenReturn(mockDto);
-//
-//        // When
-//        RecipeDetailViewDto result = sut.getRecipeDetailView(validRecipeId);
-//
-//        // Then
-//        assertThat(result).isNotNull();
-//        assertThat(result.getId()).isEqualTo(validRecipeId);
-//    }
+    @Test
+    @DisplayName("[happy] 유효한 레시피 ID로 단건 조회시 데이터를 잘 가져온다.")
+    void getRecipeDetailViewWithValidId() {
+        // Given
+        Recipe domain = Recipe.of(1L);
+        Long validRecipeId = domain.getId();
+        Recipe mockDto = Recipe.of(validRecipeId);
+
+        when(recipePort.getRecipeDetailView(domain)).thenReturn(mockDto);
+
+        // When
+        Recipe result = sut.getRecipeDetailView(domain);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(validRecipeId);
+    }
 
     @Test
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 레시피를 단건 조회하면 예외가 발생한다.")
     void getRecipeDetailViewWithInvalidId() {
         // Given
-        Long invalidRecipeId = 9999L;
-        given(recipePort.getRecipeDetailView(invalidRecipeId))
+        Recipe domain = Recipe.of(9999L);
+        given(recipePort.getRecipeDetailView(domain))
                 .willThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         // When & Then
-        assertThrows(RecipeApplicationException.class, () -> sut.getRecipeDetailView(invalidRecipeId));
+        assertThrows(RecipeApplicationException.class, () -> sut.getRecipeDetailView(domain));
     }
 
     @Test
     @DisplayName("[bad] 만약 Port 레이어에서 예외가 발생하면 서비스 레이어에서 예외를 처리한다.")
     void getRecipeDetailViewWhenPortThrowsException() {
         // Given
-        Long recipeId = 1L;
-        given(recipePort.getRecipeDetailView(recipeId)).willThrow(new RuntimeException("DB Error"));
+        Recipe domain = Recipe.of(1L);
+        given(recipePort.getRecipeDetailView(domain)).willThrow(new RuntimeException("DB Error"));
 
         // When & Then
-        assertThrows(RuntimeException.class, () -> sut.getRecipeDetailView(recipeId));
+        assertThrows(RuntimeException.class, () -> sut.getRecipeDetailView(domain));
     }
 
     @Test
@@ -215,6 +216,7 @@ class RecipeServiceTest {
         Long updatedRecipeId = 1L; // 업데이트된 id
         List<Long> savedFileIdList = List.of(1L, 2L, 3L); // 저장된 파일 id 리스트
 
+        when(recipePort.checkIsRecipeExist(recipe)).thenReturn(true);
         when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
         when(recipePort.softDeleteRecipeFilesByRecipeId(updatedRecipeId)).thenReturn(3L);
         when(imageS3Service.createRecipeFile(any(MultipartFile.class), anyInt(), eq(updatedRecipeId)))
@@ -241,6 +243,7 @@ class RecipeServiceTest {
         Long updatedRecipeId = 1L;  // 가정하는 업데이트된 ID
 
         //when
+        when(recipePort.checkIsRecipeExist(recipe)).thenReturn(true);
         when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
         when(recipePort.softDeleteRecipeFilesByRecipeId(updatedRecipeId)).thenReturn(3L);
         when(recipePort.saveRecipeFile(anyList())).thenReturn(Collections.emptyList());
@@ -252,6 +255,37 @@ class RecipeServiceTest {
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_FILE_SAVE_ERROR);
     }
 
+    @DisplayName("[happy] 레시피 소프트 삭제가 성공적으로 수행된다.")
+    @Test
+    void deleteRecipeByRecipeId_Success() {
+        // given
+        Recipe domain = Recipe.of(1L);
+        when(recipePort.checkIsRecipeExist(domain)).thenReturn(true);
+        when(recipePort.softDeleteByRecipeId(domain)).thenReturn(1L);
+
+        // when
+        Long deletedCount = sut.deleteRecipeByRecipeId(domain);
+
+        // Then
+        assertThat(deletedCount).isEqualTo(1L); // 삭제된 행의 수가 1임을 검증
+        then(recipePort).should().softDeleteByRecipeId(domain);
+    }
+
+    @DisplayName("[bad] 존재하지 않는 레시피 ID로 삭제 시도 시, 삭제되지 않음을 확인한다.")
+    @Test
+    void deleteRecipeByInvalidRecipeId() {
+        // Given
+        Recipe invalidDomain = Recipe.of(9999L); // 존재하지 않는 레시피 ID
+        when(recipePort.checkIsRecipeExist(invalidDomain)).thenReturn(true);
+        given(recipePort.softDeleteByRecipeId(invalidDomain)).willReturn(0L); // 삭제되지 않았다고 가정
+
+        // When
+        Long deletedCount = sut.deleteRecipeByRecipeId(invalidDomain);
+
+        // Then
+        assertThat(deletedCount).isEqualTo(0L); // 삭제된 행이 없음을 검증
+        then(recipePort).should().softDeleteByRecipeId(invalidDomain);
+    }
 
     private List<MultipartFile> createMockMultipartFileList() {
         return List.of(

@@ -14,7 +14,7 @@ import java.util.List;
  */
 @NoArgsConstructor
 @Data
-public class RecipeDetailViewDto {
+public class RecipeDetailViewResponseDto {
     private Long id;                    // 레시피 id
     private String recipeName;          // 레시피명
     private String recipeDesc;          // 레시피 설명
@@ -36,7 +36,7 @@ public class RecipeDetailViewDto {
      * 모든 필드를 다 생성자에 넣으면 querydsl Projection에서 오류가 나서 필요한 데이터는 setter로 넣도록 함
      */
     @Builder
-    public RecipeDetailViewDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn, boolean isBookmarked) {
+    public RecipeDetailViewResponseDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn, boolean isBookmarked) {
         this.id = id;
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
@@ -48,8 +48,8 @@ public class RecipeDetailViewDto {
         this.isBookmarked = isBookmarked;
     }
 
-    public static RecipeDetailViewDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn, boolean isBookmarked) {
-        return new RecipeDetailViewDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, delYn, isBookmarked);
+    public static RecipeDetailViewResponseDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn, boolean isBookmarked) {
+        return new RecipeDetailViewResponseDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, delYn, isBookmarked);
     }
 
 }

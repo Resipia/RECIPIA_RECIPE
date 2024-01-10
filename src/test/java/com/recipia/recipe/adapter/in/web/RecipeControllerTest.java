@@ -3,9 +3,9 @@ package com.recipia.recipe.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
+import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -44,6 +44,7 @@ class RecipeControllerTest extends TotalTestSupport {
     @MockBean private ReadRecipeUseCase readRecipeUseCase;
     @MockBean CreateRecipeUseCase createRecipeUseCase;
     @MockBean UpdateRecipeUseCase updateRecipeUseCase;
+    @MockBean DeleteRecipeUseCase deleteRecipeUseCase;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -108,12 +109,12 @@ class RecipeControllerTest extends TotalTestSupport {
     @DisplayName("존재하지 않는 레시피 ID로 조회 시, 적절한 예외 응답을 반환한다.")
     void getRecipeDetailViewWithInvalidId() throws Exception {
         //given
-        Long invalidRecipeId = 9999L;
-        when(readRecipeUseCase.getRecipeDetailView(eq(invalidRecipeId))).thenThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
+        Recipe domain = Recipe.of(9999L);
+        when(readRecipeUseCase.getRecipeDetailView(eq(domain))).thenThrow(new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         //when & then
         mockMvc.perform(get("/recipe/getRecipeDetail")
-                        .param("recipeId", String.valueOf(invalidRecipeId))
+                        .param("recipeId", String.valueOf(domain.getId()))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is5xxServerError());
     }

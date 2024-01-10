@@ -1,8 +1,7 @@
 package com.recipia.recipe.application.service;
 
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
@@ -15,8 +14,6 @@ import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
 import com.recipia.recipe.domain.SubCategory;
-import com.recipia.recipe.domain.converter.NutritionalInfoConverter;
-import com.recipia.recipe.domain.converter.RecipeConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -40,10 +37,9 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     private final RecipePort recipePort;
     private final ApplicationEventPublisher eventPublisher;
     private final ImageS3Service imageS3Service;
-    private final NutritionalInfoConverter nutritionalInfoConverter;
 
     /**
-     * 레시피 생성을 담당하는 메서드
+     * [CREATE] - 레시피 생성을 담당하는 메서드
      * 주관심사: 레시피 생성 (엔티티 저장)
      * 비관심사: 스프링 이벤트 발행 (재료, 해시태그 mongoDB에 저장)
      */
@@ -79,7 +75,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     }
 
     /**
-     * 레시피 목록 전체 조회
+     * [READ] - 레시피 목록 전체 조회
      * 페이징을 위한 Pageable 객체를 여기서 조립해서 사용한다.
      * page=0과 size=10으로 Pageable 객체를 생성하면, 이는 '첫 번째 페이지에 10개의 항목을 보여달라'는 요청이다.
      * page=1과 size=10이면 '두 번째 페이지에 10개의 항목을 보여달라'는 요청이다.
@@ -99,12 +95,14 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     }
 
     /**
-     * 레시피 단건 상세조회
+     * [READ] - 레시피 단건 상세조회
+     * 서브 카테고리, 영양소, 이미지 정보는 각각 어댑터에 요청해서 받아온 후 조립한다.
      */
-    public Recipe getRecipeDetailView(Long recipeId) {
+    public Recipe getRecipeDetailView(Recipe domain) {
 
+        Long recipeId = domain.getId();
         // 1. 레시피의 기본적인 정보를 받아온다.
-        Recipe recipe = recipePort.getRecipeDetailView(recipeId);
+        Recipe recipe = recipePort.getRecipeDetailView(domain);
 
         // 2. 서브 카테고리 정보를 받아와서 도메인에 세팅한다.
         List<SubCategory> subCategories = recipePort.getSubCategories(recipeId);
@@ -122,39 +120,66 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     }
 
     /**
-     * 레시피를 업데이트 한다.
+     * [UPDATE] - 레시피를 업데이트 한다.
      * 레시피 생성과 거의 동일하다. 다만 업데이트다 보니 기존의 데이터를 삭제하고 추가하는 방식을 주로 적용시켰다.
      */
     @Transactional
     @Override
-    public void updateRecipe(Recipe recipe, List<MultipartFile> files) {
+    public void updateRecipe(Recipe domain, List<MultipartFile> files) {
 
-        // 1. 레시피, 영양소, 카테고리 매핑 업데이트
-        Long recipeId = recipePort.updateRecipe(recipe);
-        recipePort.updateNutritionalInfo(recipe);
-        recipePort.updateCategoryMapping(recipe);
+        // 1. 레시피가 존재하고 업데이트하려는 유저가 작성한 것이 맞는지 체크한다. (예외처리)
+        checkIsRecipeExistAndMine(domain);
 
-        // 2. 파일이 null이면 저장을 하지 않는다.
+        // 2. 레시피, 영양소, 카테고리 매핑 업데이트
+        Long recipeId = recipePort.updateRecipe(domain);
+        recipePort.updateNutritionalInfo(domain);
+        recipePort.updateCategoryMapping(domain);
+
+        // 3. 파일이 null이면 저장을 하지 않는다.
         if (!files.isEmpty()) {
 
-            // 2-1. 기존 파일 전부 soft delete 처리
+            // 3-1. 기존 파일 전부 soft delete 처리
             recipePort.softDeleteRecipeFilesByRecipeId(recipeId);
 
-            // 2-2. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
+            // 3-2. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
             List<RecipeFile> recipeFileList = IntStream.range(0, files.size())
                     .mapToObj(fileOrder -> imageS3Service.createRecipeFile(files.get(fileOrder), fileOrder, recipeId))
                     .collect(Collectors.toList());
 
-            // 2-3. rdb에 레시피 파일(이미지)을 저장
+            // 3-3. rdb에 레시피 파일(이미지)을 저장
             List<Long> savedFileIdList = recipePort.saveRecipeFile(recipeFileList);
 
-            // 2-4. 만약 저장 후 반환받은 id값이 없다면 예외처리
+            // 3-4. 만약 저장 후 반환받은 id값이 없다면 예외처리
             if (savedFileIdList.isEmpty()) {
                 throw new RecipeApplicationException(ErrorCode.RECIPE_FILE_SAVE_ERROR);
             }
         }
 
-        // 3. 비관심사: 스프링 이벤트 발행 (몽고db: 재료, 해시태그 저장)
-        eventPublisher.publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
+        // 4. 비관심사: 스프링 이벤트 발행 (몽고db: 재료, 해시태그 저장)
+        eventPublisher.publishEvent(new RecipeCreationEvent(domain.getIngredient(), domain.getHashtag()));
     }
+
+    /**
+     * [DELETE] - 레시피를 삭제한다.
+     * soft delete 방식을 적용하였으며 del_yn을 "Y" 로 변경한다.
+     */
+    @Transactional
+    public Long deleteRecipeByRecipeId(Recipe domain) {
+
+        // 1. 레시피가 존재하고 업데이트하려는 유저가 작성한 것이 맞는지 체크한다. (예외처리)
+        checkIsRecipeExistAndMine(domain);
+
+        return recipePort.softDeleteByRecipeId(domain);
+    }
+
+    /**
+     * 레시피 도메인에서 recipeId, memberId, del_yn을 준비한다.
+     */
+    private void checkIsRecipeExistAndMine(Recipe recipe) {
+        boolean isRecipeExist = recipePort.checkIsRecipeExist(recipe);
+        if (!isRecipeExist) {
+            throw new RecipeApplicationException(ErrorCode.RECIPE_IS_NOT_MINE);
+        }
+    }
+
 }

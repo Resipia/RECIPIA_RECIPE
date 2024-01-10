@@ -1,11 +1,15 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
+import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Comment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static com.mongodb.assertions.Assertions.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -68,6 +72,35 @@ class CommentAdapterTest extends TotalTestSupport {
         // then
         assertThat(updatedCount).isNotNull();
         assertThat(updatedCount).isGreaterThan(0);
+    }
+
+    @DisplayName("[happy] 유효한 recipeId와 페이지 정보와 정렬 유형이 주어지면, 페이징 처리된 댓글 목록이 반환된다.")
+    @Test
+    void getRecipeCommentListSuccess() {
+        // given
+        Long recipeId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+        String sortType = "new";
+        // when
+        Page<CommentListResponseDto> result = commentAdapter.getCommentList(recipeId, pageable, sortType);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isNotNull();
+        assertThat(result.getTotalElements()).isGreaterThan(0);
+
+        // 결과의 일부를 검증 (첫 번째 댓글의 특정 필드)
+        CommentListResponseDto firstComment = result.getContent().get(0);
+        assertThat(firstComment.getId()).isNotNull();
+        assertThat(firstComment.getCommentValue()).isNotEmpty();
+
+        // createDate 형식 확인
+        String expectedDateFormat = "\\d{4}-\\d{2}-\\d{2}"; // yyyy-MM-dd 형식 정규식
+        assertThat(firstComment.getCreateDate()).matches(expectedDateFormat);
+
+        // isUpdated 필드 검증
+        // 이 부분은 실제 데이터에 따라 달라질 수 있음
+        assertThat(firstComment.isUpdated()).isFalse();
     }
 
 }

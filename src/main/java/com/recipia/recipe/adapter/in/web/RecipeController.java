@@ -37,7 +37,9 @@ public class RecipeController {
      * 유저가 레시피 생성을 요청하는 컨트롤러
      */
     @PostMapping("/createRecipe")
-    public ResponseEntity<ResponseDto<Long>> createRecipe(@Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<Long>> createRecipe(
+            @Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto
+    ) {
 
         // 1. dto에서 이미지 파일 리스트 추출
         List<MultipartFile> files = requestDto.getFileList();
@@ -87,7 +89,9 @@ public class RecipeController {
      * 레시피 업데이트
      */
     @PutMapping("/updateRecipe")
-    public ResponseEntity<ResponseDto<Void>> updateRecipe(@Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<Void>> updateRecipe(
+            @Valid @ModelAttribute RecipeCreateUpdateRequestDto requestDto
+    ) {
 
         // 1. dto에서 이미지 파일 리스트 추출
         List<MultipartFile> files = requestDto.getFileList();
@@ -105,8 +109,15 @@ public class RecipeController {
      * 레시피 삭제
      */
     @DeleteMapping("/deleteRecipe")
-    public ResponseEntity<ResponseDto<Void>> deleteRecipe(@RequestParam(name = "recipeId") Long recipeId) {
-        deleteRecipeUseCase.deleteRecipeByRecipeId(recipeId);
+    public ResponseEntity<ResponseDto<Void>> deleteRecipe(
+            @RequestParam(name = "recipeId") Long recipeId
+    ) {
+
+        // 1. securityContext에서 memberId를 가져와서 recipeId와 조립하여 도메인 객체를 만든다.
+        Recipe domain = Recipe.of(recipeId, securityUtil.getCurrentMemberId());
+
+        // 2. 레시피 삭제를 시도한다.
+        deleteRecipeUseCase.deleteRecipeByRecipeId(domain);
         return ResponseEntity.ok(ResponseDto.success());
     }
 

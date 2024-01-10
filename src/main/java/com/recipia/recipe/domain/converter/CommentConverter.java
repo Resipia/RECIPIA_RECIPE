@@ -1,5 +1,6 @@
 package com.recipia.recipe.domain.converter;
 
+import com.recipia.recipe.adapter.in.web.dto.request.CommentDeleteRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
@@ -33,6 +34,11 @@ public class CommentConverter {
     public Comment updateRequestDtoToDomain(CommentUpdateRequestDto dto) {
         Long memberId = securityUtil.getCurrentMemberId();
         return Comment.of(dto.getId(), null, memberId, dto.getCommentText(), "N");
+    }
+
+    public Comment deleteRequestDtoToDomain(CommentDeleteRequestDto dto) {
+        Long memberId = securityUtil.getCurrentMemberId();
+        return Comment.of(dto.getId(), dto.getRecipeId(), memberId, null, "Y");
     }
 
 }

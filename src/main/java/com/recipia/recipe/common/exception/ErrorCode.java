@@ -32,6 +32,10 @@ public enum ErrorCode {
     // 레시피 수정/삭제 에러
     RECIPE_IS_NOT_MINE(404, "RECIPE_IS_NOT_MINE", "레시피 수정/삭제를 시도한 유저가 주인이 아닙니다."),
 
+    // 댓글 관련 에러
+    COMMENT_NOT_FOUND(404, "COMMENT_NOT_FOUND", "댓글이 존재하지 않습니다."),
+    COMMENT_IS_NOT_MINE(404, "COMMENT_IS_NOT_MINE", "요청자가 작성한 댓글이 아닙니다."),
+
     // S3 관련 에러
     S3_UPLOAD_ERROR(500, "S3_UPLOAD_ERROR", "AWS S3 서비스 에러"),
     S3_UPLOAD_FILE_NOT_FOUND(404, "S3_UPLOAD_FILE_NOT_FOUND", "업로드할 파일이 존재하지 않습니다."),

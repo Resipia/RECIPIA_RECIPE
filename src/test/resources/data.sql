@@ -68,3 +68,7 @@ INSERT INTO recipe_category_map (recipe_id, sub_category_id, create_dttm)
 VALUES (1, 5, CURRENT_TIMESTAMP),
        (1, 6, CURRENT_TIMESTAMP),
        (1, 7, CURRENT_TIMESTAMP);
+
+-- 댓글 추가
+INSERT INTO comment (recipe_id, member_id, comment_text, del_yn, create_dttm, update_dttm)
+VALUES (1, 1, 'comment', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

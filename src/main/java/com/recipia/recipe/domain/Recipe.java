@@ -28,11 +28,12 @@ public class Recipe {
     private String nickname;     // 회원 닉네임
     private List<RecipeFile> recipeFileList; // 레시피와 연관된 파일 리스트 도메인
     private String delYn;        // 레시피 삭제여부
-    private boolean isBookmarked; // 북마크 여부
-
+    private Long recipeLikeId;   // 좋아요 id
+    private Integer likeCount;   // 레시피 좋아유 개수
+    private boolean isBookmarked;// 북마크 여부
 
     @Builder
-    public Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, boolean isBookmarked) {
+    public Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, boolean isBookmarked) {
         this.id = id;
         this.memberId = memberId;
         this.recipeName = recipeName;
@@ -45,45 +46,47 @@ public class Recipe {
         this.nickname = nickname;
         this.recipeFileList = recipeFileList;
         this.delYn = delYn;
+        this.recipeLikeId = recipeLikeId;
+        this.likeCount = likeCount;
         this.isBookmarked = isBookmarked;
     }
 
     /**
      * 파일이 존재할때 도메인 객체 생성
      */
-    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, boolean isBookmarked) {
-        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, recipeFileList, delYn, isBookmarked);
+    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, boolean isBookmarked) {
+        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, recipeFileList, delYn, recipeLikeId, likeCount, isBookmarked);
     }
 
     /**
      * 파일이 없을때 도메인 객체 생성
      */
-    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn, boolean isBookmarked) {
-        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn, isBookmarked);
+    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn, Long recipeLikeId, Integer likeCount, boolean isBookmarked) {
+        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn, recipeLikeId, likeCount, isBookmarked);
     }
 
     /**
      * 레시피 생성할때 컨버터에서 사용
      */
-    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, boolean isBookmarked) {
-        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, recipeFileList, delYn, isBookmarked);
+    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, boolean isBookmarked) {
+        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, recipeFileList, delYn, recipeLikeId, likeCount, isBookmarked);
     }
 
-    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn, boolean isBookmarked) {
-        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn, isBookmarked);
+    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn, Long recipeLikeId, Integer likeCount, boolean isBookmarked) {
+        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn, recipeLikeId, likeCount, isBookmarked);
     }
 
     /**
      * s3 업로드에 사용
      */
     public static Recipe of(Long id) {
-        return new Recipe(id, null, null, null, null, null, null, null, null, null, null, null, false);
+        return new Recipe(id, null, null, null, null, null, null, null, null, null, null, null, null, null, false);
     }
 
     /**
      * 상세조회에서 도메인 객체를 만들때 사용
      */
     public static Recipe of(Long recipeId, Long currentMemberId) {
-        return new Recipe(recipeId, currentMemberId, null, null, null, null, null, null, null, null, null, null, false);
+        return new Recipe(recipeId, currentMemberId, null, null, null, null, null, null, null, null, null, null, null, null, false);
     }
 }

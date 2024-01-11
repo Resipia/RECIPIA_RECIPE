@@ -34,27 +34,6 @@ public class RecipeConverter {
     private final SecurityUtil securityUtil;
 
     /**
-     * Recipe 엔티티를 받아서 Recipe 도메인으로 변환
-     */
-    // entity to domain
-    public Recipe entityToDomain(RecipeEntity entity) {
-        return Recipe.of(
-                entity.getId(),
-                entity.getMemberId(),
-                entity.getRecipeName(),
-                entity.getRecipeDesc(),
-                entity.getTimeTaken(),
-                entity.getIngredient(),
-                entity.getHashtag(),
-                null, // fixme: 영양소
-                null, // subCategory
-                entity.getNickname(),
-                entity.getDelYn(),
-                false // todo: 이거 북마크도 고민해보자
-        );
-    }
-
-    /**
      * [entity to domain]
      * 레시피를 생성할때 컨트롤러에 들어온 요청 dto객체를 도메인으로 변환시키는 메서드
      * 여기서 도메인 객체를 만들어서 서비스 레이어에 보낸다.
@@ -65,7 +44,7 @@ public class RecipeConverter {
         // 2. 서브 카테고리 도메인 리스트를 받아온다.
         List<SubCategory> subCategories = dtoToDomainList(dto);
 
-        // jwt 클레임으로부터 memberId, nickname을 꺼내서 주입한다.
+        // 3. jwt 클레임으로부터 memberId, nickname을 꺼내서 주입한다.
         return Recipe.of(
                 securityUtil.getCurrentMemberId(),
                 dto.getRecipeName(),
@@ -77,6 +56,8 @@ public class RecipeConverter {
                 subCategories,
                 securityUtil.getCurrentMemberNickname(),
                 "N",
+                0L, // todo: 저장할때라서 일단 0L을 넣어줬다.
+                0,
                 false
         );
     }
@@ -94,6 +75,7 @@ public class RecipeConverter {
                 domain.getIngredient(),
                 domain.getHashtag(),
                 domain.getNickname(),
+                domain.getLikeCount(),
                 domain.getDelYn()
         );
     }
@@ -163,7 +145,8 @@ public class RecipeConverter {
                 domain.getHashtag(),
                 domain.getNickname(),
                 domain.getDelYn(),
-                domain.isBookmarked()
+                domain.isBookmarked(),
+                domain.getRecipeLikeId() // 이 값은 꼭 존재해야 한다.(좋아요를 안했다면 0L 반환)
         );
 
         recipeDetailViewResponseDto.setNutritionalInfoDto(nutritionalInfoDto);

@@ -27,6 +27,7 @@ import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeFileEntity.recipeFileEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeLikeEntity.recipeLikeEntity;
 
 
 @RequiredArgsConstructor
@@ -47,6 +48,7 @@ public class RecipeQueryRepository {
     }
 
     /**
+     * [레시피 전체 목록 조회]
      * fetch join을 사용하면 관련된 엔티티들이 메모리에 모두 로드되어서, 데이터베이스 레벨에서의 페이징이 아닌 메모리 레벨에서의 페이징이 발생할 수 있다.
      * 이는 대량의 데이터를 처리할 때 메모리 사용량이 증가하고, 성능 저하를 초래할 수 있다. 그래서 여기서는 fetchJoin을 사용하지 않는다.
      */
@@ -121,6 +123,12 @@ public class RecipeQueryRepository {
                 .from(bookmarkEntity)
                 .where(bookmarkEntity.memberId.eq(currentMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
+        // todo: RecipeLikeEntity의 id값 보내기 (없으면 NuLL)
+        JPQLQuery<Long> recipeLikeSubQuery = JPAExpressions
+                .select(recipeLikeEntity.id)
+                .from(recipeLikeEntity)
+                .where(recipeEntity.id.eq(recipeLikeEntity.recipeEntity.id));
+
         // 레시피 상세조회
         return Optional.ofNullable(queryFactory
                 .select(Projections.constructor(RecipeDetailViewResponseDto.class,
@@ -132,7 +140,8 @@ public class RecipeQueryRepository {
                         recipeEntity.hashtag,
                         recipeEntity.nickname,
                         recipeEntity.delYn,
-                        ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
+                        ExpressionUtils.as(bookmarkSubQuery, "isBookmarked"),
+                        ExpressionUtils.as(recipeLikeSubQuery, "recipeLikeId")
                 ))
                 .from(recipeEntity)
                 .where(recipeEntity.id.eq(recipeId), recipeEntity.delYn.eq("N"))
@@ -192,4 +201,15 @@ public class RecipeQueryRepository {
                 .set(recipeEntity.delYn, "Y")
                 .execute();
     }
+
+    /**
+     * 레시피 내부의 좋아요 개수를 업데이트 한다.
+     */
+    public Long updateLikesInDatabase(Long recipeId, Integer likeCount) {
+        return queryFactory.update(recipeEntity)
+                .where(recipeEntity.id.eq(recipeId))
+                .set(recipeEntity.likeCount, likeCount)
+                .execute();
+    }
+
 }

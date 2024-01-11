@@ -37,7 +37,4 @@ public class RecipeLikeController {
         return ResponseEntity.ok(ResponseDto.success(savedCount));
     }
 
-
-
-
 }

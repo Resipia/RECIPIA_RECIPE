@@ -313,6 +313,8 @@ class RecipeServiceTest {
                 List.of(SubCategory.of(1L), SubCategory.of(2L)),
                 "진안",
                 "N",
+                0L,
+                0,
                 false
         );
     }

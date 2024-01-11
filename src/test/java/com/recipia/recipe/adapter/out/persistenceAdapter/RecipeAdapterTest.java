@@ -453,6 +453,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 subCategory,
                 "진안",
                 "N",
+                0L,
+                0,
                 false
         );
     }
@@ -470,6 +472,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 subCategory,
                 "진안",
                 "N",
+                0L,
+                0,
                 false
         );
     }

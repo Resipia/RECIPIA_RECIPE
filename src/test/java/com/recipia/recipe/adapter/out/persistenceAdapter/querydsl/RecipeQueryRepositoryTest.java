@@ -201,8 +201,6 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
 
         RecipeFileEntity recipeFileEntity = RecipeFileEntity.of(savedRecipeEntity, 1, "/", "url", "nm", "nm2", "jpg", 100, "N");
         RecipeFileEntity savedFileEntity = recipeFileRepository.save(recipeFileEntity);
-        entityManager.flush();
-        entityManager.clear();
 
         // when
         Long result = sut.softDeleteRecipeFilesByRecipeId(recipeId);
@@ -256,6 +254,34 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
 
         // then
         assertThat(result).isEqualTo(0); // 업데이트된 행이 없어야 함
+    }
+
+    @DisplayName("[happy] 레시피 내부의 좋아요 갯수가 업데이트 되면 0보다 큰 수를 반환한다.")
+    @Test
+    void updateLikesInDatabase() {
+        //given
+        Long recipeId = 1L;
+        Integer likeCount = 10;
+
+        //when
+        Long updatedResult = sut.updateLikesInDatabase(recipeId, likeCount);
+
+        //then
+        Assertions.assertThat(updatedResult).isGreaterThan(0);
+    }
+
+    @DisplayName("[happy] 존재하지 않는 recipeId를 사용하여 업데이트 시도하면 0을 반환한다.")
+    @Test
+    void test() {
+        //given
+        Long recipeId = 9999L;
+        Integer likeCount = 10;
+
+        //when
+        Long updatedResult = sut.updateLikesInDatabase(recipeId, likeCount);
+
+        //then
+        Assertions.assertThat(updatedResult).isEqualTo(0);
     }
 
 

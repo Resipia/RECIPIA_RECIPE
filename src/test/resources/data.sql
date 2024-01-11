@@ -1,7 +1,5 @@
-INSERT INTO recipe (member_id, recipe_nm, recipe_desc, time_taken, ingredient, hashtag, nickname,
-                    create_dttm, update_dttm, del_yn)
-VALUES (1, '김치찌개', '매콤한 김치찌개 레시피', 30, '김치, 돼지고기, 두부', '#김치찌개', '진아',
-        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'N');
+INSERT INTO recipe (member_id, recipe_nm, recipe_desc, time_taken, ingredient, hashtag, nickname, like_count, del_yn, create_dttm, update_dttm)
+VALUES (1, '김치찌개', '매콤한 김치찌개 레시피', 30, '김치, 돼지고기, 두부', '#김치찌개', '진안', 0, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 --        (1, '된장찌개', '구수한 된장찌개 레시피', 25, '된장, 두부, 야채', '#된장찌개', '민준',
 --         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'N'),
 --        (1, '볶음밥', '간단한 볶음밥 레시피', 15, '밥, 야채, 계란', '#볶음밥', '서윤',

@@ -18,6 +18,12 @@ spring:
       s3:
         bucketName: recipia-file
 
+#  redis:
+#    host: 실제ip
+#    port: 6379
+#    password: redis
+#    database: 0   # 0번 데이터베이스 사용 (상용)
+
 
 feign:
   member_url: ${MEMBER_URL}

@@ -7,6 +7,9 @@ import com.recipia.recipe.domain.Comment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -43,5 +46,26 @@ class CommentQueryRepositoryTest extends TotalTestSupport {
         // then
         CommentEntity updatedComment = commentRepository.findById(commentId).orElseThrow();
         assertThat(updatedComment.getDelYn()).isEqualTo("Y");
+    }
+
+    @DisplayName("[happy] recipeId에 해당하는 댓글 목록을 페이징하여 조회한다.")
+    @Test
+    void getAllCommentListSuccess() {
+        // given
+        Long recipeId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+        String sortType = "new";
+
+        // when
+        Page<CommentEntity> result = sut.getCommentEntityList(recipeId, pageable, sortType);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isNotNull();
+        result.getContent().forEach(commentEntity -> {
+            assertThat(commentEntity.getId()).isNotNull();
+            assertThat(commentEntity.getCommentText()).isNotNull();
+            assertThat(commentEntity.getMemberId()).isNotNull();
+        });
     }
 }

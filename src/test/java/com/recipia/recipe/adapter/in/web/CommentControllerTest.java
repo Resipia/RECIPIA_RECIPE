@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentDeleteRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Comment;
@@ -16,9 +18,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("[통합] 댓글 컨트롤러 테스트")
@@ -88,6 +95,25 @@ class CommentControllerTest extends TotalTestSupport {
                 .andExpect(status().isOk())
                 .andDo(print());
 
+    }
+
+    @DisplayName("[happy] recipeId에 해당하는 댓글 목록 조회 요청 시 정상적으로 페이징된 데이터와 성공 응답을 반환한다.")
+    @Test
+    void getCommentListWithValidParams() throws Exception {
+        // given
+        CommentListResponseDto dto = CommentListResponseDto.of(1L, 1L, "nickname", "commentValue", "2021-01-22", false);
+        PagingResponseDto<CommentListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
+
+        when(commentUseCase.getCommentList(anyLong(), anyInt(), anyInt(), eq("new"))).thenReturn(pagingResponseDto);
+        //when & then
+        mockMvc.perform(get("/recipe/getAllCommentList")
+                        .param("recipeId", "1")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sortType", "new")
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.totalCount").value(pagingResponseDto.getTotalCount()));
     }
 
     // JSON 문자열 변환을 위한 유틸리티 메서드

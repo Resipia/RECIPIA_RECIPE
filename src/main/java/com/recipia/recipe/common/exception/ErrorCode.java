@@ -42,6 +42,9 @@ public enum ErrorCode {
     INVALID_INPUT(404, "INVALID_INPUT", "잘못된 입력입니다."),
     BOOKMARK_NOT_FOUND(404, "BOOKMARK_NOT_FOUND", "북마크를 찾을 수 없습니다."),
 
+    // 좋아요 관련 에러
+    NOT_FOUND_LIKE(404, "NOT_FOUND_LIKE", "좋아요가 존재하지 않습니다."),
+
     // 영양소 관련 에러
     NUTRITIONAL_INFO_NOT_FOUND(404, "NUTRITIONAL_INFO_NOT_FOUND", "업데이트 하려는 영양소 정보가 존재하지 않습니다."),
 
@@ -79,6 +82,7 @@ public enum ErrorCode {
     RECIPE_SERVICE_ERROR(500, "RECIPE_SERVICE_ERROR", "RECIPE 서비스 에러"),
     WRIGGLE_SERVICE_ERROR(500, "WRIGGLE_SERVICE_ERROR", "WRIGGLE 서비스 에러"),
     CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러"),
+    REDIS_RECIPE_ID_NOT_FOUND(404, "REDIS_RECIPE_ID_NOT_FOUND", "레디스 내부에서 레시피id를 찾을 수 없습니다.")
 
     ;
 

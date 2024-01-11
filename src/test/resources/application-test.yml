@@ -9,6 +9,12 @@ spring:
     username: sa
     password:
 
+  redis:
+    host: localhost
+    port: 6379
+    password: redis
+    database: 1   # 1번 데이터베이스 사용 (개발용)
+
   jpa:
     defer-datasource-initialization: true
     hibernate:

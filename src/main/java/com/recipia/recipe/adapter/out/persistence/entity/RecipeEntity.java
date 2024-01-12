@@ -40,9 +40,6 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
     @Column(name = "hashtag", nullable = false)
     private String hashtag;
 
-    @Column(name = "nickname", nullable = false)
-    private String nickname;
-
     @OneToMany(mappedBy = "recipeEntity", cascade = CascadeType.ALL, fetch=FetchType.LAZY)
     @ToString.Exclude
     private List<RecipeFileEntity> recipeFileList = new ArrayList<>();
@@ -55,7 +52,7 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
 
 
     @Builder
-    private RecipeEntity(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, List<RecipeFileEntity> recipeFileList, Integer likeCount, String delYn) {
+    private RecipeEntity(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, List<RecipeFileEntity> recipeFileList, Integer likeCount, String delYn) {
         this.id = id;
         this.memberId = memberId;
         this.recipeName = recipeName;
@@ -63,23 +60,22 @@ public class RecipeEntity extends UpdateDateTimeForEntity {
         this.timeTaken = timeTaken;
         this.ingredient = ingredient;
         this.hashtag = hashtag;
-        this.nickname = nickname;
         this.recipeFileList = recipeFileList;
         this.likeCount = likeCount;
         this.delYn = delYn;
     }
 
-    public static RecipeEntity of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Integer likeCount, String delYn) {
-        return new RecipeEntity(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, Collections.emptyList(), likeCount, delYn);
+    public static RecipeEntity of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, Integer likeCount, String delYn) {
+        return new RecipeEntity(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, Collections.emptyList(), likeCount, delYn);
     }
 
-    public static RecipeEntity of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Integer likeCount, String delYn) {
-        return new RecipeEntity(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, Collections.emptyList(), likeCount, delYn);
+    public static RecipeEntity of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, Integer likeCount, String delYn) {
+        return new RecipeEntity(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, Collections.emptyList(), likeCount, delYn);
     }
 
 
     public static RecipeEntity of(Long id) {
-        return new RecipeEntity(id, null, null, null, null, null, null, null, Collections.emptyList(), null, null);
+        return new RecipeEntity(id, null, null, null, null, null, null, Collections.emptyList(), null, null);
     }
 
     @Override

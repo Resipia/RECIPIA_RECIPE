@@ -42,21 +42,6 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     @Autowired
     private EntityManager entityManager;
 
-    @DisplayName("[happy] 닉네임이 성공적으로 업데이트된다.")
-    @Test
-    void updateRecipesNicknamesTest() {
-        //given
-        NicknameDto nicknameDto = new NicknameDto(1L, "새로운 닉네임");
-
-        //when
-        sut.updateRecipesNicknames(nicknameDto);
-
-        //then
-        RecipeEntity updatedRecipe = recipeRepository.findById(1L).orElseThrow();
-        assertThat(updatedRecipe.getNickname()).isEqualTo("새로운 닉네임");
-    }
-
-
     @DisplayName("[happy] 전체 레시피 목록을 페이징하여 조회한다.")
     @Test
     void getAllRecipeListTest() {

@@ -9,7 +9,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
-import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity;
@@ -24,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QNicknameEntity.nicknameEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeFileEntity.recipeFileEntity;
@@ -35,17 +35,6 @@ import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeLikeEntit
 public class RecipeQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    /**
-     * 유저가 변경한 닉네임을 레시피의 모든 엔티티에서도 변경시켜준다.
-     */
-    public Optional<Long> updateRecipesNicknames(NicknameDto nicknameDto) {
-        return Optional.of(queryFactory
-                .update(recipeEntity)
-                .set(recipeEntity.nickname, nicknameDto.nickname())
-                .where(recipeEntity.memberId.eq(nicknameDto.memberId()))
-                .execute());
-    }
 
     /**
      * [레시피 전체 목록 조회]
@@ -60,12 +49,18 @@ public class RecipeQueryRepository {
                 .from(bookmarkEntity)
                 .where(bookmarkEntity.memberId.eq(memberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
+        // 닉네임 엔티티에서 닉네임 조회 서브쿼리
+        JPQLQuery<String> nicknameSubQuery = JPAExpressions
+                .select(nicknameEntity.nickname)
+                .from(nicknameEntity)
+                .where(nicknameEntity.memberId.eq(memberId));
+
         // sort 이전 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
         JPAQuery<RecipeMainListResponseDto> query = queryFactory
                 .select(Projections.constructor(RecipeMainListResponseDto.class, //subCategory 주의가 필요 (일단 null로 들어가고 아래에서 데이터를 추가해줌)
                         recipeEntity.id,
                         recipeEntity.recipeName,
-                        recipeEntity.nickname,
+                        ExpressionUtils.as(nicknameSubQuery, "nickname"),
                         ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
                 ))
                 .from(recipeEntity)
@@ -123,6 +118,13 @@ public class RecipeQueryRepository {
                 .from(bookmarkEntity)
                 .where(bookmarkEntity.memberId.eq(currentMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
+        // 닉네임 엔티티에서 닉네임 조회 서브쿼리
+        JPQLQuery<String> nicknameSubQuery = JPAExpressions
+                .select(nicknameEntity.nickname)
+                .from(nicknameEntity)
+                .where(nicknameEntity.memberId.eq(currentMemberId));
+
+
         // todo: RecipeLikeEntity의 id값 보내기 (없으면 NuLL)
         JPQLQuery<Long> recipeLikeSubQuery = JPAExpressions
                 .select(recipeLikeEntity.id)
@@ -138,7 +140,7 @@ public class RecipeQueryRepository {
                         recipeEntity.timeTaken,
                         recipeEntity.ingredient,
                         recipeEntity.hashtag,
-                        recipeEntity.nickname,
+                        ExpressionUtils.as(nicknameSubQuery, "nickname"),
                         recipeEntity.delYn,
                         ExpressionUtils.as(bookmarkSubQuery, "isBookmarked"),
                         ExpressionUtils.as(recipeLikeSubQuery, "recipeLikeId")
@@ -152,15 +154,14 @@ public class RecipeQueryRepository {
      * 레시피 업데이트
      * 이름, 내용, 재료, 해시태그를 업데이트 한다.
      */
-    public Long updateRecipe(RecipeEntity recipeEntity) {
-        QRecipeEntity qRecipe = QRecipeEntity.recipeEntity;
+    public Long updateRecipe(RecipeEntity entity) {
 
-        return queryFactory.update(qRecipe)
-                .where(qRecipe.id.eq(recipeEntity.getId()))
-                .set(qRecipe.recipeName, recipeEntity.getRecipeName())
-                .set(qRecipe.recipeDesc, recipeEntity.getRecipeDesc())
-                .set(qRecipe.ingredient, recipeEntity.getIngredient())
-                .set(qRecipe.hashtag, recipeEntity.getHashtag())
+        return queryFactory.update(recipeEntity)
+                .where(recipeEntity.id.eq(entity.getId()))
+                .set(recipeEntity.recipeName, entity.getRecipeName())
+                .set(recipeEntity.recipeDesc, entity.getRecipeDesc())
+                .set(recipeEntity.ingredient, entity.getIngredient())
+                .set(recipeEntity.hashtag, entity.getHashtag())
                 .execute();
     }
 

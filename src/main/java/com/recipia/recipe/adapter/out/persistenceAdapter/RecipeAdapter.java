@@ -55,26 +55,6 @@ public class RecipeAdapter implements RecipePort {
 
 
     /**
-     * [UPDATE] - 레시피 테이블의 닉네임 컬럼 변경
-     * MSA 프로젝트라서 레시피 테이블에는 [유저의 닉네임] 컬럼이 존재한다.
-     * 유저가 닉네임을 변경하면 SNS로 이벤트가 발행되고 SQSListener가 동작해서 이 메서드가 호출된다.
-     * 여기서는 memberId로 유저가 작성한 모든 레시피를 조회한 다음 그 레시피 엔티티가 가진 유저의 닉네임 컬럼을 변경한다.
-     */
-    @Override
-    public Long updateRecipesNicknames(NicknameDto nicknameDto) {
-        long updateCount = querydslRepository.updateRecipesNicknames(nicknameDto)
-                .orElseThrow(() -> new RecipeApplicationException(ErrorCode.DB_ERROR));
-
-        // 만약 업데이트 개수가0이면 memberId가 존재하지 않기 때문
-        if (updateCount == 0) {
-            throw new RecipeApplicationException(ErrorCode.USER_NOT_FOUND);
-        }
-
-        log.info("Updated {} recipe(s) with new nickname '{}' for memberId {}", updateCount, nicknameDto.nickname(), nicknameDto.memberId());
-        return updateCount;
-    }
-
-    /**
      * [CREATE] - 레시피 저장
      * 저장에 성공하면 레시피 엔티티의 id값을 반환한다.
      */

@@ -17,8 +17,6 @@ import java.util.List;
  */
 public interface RecipePort {
 
-    Long updateRecipesNicknames(NicknameDto nicknameDto);
-
     Long createRecipe(Recipe recipe);
 
     Long createNutritionalInfo(Recipe recipe, Long savedRecipeId);

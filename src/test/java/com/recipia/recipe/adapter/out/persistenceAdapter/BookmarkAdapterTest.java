@@ -92,7 +92,7 @@ class BookmarkAdapterTest extends TotalTestSupport {
                 20,
                 "김치, 감자",
                 "#고구마",
-                "진안",
+                0,
                 "N"
         );
     }

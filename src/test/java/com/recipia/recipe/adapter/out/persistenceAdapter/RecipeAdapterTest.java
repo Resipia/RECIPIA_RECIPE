@@ -54,36 +54,6 @@ class RecipeAdapterTest extends TotalTestSupport {
     private RecipeFileRepository recipeFileRepository;
 
 
-    @DisplayName("[happy] 유저가 닉네임을 변경하면 레시피 엔티티 내부의 유저 닉네임도 변경된다.")
-    @Transactional
-    @Test
-    public void updateRecipesNicknames() {
-        //given
-        NicknameDto nicknameDto = NicknameDto.of(1L, "changedNickname");
-
-        //when
-        Long updatedCount = sut.updateRecipesNicknames(nicknameDto);
-
-        //then
-        String nickname = recipeRepository.findById(nicknameDto.memberId()).get().getNickname();
-        assertThat(nickname).isEqualTo(nicknameDto.nickname());
-        assertThat(updatedCount).isNotNull();
-        assertThat(updatedCount).isGreaterThan(0);
-    }
-
-    @DisplayName("[bad] 존재하지 않는 유저(memberId)가 닉네임 변경을 시도하면 예외가 발생한다.")
-    @Test
-    void updateRecipesNicknamesFail() {
-        //given
-        NicknameDto nicknameDto = NicknameDto.of(100L, "NotValidNickname");
-
-        //when & then
-        assertThatThrownBy(() -> sut.updateRecipesNicknames(nicknameDto))
-                .isInstanceOf(RecipeApplicationException.class)
-                .hasMessageContaining("유저를 찾을 수 없습니다.")
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
-    }
-
     @DisplayName("[happy] 유저가 레시피 저장에 성공하면 생성된 레시피의 id가 반환된다.")
     @Transactional
     @Test
@@ -453,6 +423,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 subCategory,
                 "진안",
                 "N",
+                0L,
+                0,
                 false
         );
     }
@@ -470,6 +442,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 subCategory,
                 "진안",
                 "N",
+                0L,
+                0,
                 false
         );
     }

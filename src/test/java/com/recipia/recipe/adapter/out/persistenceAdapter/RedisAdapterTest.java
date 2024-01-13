@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeViewCntEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -25,6 +26,9 @@ class RedisAdapterTest extends TotalTestSupport {
 
     @Autowired
     private RecipeRepository recipeRepository;
+
+    @Autowired
+    private RecipeViewCountRepository recipeViewCountRepository;
 
     @Autowired
     private RedisTemplate<String, Integer> redisTemplate;
@@ -76,7 +80,7 @@ class RedisAdapterTest extends TotalTestSupport {
     }
 
 
-    @DisplayName("[happy] 레시피의 좋아요 수를 정확히 가져온다.")
+    @DisplayName("[happy] 레디스에서 레시피의 좋아요 수를 정확히 가져온다.")
     @Test
     void testGetLikes() {
         Long recipeId = 1L;
@@ -100,7 +104,7 @@ class RedisAdapterTest extends TotalTestSupport {
         assertEquals(0, actualLikes);
     }
 
-    @DisplayName("[happy] 레시피의 조회수를 정확히 가져온다.")
+    @DisplayName("[happy] 레디스에서 레시피의 조회수를 정확히 가져온다.")
     @Test
     void testGetViews() {
         Long recipeId = 1L;
@@ -148,6 +152,40 @@ class RedisAdapterTest extends TotalTestSupport {
 
         Integer likes = valueOperations.get(key);
         assertEquals(1, likes);
+    }
+
+    @DisplayName("[happy] 누군가 레시피를 조회하면 레디스에서 조회수를 증가시킨다.")
+    @Test
+    void incrementViewCountHappy() {
+        //given
+        Long recipeId = 1L;
+        String key = "recipe:view:" + recipeId;
+        valueOperations.set(key, 0);
+
+        //when
+        sut.incrementViewCount(recipeId);
+
+        //then
+        Integer viewCounts = valueOperations.get(key);
+        Assertions.assertThat(viewCounts).isEqualTo(1);
+    }
+
+    @DisplayName("Redis에 저장되어 있던 조회수를 RDB로 동기화시킨다.")
+    @Test
+    void test() {
+        //given
+        Long recipeId = 1L;
+        String key = "recipe:view:" + recipeId;
+        valueOperations.set(key, 4);
+
+        //when
+        sut.syncViewCountWithDatabase();
+
+        //then
+        RecipeViewCntEntity entity = recipeViewCountRepository.findByRecipeEntityId(recipeId).orElseThrow();
+        Integer viewCount = entity.getViewCount();
+
+        Assertions.assertThat(viewCount).isEqualTo(4);
     }
 
 }

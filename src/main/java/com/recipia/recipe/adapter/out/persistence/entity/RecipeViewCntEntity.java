@@ -24,21 +24,21 @@ public class RecipeViewCntEntity extends UpdateDateTimeForEntity {
     private RecipeEntity recipeEntity;
 
     @Column(name = "recipe_view_cnt_value", nullable = false)
-    private Long recipeViewCntValue;
+    private Integer viewCount;
 
     @Builder
-    private RecipeViewCntEntity(Long id, RecipeEntity recipeEntity, Long recipeViewCntValue) {
+    private RecipeViewCntEntity(Long id, RecipeEntity recipeEntity, Integer viewCount) {
         this.id = id;
         this.recipeEntity = recipeEntity;
-        this.recipeViewCntValue = recipeViewCntValue;
+        this.viewCount = viewCount;
     }
 
-    public static RecipeViewCntEntity of(Long id, RecipeEntity recipeEntity, Long recipeViewCntValue) {
-        return new RecipeViewCntEntity(id, recipeEntity, recipeViewCntValue);
+    public static RecipeViewCntEntity of(Long id, RecipeEntity recipeEntity, Integer viewCount) {
+        return new RecipeViewCntEntity(id, recipeEntity, viewCount);
     }
 
-    public static RecipeViewCntEntity of(RecipeEntity recipeEntity, Long recipeViewCntValue) {
-        return new RecipeViewCntEntity(null, recipeEntity, recipeViewCntValue);
+    public static RecipeViewCntEntity of(RecipeEntity recipeEntity, Integer viewCount) {
+        return new RecipeViewCntEntity(null, recipeEntity, viewCount);
     }
 
     @Override
@@ -53,4 +53,10 @@ public class RecipeViewCntEntity extends UpdateDateTimeForEntity {
         return Objects.hash(getId());
     }
 
+    /**
+     * 조회수 변경감지에 사용
+     */
+    public void changeViewCount(Integer viewCount) {
+        this.viewCount = viewCount;
+    }
 }

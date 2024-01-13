@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class RecipeLikeService implements RecipeLikeUseCase {
+public class RecipeLikeAndViewService implements RecipeLikeUseCase {
 
     private final RedisPort redisPort;
     private final RecipeLikePort recipeLikePort;
@@ -41,7 +41,7 @@ public class RecipeLikeService implements RecipeLikeUseCase {
     }
 
     // 매일 자정 스케쥴러로 RDB랑 레디스 데이터 동기화하기
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void syncLikesAndViewsWithDatabase() {
         redisPort.syncLikesAndViewsWithDatabase();
     }
@@ -56,5 +56,13 @@ public class RecipeLikeService implements RecipeLikeUseCase {
         return redisPort.getViews(recipeId);
     }
 
+
+    /**
+     * 매일 자정 스케쥴러로 RDB의 조회수 테이블에 레디스 데이터 동기화하기
+     */
+    @Scheduled(cron = "0 0 * * * *")
+    public void syncViewCountWithDatabase() {
+        redisPort.syncViewCountWithDatabase();
+    }
 
 }

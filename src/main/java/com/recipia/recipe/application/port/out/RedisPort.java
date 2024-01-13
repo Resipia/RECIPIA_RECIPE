@@ -11,4 +11,8 @@ public interface RedisPort {
     void incrementLikeCount(Long recipeId);
 
     void decreaseLikeCount(Long recipeId);
+
+    void incrementViewCount(Long recipeId);
+
+    void syncViewCountWithDatabase();
 }

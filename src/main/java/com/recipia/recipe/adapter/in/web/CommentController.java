@@ -3,18 +3,21 @@ package com.recipia.recipe.adapter.in.web;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentDeleteRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.SubCommentRegistRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
+import com.recipia.recipe.application.port.in.SubCommentUseCase;
 import com.recipia.recipe.domain.converter.CommentConverter;
+import com.recipia.recipe.domain.converter.SubCommentConverter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 댓글 컨트롤러
+ * 댓글/대댓글 컨트롤러
  */
 @RequestMapping("/recipe")
 @RequiredArgsConstructor
@@ -22,7 +25,9 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentUseCase commentUseCase;
+    private final SubCommentUseCase subCommentUseCase;
     private final CommentConverter commentConverter;
+    private final SubCommentConverter subCommentConverter;
 
     /**
      * 댓글 등록
@@ -71,5 +76,15 @@ public class CommentController {
         return ResponseEntity.ok(commentList);
     }
 
+    /**
+     * 대댓글 등록
+     */
+    @PostMapping("/regist/subComment")
+    public ResponseEntity<ResponseDto<Long>> registSubComment(@Valid @RequestBody SubCommentRegistRequestDto dto) {
+        Long createdSubCommentId = subCommentUseCase.createSubComment(subCommentConverter.registRequestDtoToDomain(dto));
+        return ResponseEntity.ok(
+                ResponseDto.success(createdSubCommentId)
+        );
+    }
 
 }

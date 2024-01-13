@@ -86,7 +86,8 @@ public enum ErrorCode {
     RECIPE_SERVICE_ERROR(500, "RECIPE_SERVICE_ERROR", "RECIPE 서비스 에러"),
     WRIGGLE_SERVICE_ERROR(500, "WRIGGLE_SERVICE_ERROR", "WRIGGLE 서비스 에러"),
     CHAT_SERVICE_ERROR(500, "CHAT_SERVICE_ERROR", "CHAT 서비스 에러"),
-    REDIS_RECIPE_ID_NOT_FOUND(404, "REDIS_RECIPE_ID_NOT_FOUND", "레디스 내부에서 레시피id를 찾을 수 없습니다.")
+    REDIS_RECIPE_ID_NOT_FOUND(404, "REDIS_RECIPE_ID_NOT_FOUND", "레디스 내부에서 레시피id를 찾을 수 없습니다."),
+    REDIS_ERROR_OCCUR(404, "REDIS_ERROR_OCCUR", "레디스에서 오류가 발생했습니다.")
 
     ;
 

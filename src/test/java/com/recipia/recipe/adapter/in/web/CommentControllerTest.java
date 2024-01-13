@@ -4,12 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentDeleteRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.SubCommentRegistRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
+import com.recipia.recipe.application.port.in.SubCommentUseCase;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Comment;
+import com.recipia.recipe.domain.SubComment;
 import com.recipia.recipe.domain.converter.CommentConverter;
+import com.recipia.recipe.domain.converter.SubCommentConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +42,10 @@ class CommentControllerTest extends TotalTestSupport {
     private CommentConverter commentConverter;
     @MockBean
     private CommentUseCase commentUseCase;
+    @MockBean
+    private SubCommentConverter subCommentConverter;
+    @MockBean
+    private SubCommentUseCase subCommentUseCase;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @DisplayName("[happy] 유저가 댓글 등록 요청 시 정상적으로 저장되고 성공 응답을 반환한다.")
@@ -114,6 +122,23 @@ class CommentControllerTest extends TotalTestSupport {
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").exists())
                 .andExpect(jsonPath("$.totalCount").value(pagingResponseDto.getTotalCount()));
+    }
+
+    @DisplayName("[happy] 유저가 대댓글 등록 요청 시 정상적으로 저장되고 성공 응답을 반환한다.")
+    @Test
+    void ifUserCreateSubCommentShouldComplete() throws Exception {
+        // given
+        SubCommentRegistRequestDto dto = SubCommentRegistRequestDto.of(1L, "subValue");
+        SubComment domain = SubComment.of(dto.getParentCommentId(), 1L, dto.getSubCommentText(), "N");
+        when(subCommentConverter.registRequestDtoToDomain(dto)).thenReturn(domain);
+        when(subCommentUseCase.createSubComment(domain)).thenReturn(1L);
+
+        //when & then
+        mockMvc.perform(post("/recipe/regist/subComment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(dto)))
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     // JSON 문자열 변환을 위한 유틸리티 메서드

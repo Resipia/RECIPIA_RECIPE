@@ -6,6 +6,7 @@ import com.recipia.recipe.application.port.out.CommentPort;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.domain.Comment;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.SubComment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("[단위] 댓글 서비스 테스트")
+@DisplayName("[단위] 댓글/대댓글 서비스 테스트")
 class CommentServiceTest {
 
     @InjectMocks
@@ -109,4 +110,22 @@ class CommentServiceTest {
         assertThat(result.getContent()).hasSize(mockCommentList.size());
         assertThat(result.getContent()).containsExactlyElementsOf(mockCommentList);
     }
+
+    @DisplayName("[happy] parentCommentId, memberId, subCommentText가 정상적으로 들어오면 대댓글 저장에 성공한다.")
+    @Test
+    void saveSubCommentSuccess() {
+        // given
+        SubComment subComment = SubComment.of(1L, 1L, "subValue", "N");
+        when(commentPort.checkIsCommentExist(subComment.getParentCommentId())).thenReturn(true);
+        when(commentPort.createSubComment(subComment)).thenReturn(1L);
+        when(sut.createSubComment(subComment)).thenReturn(1L);
+
+
+        // when
+        Long savedSubCommentId = sut.createSubComment(subComment);
+        // then
+        assertEquals(savedSubCommentId, 1L);
+
+    }
+
 }

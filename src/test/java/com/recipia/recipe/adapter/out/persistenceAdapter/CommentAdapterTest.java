@@ -2,8 +2,10 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.SubCommentEntity;
 import com.recipia.recipe.config.TotalTestSupport;
 import com.recipia.recipe.domain.Comment;
+import com.recipia.recipe.domain.SubComment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ class CommentAdapterTest extends TotalTestSupport {
     private CommentAdapter commentAdapter;
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private SubCommentRepository subCommentRepository;
 
     @DisplayName("[happy] 댓글 저장에 성공하면 저장된 comment id값을 반환한다.")
     @Test
@@ -53,7 +57,7 @@ class CommentAdapterTest extends TotalTestSupport {
 
     @DisplayName("[happy] commentId, memberId, delYn에 해당하는 댓글이 존재할때 true를 반환한다.")
     @Test
-    void whenCommentExistReturnTrue() {
+    void whenMyCommentExistReturnTrue() {
         // given
         Comment comment = Comment.of(1L, null, 1L, "update-comment", "N");
         // when
@@ -102,6 +106,32 @@ class CommentAdapterTest extends TotalTestSupport {
         // isUpdated 필드 검증
         // 이 부분은 실제 데이터에 따라 달라질 수 있음
         assertThat(firstComment.isUpdated()).isFalse();
+    }
+
+    @DisplayName("[happy] commentId, delYn에 해당하는 댓글이 존재할때 true를 반환한다.")
+    @Test
+    void whenCommentExistReturnTrue() {
+        // given
+        Long parentCommentId = 1L;
+        // when
+        boolean isCommentExist = commentAdapter.checkIsCommentExist(parentCommentId);
+        // then
+        assertTrue(isCommentExist);
+    }
+
+
+    @DisplayName("[happy] 대댓글 저장에 성공하면 저장된 subComment id값을 반환한다.")
+    @Test
+    void createSubCommentSuccess() {
+        // given
+        SubComment subComment = SubComment.of(1L, 1L, "subValue", "N");
+        // when
+        Long createdSubCommentId = commentAdapter.createSubComment(subComment);
+
+        // then
+        SubCommentEntity savedSubCommentId = subCommentRepository.findById(createdSubCommentId).get();
+        assertThat(createdSubCommentId).isNotNull();
+        assertThat(createdSubCommentId).isEqualTo(savedSubCommentId.getId());
     }
 
 }

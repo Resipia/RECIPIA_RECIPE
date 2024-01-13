@@ -75,8 +75,8 @@ class RedisAdapterTest extends TotalTestSupport {
         // 예외가 발생하는지 검증
         Assertions.assertThatThrownBy(() -> sut.syncLikesAndViewsWithDatabase())
                 .isInstanceOf(RecipeApplicationException.class)
-                .hasMessageContaining("레디스 내부에서 레시피id를 찾을 수 없습니다.")
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.REDIS_RECIPE_ID_NOT_FOUND);
+                .hasMessageContaining("레디스에서 오류가 발생했습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.REDIS_ERROR_OCCUR);
     }
 
 

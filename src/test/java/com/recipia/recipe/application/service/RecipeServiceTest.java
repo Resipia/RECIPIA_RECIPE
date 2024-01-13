@@ -3,6 +3,7 @@ package com.recipia.recipe.application.service;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.out.RecipePort;
+import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -45,6 +46,9 @@ class RecipeServiceTest {
 
     @Mock
     private RecipePort recipePort;
+
+    @Mock
+    private RedisPort redisPort;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;

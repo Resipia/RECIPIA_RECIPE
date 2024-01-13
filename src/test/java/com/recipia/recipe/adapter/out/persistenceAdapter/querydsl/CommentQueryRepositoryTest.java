@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
+import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.CommentRepository;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -57,15 +58,16 @@ class CommentQueryRepositoryTest extends TotalTestSupport {
         String sortType = "new";
 
         // when
-        Page<CommentEntity> result = sut.getCommentEntityList(recipeId, pageable, sortType);
+        Page<CommentListResponseDto> result = sut.getCommentDtoList(recipeId, pageable, sortType);
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).isNotNull();
-        result.getContent().forEach(commentEntity -> {
-            assertThat(commentEntity.getId()).isNotNull();
-            assertThat(commentEntity.getCommentText()).isNotNull();
-            assertThat(commentEntity.getMemberId()).isNotNull();
+        result.getContent().forEach(commentDto -> {
+            assertThat(commentDto.getId()).isNotNull();
+            assertThat(commentDto.getCommentValue()).isNotNull();
+            assertThat(commentDto.getMemberId()).isNotNull();
+            assertThat(commentDto.getNickname()).isNotNull();
         });
     }
 }

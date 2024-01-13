@@ -92,6 +92,7 @@ class CommentAdapterTest extends TotalTestSupport {
         // 결과의 일부를 검증 (첫 번째 댓글의 특정 필드)
         CommentListResponseDto firstComment = result.getContent().get(0);
         assertThat(firstComment.getId()).isNotNull();
+        assertThat(firstComment.getNickname()).isNotNull();
         assertThat(firstComment.getCommentValue()).isNotEmpty();
 
         // createDate 형식 확인

@@ -1,8 +1,13 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
+import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.domain.Comment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QCommentEntity.commentEntity;
-import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QNicknameEntity.nicknameEntity;
 
 @RequiredArgsConstructor
 @Repository
@@ -45,23 +50,37 @@ public class CommentQueryRepository {
     }
 
     /**
-     * recipeId에 해당하는 (삭제되지 않은) 댓글을 sortType으로 정렬해 Comment Entity 리스트를 반환한다.
+     * recipeId에 해당하는 (삭제되지 않은) 댓글을 sortType으로 정렬해 CommentListResponseDto 리스트를 반환한다.
      */
-    public Page<CommentEntity> getCommentEntityList(Long recipeId, Pageable pageable, String sortType) {
+    public Page<CommentListResponseDto> getCommentDtoList(Long recipeId, Pageable pageable, String sortType) {
+
+        // 닉네임 엔티티에서 닉네임 조회 서브쿼리
+        JPQLQuery<String> nicknameSubQuery = JPAExpressions
+                .select(nicknameEntity.nickname)
+                .from(nicknameEntity)
+                .where(nicknameEntity.memberId.eq(commentEntity.memberId));
+
         // 기본 쿼리 설정
-        JPAQuery<CommentEntity> query = queryFactory
-                .selectFrom(commentEntity)
+        JPAQuery<CommentListResponseDto> query = queryFactory
+                .select(Projections.constructor(
+                        CommentListResponseDto.class,
+                        commentEntity.id,
+                        commentEntity.memberId,
+                        ExpressionUtils.as(nicknameSubQuery, "nickname"),
+                        commentEntity.commentText,
+                        Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", commentEntity.createDateTime),
+                        commentEntity.createDateTime.ne(commentEntity.updateDateTime)
+                ))
+                .from(commentEntity)
                 .where(commentEntity.recipeEntity.id.eq(recipeId), commentEntity.delYn.eq("N"));
 
-        // 정렬 조건 적용
-        query = switch (sortType) {
-            case "new" -> query.orderBy(commentEntity.createDateTime.desc());
-            case "old" -> query.orderBy(commentEntity.createDateTime.asc());
-            default -> query.orderBy(recipeEntity.createDateTime.desc()); // 기본 정렬 조건
-        };
 
-        // sort 적용 이후 메인 쿼리 실행
-        List<CommentEntity> entityList = query
+        // 정렬 조건 적용
+        query = applySort(query, sortType);
+
+
+        // 쿼리 실행 및 결과 페이징
+        List<CommentListResponseDto> dtoList = query
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -75,6 +94,15 @@ public class CommentQueryRepository {
                 .orElse(0L);
 
 
-        return new PageImpl<>(entityList, pageable, totalCount);
+        return new PageImpl<>(dtoList, pageable, totalCount);
     }
+
+    private JPAQuery<CommentListResponseDto> applySort(JPAQuery<CommentListResponseDto> query, String sortType) {
+        return switch (sortType) {
+            case "new" -> query.orderBy(commentEntity.createDateTime.desc());
+            case "old" -> query.orderBy(commentEntity.createDateTime.asc());
+            default -> query.orderBy(commentEntity.createDateTime.desc());
+        };
+    }
+
 }

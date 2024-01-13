@@ -29,7 +29,6 @@ public class CommentController {
      */
     @PostMapping("/regist/comment")
     public ResponseEntity<ResponseDto<Long>> registComment(@Valid @RequestBody CommentRegistRequestDto requestDto) {
-        // todo: member nickname까지 저장하기
         Long createdCommentId = commentUseCase.createComment(commentConverter.registRequestDtoToDomain(requestDto));
         return ResponseEntity.ok(
                 ResponseDto.success(createdCommentId)

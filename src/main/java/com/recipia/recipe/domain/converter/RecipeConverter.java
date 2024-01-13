@@ -74,7 +74,6 @@ public class RecipeConverter {
                 domain.getTimeTaken(),
                 domain.getIngredient(),
                 domain.getHashtag(),
-                domain.getLikeCount(),
                 domain.getDelYn()
         );
     }

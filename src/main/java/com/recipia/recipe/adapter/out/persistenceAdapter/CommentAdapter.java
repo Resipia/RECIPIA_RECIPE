@@ -2,10 +2,13 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.SubCommentEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.CommentQueryRepository;
 import com.recipia.recipe.application.port.out.CommentPort;
 import com.recipia.recipe.domain.Comment;
+import com.recipia.recipe.domain.SubComment;
 import com.recipia.recipe.domain.converter.CommentConverter;
+import com.recipia.recipe.domain.converter.SubCommentConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +25,8 @@ public class CommentAdapter implements CommentPort {
     private final CommentRepository commentRepository;
     private final CommentConverter commentConverter;
     private final CommentQueryRepository commentQueryRepository;
+    private final SubCommentRepository subCommentRepository;
+    private final SubCommentConverter subCommentConverter;
 
     /**
      * [CREATE] 댓글 저장
@@ -69,6 +74,26 @@ public class CommentAdapter implements CommentPort {
     public Page<CommentListResponseDto> getCommentList(Long recipeId, Pageable pageable, String sortType) {
         Page<CommentListResponseDto> commentDtoList = commentQueryRepository.getCommentDtoList(recipeId, pageable, sortType);
         return commentDtoList;
+    }
+
+    /**
+     * [READ] commentId, del_yn으로 댓글 검색
+     * 조건에 해당하는 댓글을 검색해서 댓글이 존재하면 true, 존재하지 않으면 false를 반환한다.
+     */
+    @Override
+    public boolean checkIsCommentExist(Long parentCommentId) {
+        Optional<CommentEntity> commentEntity = commentRepository.findByIdAndDelYn(parentCommentId, "N");
+        return commentEntity.isPresent();
+    }
+
+    /**
+     * [CREATE] 대댓글 저장
+     * 저장에 성공하면 생성된 대댓글의 pk값을 반환한다.
+     */
+    @Override
+    public Long createSubComment(SubComment subComment) {
+        SubCommentEntity entity = subCommentConverter.domainToEntity(subComment);
+        return subCommentRepository.save(entity).getId();
     }
 
 }

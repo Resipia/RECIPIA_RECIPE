@@ -16,7 +16,7 @@ public class CommentListResponseDto {
     private String createDate;      // 댓글 작성 날짜
     private boolean isUpdated;      // 댓글 수정 여부
 
-    private CommentListResponseDto(Long id, Long memberId, String nickname, String commentValue, String createDate, boolean isUpdated) {
+    public CommentListResponseDto(Long id, Long memberId, String nickname, String commentValue, String createDate, boolean isUpdated) {
         this.id = id;
         this.memberId = memberId;
         this.nickname = nickname;

@@ -9,14 +9,10 @@ import com.recipia.recipe.domain.converter.CommentConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -71,20 +67,8 @@ public class CommentAdapter implements CommentPort {
      */
     @Override
     public Page<CommentListResponseDto> getCommentList(Long recipeId, Pageable pageable, String sortType) {
-        Page<CommentEntity> commentEntities = commentQueryRepository.getCommentEntityList(recipeId, pageable, sortType);
-
-        List<CommentListResponseDto> dtoList = commentEntities.getContent().stream()
-                .map(entity -> CommentListResponseDto.of(
-                        entity.getId(),
-                        entity.getMemberId(),
-                        null,
-                        entity.getCommentText(),
-                        entity.getCreateDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-                        !entity.getCreateDateTime().isEqual(entity.getUpdateDateTime())
-                ))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(dtoList, pageable, commentEntities.getTotalElements());
+        Page<CommentListResponseDto> commentDtoList = commentQueryRepository.getCommentDtoList(recipeId, pageable, sortType);
+        return commentDtoList;
     }
 
 }

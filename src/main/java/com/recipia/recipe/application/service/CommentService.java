@@ -3,12 +3,14 @@ package com.recipia.recipe.application.service;
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
+import com.recipia.recipe.application.port.in.SubCommentUseCase;
 import com.recipia.recipe.application.port.out.CommentPort;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.domain.Comment;
 import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.SubComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,12 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 댓글 서비스 클래스
+ * 댓글/대댓글 서비스 클래스
  */
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
-public class CommentService implements CommentUseCase {
+public class CommentService implements CommentUseCase, SubCommentUseCase {
 
     private final CommentPort commentPort;
     private final RecipePort recipePort;
@@ -103,6 +105,18 @@ public class CommentService implements CommentUseCase {
     }
 
     /**
+     * [CREATE] 대댓글 등록을 담당하는 메서드
+     * 1단계 - 대댓글을 등록하려는 댓글이 존재하는지 검증한다.
+     * 2단계 - 상위 댓글이 존재한다면 대댓글을 등록한다.
+     */
+    @Override
+    public Long createSubComment(SubComment subComment) {
+        // 1단계 - 삭제되지 않은 댓글인지 검증
+        checkIsCommentExist(subComment.getParentCommentId());
+        return commentPort.createSubComment(subComment);
+    }
+
+    /**
      * [READ] 레시피가 존재하는지 확인하는 메서드
      * recipeId로 레시피가 존재하는지, 삭제되었는지 검증하는 내부 메서드
      */
@@ -123,6 +137,19 @@ public class CommentService implements CommentUseCase {
         boolean isCommentExistAndMine = commentPort.checkIsCommentExistAndMine(comment);
         if(!isCommentExistAndMine) {
             throw new RecipeApplicationException(ErrorCode.COMMENT_IS_NOT_MINE);
+        }
+        return true;
+    }
+
+
+    /**
+     * [READ] 삭제된 댓글이 아닌지 검증
+     * commentId로 댓글이 존재하는지 검증하는 내부 메서드
+     */
+    public boolean checkIsCommentExist(Long parentCommentId) {
+        boolean isCommentExist = commentPort.checkIsCommentExist(parentCommentId);
+        if(!isCommentExist) {
+            throw new RecipeApplicationException(ErrorCode.COMMENT_NOT_FOUND);
         }
         return true;
     }

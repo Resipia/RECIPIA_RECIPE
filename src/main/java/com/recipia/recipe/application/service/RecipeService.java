@@ -7,13 +7,11 @@ import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
 import com.recipia.recipe.application.port.out.RecipePort;
+import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
-import com.recipia.recipe.domain.NutritionalInfo;
-import com.recipia.recipe.domain.Recipe;
-import com.recipia.recipe.domain.RecipeFile;
-import com.recipia.recipe.domain.SubCategory;
+import com.recipia.recipe.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,6 +33,7 @@ import java.util.stream.IntStream;
 public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, UpdateRecipeUseCase, DeleteRecipeUseCase {
 
     private final RecipePort recipePort;
+    private final RedisPort redisPort;
     private final ApplicationEventPublisher eventPublisher;
     private final ImageS3Service imageS3Service;
 
@@ -115,6 +114,9 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         // 4. 이미지(파일)을 받아와서 도메인에 세팅한다.
         List<RecipeFile> recipeFileList = recipePort.getRecipeFile(recipeId);
         recipe.setRecipeFileList(recipeFileList);
+
+        // 조회수 증가 로직 호출 (트랜잭션에 포함되지 않음)
+        redisPort.incrementViewCount(recipeId);
 
         return recipe;
     }

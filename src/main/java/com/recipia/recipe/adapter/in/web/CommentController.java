@@ -4,6 +4,7 @@ import com.recipia.recipe.adapter.in.web.dto.request.*;
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
 import com.recipia.recipe.application.port.in.SubCommentUseCase;
 import com.recipia.recipe.domain.converter.CommentConverter;
@@ -104,6 +105,19 @@ public class CommentController {
         return ResponseEntity.ok(
                 ResponseDto.success()
         );
+    }
+
+    /**
+     * 부모 댓글에서 대댓글에 해당하는 대댓글 목록 조회
+     */
+    @GetMapping("/getAllSubCommentList")
+    public ResponseEntity<PagingResponseDto<SubCommentListResponseDto>> getAllSubCommentList(
+            @RequestParam(value = "parentCommentId") Long parentCommentId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        PagingResponseDto<SubCommentListResponseDto> commentList = subCommentUseCase.getSubCommentList(parentCommentId, page, size);
+        return ResponseEntity.ok(commentList);
     }
 
 }

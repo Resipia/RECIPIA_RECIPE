@@ -30,11 +30,12 @@ public class SubComment {
         return new SubComment(id, parentCommentId, memberId, subCommentText, delYn);
     }
 
-    /**
-     * 대댓글 요청용 도메인 생성
-     */
     public static SubComment of(Long parentCommentId, Long memberId, String subCommentText, String delYn) {
         return new SubComment(null, parentCommentId, memberId, subCommentText, delYn);
+    }
+
+    public static SubComment of(Long id, Long parentCommentId, Long memberId, String delYn) {
+        return new SubComment(id, parentCommentId, memberId, null, delYn);
     }
 
 }

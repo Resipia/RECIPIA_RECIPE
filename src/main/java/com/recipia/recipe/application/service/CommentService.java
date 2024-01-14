@@ -63,8 +63,6 @@ public class CommentService implements CommentUseCase, SubCommentUseCase {
         return commentPort.updateComment(comment);
     }
 
-
-
     /**
      * [DELETE] 댓글 삭제를 담당하는 메서드
      * 1단계 - 댓글을 삭제하려는 레시피가 삭제되지 않은 레시피인지 검증한다. (recipeId, delYn으로 검색)
@@ -125,7 +123,7 @@ public class CommentService implements CommentUseCase, SubCommentUseCase {
      */
     @Transactional
     @Override
-    public Long updateSubcomment(SubComment subComment) {
+    public Long updateSubComment(SubComment subComment) {
         // 1단계 - 삭제되지 않은 부모 댓글인지 거증
         checkIsCommentExist(subComment.getParentCommentId());
 
@@ -134,6 +132,24 @@ public class CommentService implements CommentUseCase, SubCommentUseCase {
 
         // 3단계 - 대댓글 수정
         return commentPort.updateSubComment(subComment);
+    }
+
+    /**
+     * [DELETE] 대댓글 삭제를 담당하는 메서드
+     * 1단계 - 삭제하려는 대댓글의 상위 댓글이 삭제되지 않은 댓글인지 검증한다. (parentCommentId, delYn으로 검색)
+     * 2단계 - 삭제 요청한 대댓글이 삭제되지 않은 대댓글인지, 그리고 내가 원작자인지 검증한다. (subCommentId, memberId, delYn으로 검색)
+     * 3단계 - 위 단계를 전부 패스했다면 대댓글을 삭제한다.
+     */
+    @Override
+    public Long deleteSubComment(SubComment subComment) {
+        // 1단계 - 삭제되지 않은 부모 댓글인지 검증
+        checkIsCommentExist(subComment.getParentCommentId());
+
+        // 2단계 - 삭제된 대댓글이 아니고 내가 작성한 대댓글이 맞는지 검증
+        checkIsSubCommentExistAndMine(subComment);
+
+        // 3단계 - 대댓글 삭제
+        return commentPort.softDeleteSubComment(subComment);
     }
 
     /**

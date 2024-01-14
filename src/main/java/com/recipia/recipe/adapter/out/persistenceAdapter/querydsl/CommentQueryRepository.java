@@ -50,7 +50,7 @@ public class CommentQueryRepository {
     }
 
     /**
-     * recipeId에 해당하는 (삭제되지 않은) 댓글을 sortType으로 정렬해 CommentListResponseDto 리스트를 반환한다.
+     * [READ] recipeId에 해당하는 (삭제되지 않은) 댓글을 sortType으로 정렬해 CommentListResponseDto 리스트를 반환한다.
      */
     public Page<CommentListResponseDto> getCommentDtoList(Long recipeId, Pageable pageable, String sortType) {
 

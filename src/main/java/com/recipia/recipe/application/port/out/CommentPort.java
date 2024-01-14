@@ -1,6 +1,7 @@
 package com.recipia.recipe.application.port.out;
 
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.domain.Comment;
 import com.recipia.recipe.domain.SubComment;
 import org.springframework.data.domain.Page;
@@ -26,4 +27,6 @@ public interface CommentPort {
     Long updateSubComment(SubComment subComment);
 
     Long softDeleteSubComment(SubComment subComment);
+
+    Page<SubCommentListResponseDto> getSubCommentList(Long parentCommentId, Pageable pageable);
 }

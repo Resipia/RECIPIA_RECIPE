@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.SubCommentEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.CommentQueryRepository;
@@ -125,6 +126,16 @@ public class CommentAdapter implements CommentPort {
     @Override
     public Long softDeleteSubComment(SubComment subComment) {
         return subCommentQueryRepository.softDeleteSubComment(subComment.getId());
+    }
+
+    /**
+     * [READ] parentCommentId 해당하는 대댓글 목록 조회
+     * querydsl을 사용해서 대댓글 목록 조회 최적화 (목록, count)
+     */
+    @Override
+    public Page<SubCommentListResponseDto> getSubCommentList(Long parentCommentId, Pageable pageable) {
+        Page<SubCommentListResponseDto> subCommentDtoList = subCommentQueryRepository.getSubCommentDtoList(parentCommentId, pageable);
+        return subCommentDtoList;
     }
 
 }

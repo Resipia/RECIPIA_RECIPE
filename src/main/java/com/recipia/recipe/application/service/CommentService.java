@@ -109,11 +109,31 @@ public class CommentService implements CommentUseCase, SubCommentUseCase {
      * 1단계 - 대댓글을 등록하려는 댓글이 존재하는지 검증한다.
      * 2단계 - 상위 댓글이 존재한다면 대댓글을 등록한다.
      */
+    @Transactional
     @Override
     public Long createSubComment(SubComment subComment) {
         // 1단계 - 삭제되지 않은 댓글인지 검증
         checkIsCommentExist(subComment.getParentCommentId());
         return commentPort.createSubComment(subComment);
+    }
+
+    /**
+     * [UPDATE] 대댓글 수정을 담당하는 메서드
+     * 1단계 - 대댓글을 달려는 댓글이 삭제되지 않은 댓글인지 검증한다. (commentId, delYn으로 검색)
+     * 2단계 - 수정을 요청한 대댓글이 삭제되지 않은 대댓글인지, 그리고 내가 원작자인지 검증한다. (subCommentId, memberId, delYn으로 검색)
+     * 3단계 - 위 단계를 전부 패스했다면 대댓글 내용을 수정한다.
+     */
+    @Transactional
+    @Override
+    public Long updateSubcomment(SubComment subComment) {
+        // 1단계 - 삭제되지 않은 부모 댓글인지 거증
+        checkIsCommentExist(subComment.getParentCommentId());
+
+        // 2단계 - 삭제된 대댓글이 아니고 내가 작성한 대댓글이 맞는지 검증
+        checkIsSubCommentExistAndMine(subComment);
+
+        // 3단계 - 대댓글 수정
+        return commentPort.updateSubComment(subComment);
     }
 
     /**
@@ -154,5 +174,16 @@ public class CommentService implements CommentUseCase, SubCommentUseCase {
         return true;
     }
 
+    /**
+     * [READ] 삭제된 대댓글이 아니고 내가 작성한 대댓글이 맞는지 검증
+     * subCommentId로 댓글이 존재하고, memberId로 내가 원작자인지 검증하는 내부 메서드
+     */
+    public boolean checkIsSubCommentExistAndMine(SubComment subComment) {
+        boolean isSubCommentExistAndMine = commentPort.checkIsSubCommentExistAndMine(subComment);
+        if(!isSubCommentExistAndMine) {
+            throw new RecipeApplicationException(ErrorCode.SUB_COMMENT_IS_NOT_MINE);
+        }
+        return true;
+    }
 
 }

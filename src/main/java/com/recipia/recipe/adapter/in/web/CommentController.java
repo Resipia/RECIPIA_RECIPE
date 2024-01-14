@@ -89,7 +89,18 @@ public class CommentController {
      */
     @PostMapping("/update/subComment")
     public ResponseEntity<ResponseDto<Void>> updateSubComment(@Valid @RequestBody SubCommentUpdateRequestDto dto) {
-        subCommentUseCase.updateSubcomment(subCommentConverter.updateRequestDtoToDomain(dto));
+        subCommentUseCase.updateSubComment(subCommentConverter.updateRequestDtoToDomain(dto));
+        return ResponseEntity.ok(
+                ResponseDto.success()
+        );
+    }
+
+    /**
+     * 대댓글 삭제
+     */
+    @PostMapping("/delete/subComment")
+    public ResponseEntity<ResponseDto<Void>> softDeleteSubComment(@Valid @RequestBody SubCommentDeleteRequestDto requestDto) {
+        subCommentUseCase.deleteSubComment(subCommentConverter.deleteRequestDtoToDomain(requestDto));
         return ResponseEntity.ok(
                 ResponseDto.success()
         );

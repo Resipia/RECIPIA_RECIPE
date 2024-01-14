@@ -1,10 +1,7 @@
 package com.recipia.recipe.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.recipia.recipe.adapter.in.web.dto.request.CommentDeleteRequestDto;
-import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
-import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
-import com.recipia.recipe.adapter.in.web.dto.request.SubCommentRegistRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.*;
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
@@ -139,6 +136,24 @@ class CommentControllerTest extends TotalTestSupport {
                         .content(asJsonString(dto)))
                 .andExpect(status().isOk())
                 .andDo(print());
+    }
+
+    @DisplayName("[happy] 유저가 대댓글 수정 요청 시 정상적으로 저장되고 성공 응답을 반환한다.")
+    @Test
+    void ifUserUpdateSubCommentShouldComplete() throws Exception {
+        // given
+        SubCommentUpdateRequestDto dto = SubCommentUpdateRequestDto.of(1L, "update-value");
+        SubComment domain = SubComment.of(dto.getId(), 1L, dto.getSubCommentText(), "N");
+
+        when(subCommentConverter.updateRequestDtoToDomain(dto)).thenReturn(domain);
+
+        //when & then
+        mockMvc.perform(post("/recipe/update/subComment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(dto)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
     }
 
     // JSON 문자열 변환을 위한 유틸리티 메서드

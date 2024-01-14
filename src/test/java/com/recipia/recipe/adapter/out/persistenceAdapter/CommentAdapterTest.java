@@ -134,4 +134,29 @@ class CommentAdapterTest extends TotalTestSupport {
         assertThat(createdSubCommentId).isEqualTo(savedSubCommentId.getId());
     }
 
+    @DisplayName("[happy] subCommentId, memberId, del_yn에 해당하는 대댓글이 존재할때 true를 반환한다.")
+    @Test
+    void whenMySubCommentExistReturnTrue() {
+        // given
+        SubComment subComment = SubComment.of(1L, 1L, 1L, "sub-value", "N");
+        // when
+        boolean isMySubCommentExist = commentAdapter.checkIsSubCommentExistAndMine(subComment);
+        // then
+        assertTrue(isMySubCommentExist);
+    }
+
+    @DisplayName("[happy] 대댓글 수정에 성공하면 수정된 데이터 갯수를 반환한다.")
+    @Test
+    void updateSubCommentSuccess() {
+        // given
+        SubComment subComment = SubComment.of(1L, 1L, 1L, "update-sub-value", "N");
+        // when
+        Long updatedCount = commentAdapter.updateSubComment(subComment);
+        // then
+        String subCommentText = subCommentRepository.findById(subComment.getId()).get().getSubcommentText();
+        assertThat(subCommentText).isEqualTo(subComment.getSubCommentText());
+        assertThat(updatedCount).isNotNull();
+        assertThat(updatedCount).isGreaterThan(0);
+    }
+
 }

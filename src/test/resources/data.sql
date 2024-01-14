@@ -53,6 +53,11 @@ VALUES (1, 5, CURRENT_TIMESTAMP),
 INSERT INTO comment (recipe_id, member_id, comment_text, del_yn, create_dttm, update_dttm)
 VALUES (1, 1, 'comment', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+-- 대댓글 추가
+INSERT INTO subcomment (comment_id, member_id, subcomment_text, del_yn, create_dttm, update_dttm)
+VALUES (1, 1, 'subComment', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
 -- 닉네임 추가
 INSERT INTO nickname (member_id, nickname)
 VALUES (1, 'nickname');

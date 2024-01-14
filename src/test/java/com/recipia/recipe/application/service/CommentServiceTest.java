@@ -4,6 +4,8 @@ import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.application.port.out.CommentPort;
 import com.recipia.recipe.application.port.out.RecipePort;
+import com.recipia.recipe.common.exception.ErrorCode;
+import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.domain.Comment;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.SubComment;
@@ -20,7 +22,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -126,6 +130,126 @@ class CommentServiceTest {
         // then
         assertEquals(savedSubCommentId, 1L);
 
+    }
+
+    @DisplayName("[happy] subCommentId, subCommentText가 정상적으로 들어오면 대댓글 수정에 성공한다.")
+    @Test
+    void updateSubCommentSuccess() {
+        // given
+        SubComment subComment = SubComment.of(1L, 1L, "update-subcomment", "N");
+        when(commentPort.checkIsCommentExist(subComment.getParentCommentId())).thenReturn(true);
+        when(commentPort.checkIsSubCommentExistAndMine(subComment)).thenReturn(true);
+        when(commentPort.updateSubComment(subComment)).thenReturn(1L);
+        // when
+        Long updatedCount = sut.updateSubcomment(subComment);
+        // then
+        assertThat(updatedCount).isNotNull();
+        assertThat(updatedCount).isGreaterThan(0);
+        assertEquals(updatedCount, 1L);
+    }
+
+    @DisplayName("[happy] DB에 존재하는 recipeId로 요청받으면 true를 반환한다.")
+    @Test
+    void checkIsRecipeExistSuccess() {
+        // given
+        Comment comment = Comment.of(1L, 1L, 1L, "comment", "N");
+        when(recipePort.checkIsRecipeExist(any(Recipe.class))).thenReturn(true);
+        // when
+        boolean isRecipeExist = sut.checkIsRecipeExist(comment);
+        // then
+        assertTrue(isRecipeExist);
+    }
+
+    @DisplayName("[bad] DB에 존재하지 않는 recipeId로 요청받으면 에러를 발생시킨다.")
+    @Test
+    void checkIsRecipeExistFail() {
+        // given
+        Comment comment = Comment.of(1L, 999L, 1L, "comment", "N");
+        when(recipePort.checkIsRecipeExist(any(Recipe.class))).thenReturn(false);
+
+        //when & then
+        assertThatThrownBy(() -> sut.checkIsRecipeExist(comment))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("레시피가 존재하지 않습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
+    }
+
+    @DisplayName("[happy] commentId, memberId로 검색했을때 삭제되지 않은 댓글이고 내가 작성한 댓글일때 true를 반환한다.")
+    @Test
+    void checkIsCommentExistAndMineSuccess() {
+        // given
+        Comment comment = Comment.of(1L, 1L, 1L, "comment", "N");
+        when(commentPort.checkIsCommentExistAndMine(comment)).thenReturn(true);
+        // when
+        boolean isCommentExistAndMine = sut.checkIsCommentExistAndMine(comment);
+        // then
+        assertTrue(isCommentExistAndMine);
+    }
+
+    @DisplayName("[bad] commentId, memberId로 검색했을때 데이터가 없으면 에러를 발생시킨다.")
+    @Test
+    void checkIsCommentExistAndMineFail() {
+        // given
+        Comment comment = Comment.of(1L, 999L, 1L, "comment", "N");
+        when(commentPort.checkIsCommentExistAndMine(comment)).thenReturn(false);
+
+        //when & then
+        assertThatThrownBy(() -> sut.checkIsCommentExistAndMine(comment))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("요청자가 작성한 댓글이 아닙니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.COMMENT_IS_NOT_MINE);
+    }
+
+    @DisplayName("[happy] commentId로 검색했을때 삭제되지 않은 댓글일때 true를 반환한다.")
+    @Test
+    void checkIsCommentExistSuccess() {
+        // given
+        Long parentComment = 1L;
+        when(commentPort.checkIsCommentExist(parentComment)).thenReturn(true);
+        // when
+        boolean isCommentExist = sut.checkIsCommentExist(parentComment);
+        // then
+        assertTrue(isCommentExist);
+    }
+
+    @DisplayName("[bad] commentId로 검색했을때 데이터가 없으면 에러를 발생시킨다.")
+    @Test
+    void checkIsCommentExistFail() {
+        // given
+        Long parentComment = 999L;
+        when(commentPort.checkIsCommentExist(parentComment)).thenReturn(false);
+
+        //when & then
+        assertThatThrownBy(() -> sut.checkIsCommentExist(parentComment))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("댓글이 존재하지 않습니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.COMMENT_NOT_FOUND);
+    }
+
+    @DisplayName("[happy] subCommentId, memberId로 검색했을때 삭제되지 않은 대댓글에 내가 작성한 대댓글일때 true를 반환한다.")
+    @Test
+    void checkIsSubCommentExistAndMineSuccess() {
+        // given
+        SubComment subComment = SubComment.of(1L, 1L, 1L, "sub", "N");
+        when(commentPort.checkIsSubCommentExistAndMine(subComment)).thenReturn(true);
+        // when
+        boolean isSubCommentExistAndMine = sut.checkIsSubCommentExistAndMine(subComment);
+        // then
+        assertTrue(isSubCommentExistAndMine);
+    }
+
+    @DisplayName("[bad] subCommentId, memberId로 검색했을때 데이터가 없다면 에러를 반환한다.")
+    @Test
+    void checkIsSubCommentExistAndMineFail() {
+        // given
+        SubComment subComment = SubComment.of(999L, 1L, 1L, "sub", "N");
+        when(commentPort.checkIsSubCommentExistAndMine(subComment)).thenReturn(false);
+
+        //when & then
+        assertThatThrownBy(() -> sut.checkIsSubCommentExistAndMine(subComment))
+                .isInstanceOf(RecipeApplicationException.class)
+                .hasMessageContaining("요청자가 작성한 대댓글이 아닙니다.")
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SUB_COMMENT_IS_NOT_MINE);
     }
 
 }

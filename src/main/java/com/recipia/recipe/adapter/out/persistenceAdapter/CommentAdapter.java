@@ -4,6 +4,7 @@ import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.SubCommentEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.CommentQueryRepository;
+import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.SubCommentQueryRepository;
 import com.recipia.recipe.application.port.out.CommentPort;
 import com.recipia.recipe.domain.Comment;
 import com.recipia.recipe.domain.SubComment;
@@ -27,6 +28,7 @@ public class CommentAdapter implements CommentPort {
     private final CommentQueryRepository commentQueryRepository;
     private final SubCommentRepository subCommentRepository;
     private final SubCommentConverter subCommentConverter;
+    private final SubCommentQueryRepository subCommentQueryRepository;
 
     /**
      * [CREATE] 댓글 저장
@@ -94,6 +96,26 @@ public class CommentAdapter implements CommentPort {
     public Long createSubComment(SubComment subComment) {
         SubCommentEntity entity = subCommentConverter.domainToEntity(subComment);
         return subCommentRepository.save(entity).getId();
+    }
+
+
+    /**
+     * [READ] subCommentId, memberId, del_yn으로 대댓글 검색
+     * 조건에 해당하는 대댓글을 검색해서 대댓글이 존재하면 true, 존재하지 않으면 false를 반환한다.
+     */
+    @Override
+    public boolean checkIsSubCommentExistAndMine(SubComment subComment) {
+        Optional<SubCommentEntity> subCommentEntity = subCommentRepository.findByIdAndMemberIdAndDelYn(subComment.getId(), subComment.getMemberId(), subComment.getDelYn());
+        return subCommentEntity.isPresent();
+    }
+
+    /**
+     * [UPDATE] 대댓글 수정
+     * 대댓글 수정에 성공하면 업데이트 된 row의 갯수를 반환한다.
+     */
+    @Override
+    public Long updateSubComment(SubComment subComment) {
+        return subCommentQueryRepository.updateSubComment(subComment);
     }
 
 }

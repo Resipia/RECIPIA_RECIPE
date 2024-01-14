@@ -20,4 +20,8 @@ public interface CommentPort {
     boolean checkIsCommentExist(Long parentCommentId);
 
     Long createSubComment(SubComment subComment);
+
+    boolean checkIsSubCommentExistAndMine(SubComment subComment);
+
+    Long updateSubComment(SubComment subComment);
 }

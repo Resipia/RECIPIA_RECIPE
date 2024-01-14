@@ -141,7 +141,7 @@ class CommentServiceTest {
         when(commentPort.checkIsSubCommentExistAndMine(subComment)).thenReturn(true);
         when(commentPort.updateSubComment(subComment)).thenReturn(1L);
         // when
-        Long updatedCount = sut.updateSubcomment(subComment);
+        Long updatedCount = sut.updateSubComment(subComment);
         // then
         assertThat(updatedCount).isNotNull();
         assertThat(updatedCount).isGreaterThan(0);
@@ -251,5 +251,22 @@ class CommentServiceTest {
                 .hasMessageContaining("요청자가 작성한 대댓글이 아닙니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SUB_COMMENT_IS_NOT_MINE);
     }
+
+    @DisplayName("[happy] subCommentId, subCommentText가 정상적으로 들어오면 대댓글 수정에 성공한다.")
+    @Test
+    void deleteSubCommentSuccess() {
+        // given
+        SubComment subComment = SubComment.of(1L, 1L, 1L, "Y");
+        when(commentPort.checkIsCommentExist(subComment.getParentCommentId())).thenReturn(true);
+        when(commentPort.checkIsSubCommentExistAndMine(subComment)).thenReturn(true);
+        when(commentPort.softDeleteSubComment(subComment)).thenReturn(1L);
+        // when
+        Long updatedCount = sut.deleteSubComment(subComment);
+        // then
+        assertThat(updatedCount).isNotNull();
+        assertThat(updatedCount).isGreaterThan(0);
+        assertEquals(updatedCount, 1L);
+    }
+
 
 }

@@ -156,6 +156,25 @@ class CommentControllerTest extends TotalTestSupport {
 
     }
 
+    @DisplayName("[happy] 유저가 대댓글 삭제 요청 시 정상적으로 삭제하고 성공 응답을 반환한다.")
+    @Test
+    void ifUserDeleteSubCommentShouldComplete() throws Exception {
+        // given
+        SubCommentDeleteRequestDto dto = SubCommentDeleteRequestDto.of(1L, 1L);
+        SubComment domain = SubComment.of(dto.getId(), dto.getParentCommentId(), 1L, null, "Y");
+
+        when(subCommentConverter.deleteRequestDtoToDomain(dto)).thenReturn(domain);
+        when(subCommentUseCase.deleteSubComment(domain)).thenReturn(1L);
+
+        //when & then
+        mockMvc.perform(post("/recipe/delete/subComment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(dto)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
     // JSON 문자열 변환을 위한 유틸리티 메서드
     private String asJsonString(final Object obj) {
         try {

@@ -159,4 +159,17 @@ class CommentAdapterTest extends TotalTestSupport {
         assertThat(updatedCount).isGreaterThan(0);
     }
 
+
+    @DisplayName("[happy] 대댓글을 soft delete 처리(del_yn = 'Y')해주고 업데이트된 row의 갯수를 반환한다.")
+    @Test
+    void deleteSubCommentSuccess() {
+        // given
+        SubComment subComment = SubComment.of(1L, 1L, 1L, "N");
+        // when
+        Long updatedCount = commentAdapter.softDeleteSubComment(subComment);
+        // then
+        assertThat(updatedCount).isNotNull();
+        assertThat(updatedCount).isGreaterThan(0);
+    }
+
 }

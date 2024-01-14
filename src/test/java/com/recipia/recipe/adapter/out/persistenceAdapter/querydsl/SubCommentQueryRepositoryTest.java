@@ -32,4 +32,15 @@ class SubCommentQueryRepositoryTest extends TotalTestSupport {
         assertEquals(updatedEntity.getSubcommentText(), subComment.getSubCommentText());
     }
 
+    @DisplayName("[happy] 대댓글이 성공적으로 삭제처리(del_yn = 'N') 된다.")
+    @Test
+    void deleteSubCommentSuccess() {
+        // given
+        Long subCommentId = 1L;
+        // when
+        sut.softDeleteSubComment(subCommentId);
+        // then
+        SubCommentEntity updatedEntity = subCommentRepository.findById(1L).get();
+        assertEquals(updatedEntity.getDelYn(), "Y");
+    }
 }

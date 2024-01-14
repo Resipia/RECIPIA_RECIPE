@@ -241,7 +241,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         assertThat(result).isEqualTo(0); // 업데이트된 행이 없어야 함
     }
 
-    @DisplayName("[happy] 레시피 내부의 좋아요 갯수가 업데이트 되면 0보다 큰 수를 반환한다.")
+    @DisplayName("[happy] 레시피 내부의 좋아요 갯수가 이미 존재할 때 업데이트 되면 0보다 큰 수를 반환한다.")
     @Test
     void updateLikesInDatabase() {
         //given

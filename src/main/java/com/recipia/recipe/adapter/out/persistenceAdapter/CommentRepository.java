@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     Optional<CommentEntity> findByIdAndMemberIdAndDelYn(Long id, Long memberId, String delYn);
+
+    Optional<CommentEntity> findByIdAndDelYn(Long id, String delYn);
 }

@@ -10,8 +10,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("[단위] 댓글 저장에 사용되는 RequestDto 테스트")
-class CommentRegistRequestDtoTest {
+@DisplayName("[단위] 대댓글 삭제에 사용되는 RequestDto 테스트")
+class SubCommentDeleteRequestDtoTest {
 
     // Java의 Bean Validation API를 사용해 유효성 검증을 수행하기 위한 Validator 객체를 생성
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -20,14 +20,13 @@ class CommentRegistRequestDtoTest {
     @Test
     void validInputTest() {
         // given
-        CommentRegistRequestDto dto = CommentRegistRequestDto.of(1L, "commentvalue");
+        SubCommentDeleteRequestDto dto = SubCommentDeleteRequestDto.of(1L, 1L);
         // when
         // ConstraintViolation은 유효성 검사에서 발견된 제약 조건 위반을 나타내는 클래스다.
-        Set<ConstraintViolation<CommentRegistRequestDto>> violations = validator.validate(dto);
+        Set<ConstraintViolation<SubCommentDeleteRequestDto>> violations = validator.validate(dto);
 
         // then
         assertThat(violations).isEmpty();
 
     }
-
 }

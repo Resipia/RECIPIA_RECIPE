@@ -2,6 +2,7 @@ package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
 import com.recipia.recipe.application.port.in.SubCommentUseCase;
 import com.recipia.recipe.application.port.out.CommentPort;
@@ -150,6 +151,26 @@ public class CommentService implements CommentUseCase, SubCommentUseCase {
 
         // 3단계 - 대댓글 삭제
         return commentPort.softDeleteSubComment(subComment);
+    }
+
+    /**
+     * [READ] parentCommentId에 해당하는 대댓글 목록 조회
+     * 페이징을 위한 Pageable 객체를 여기서 조립해서 사용한다.
+     * page=0과 size=10으로 Pageable 객체를 생성하면, 이는 '첫 번째 페이지에 10개의 항목을 보여달라'는 요청이다.
+     * page=1과 size=10이면 '두 번째 페이지에 10개의 항목을 보여달라'는 요청이다.
+     */
+    @Override
+    public PagingResponseDto<SubCommentListResponseDto> getSubCommentList(Long parentCommentId, int page, int size) {
+        // 1. 정렬조건을 정한 뒤 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 2. 데이터를 받아온다.
+        Page<SubCommentListResponseDto> subCommentDtoList = commentPort.getSubCommentList(parentCommentId, pageable);
+
+        // 3. 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해준다.
+        List<SubCommentListResponseDto> content = subCommentDtoList.getContent();
+        Long totalCount = subCommentDtoList.getTotalElements();
+        return PagingResponseDto.of(content, totalCount);
     }
 
     /**

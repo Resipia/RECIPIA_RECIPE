@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.web.dto.request.*;
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.application.port.in.CommentUseCase;
 import com.recipia.recipe.application.port.in.SubCommentUseCase;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -173,6 +174,26 @@ class CommentControllerTest extends TotalTestSupport {
                 .andExpect(status().isOk())
                 .andDo(print());
 
+    }
+
+
+    @DisplayName("[happy] parentCommentId에 해당하는 대댓글 목록 조회 요청 시 정상적으로 페이징된 데이터와 성공 응답을 반환한다.")
+    @Test
+    void getSubCommentListWithValidParams() throws Exception {
+        // given
+        SubCommentListResponseDto dto = SubCommentListResponseDto.of(1L, 1L, 1L, "member-1-nickname", "first-subComment", "2024-01-14", false);
+        PagingResponseDto<SubCommentListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
+
+        when(subCommentUseCase.getSubCommentList(anyLong(), anyInt(), anyInt())).thenReturn(pagingResponseDto);
+
+        //when & then
+        mockMvc.perform(get("/recipe/getAllSubCommentList")
+                        .param("parentCommentId", "1")
+                        .param("page", "0")
+                        .param("size", "10")
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists())
+                .andExpect(jsonPath("$.totalCount").value(pagingResponseDto.getTotalCount()));
     }
 
     // JSON 문자열 변환을 위한 유틸리티 메서드

@@ -1,5 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
+import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.SubCommentEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.SubCommentRepository;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -7,8 +9,12 @@ import com.recipia.recipe.domain.SubComment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
@@ -43,4 +49,26 @@ class SubCommentQueryRepositoryTest extends TotalTestSupport {
         SubCommentEntity updatedEntity = subCommentRepository.findById(1L).get();
         assertEquals(updatedEntity.getDelYn(), "Y");
     }
+
+    @DisplayName("[happy] parentCommentId에 해당하는 대댓글 목록을 페이징하여 조회한다.")
+    @Test
+    void getAllSubCommentListSuccess() {
+        // given
+        Long parentCommentId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<SubCommentListResponseDto> result = sut.getSubCommentDtoList(parentCommentId, pageable);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).isNotNull();
+        result.getContent().forEach(subCommentDto -> {
+            assertThat(subCommentDto.getId()).isNotNull();
+            assertThat(subCommentDto.getSubCommentValue()).isNotNull();
+            assertThat(subCommentDto.getMemberId()).isNotNull();
+            assertThat(subCommentDto.getNickname()).isNotNull();
+        });
+    }
+
 }

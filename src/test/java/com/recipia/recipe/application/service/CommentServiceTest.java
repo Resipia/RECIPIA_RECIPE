@@ -2,6 +2,7 @@ package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.application.port.out.CommentPort;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -267,6 +268,36 @@ class CommentServiceTest {
         assertThat(updatedCount).isGreaterThan(0);
         assertEquals(updatedCount, 1L);
     }
+
+    @DisplayName("[happy] parentCommentId와 기본 페이징으로 댓글 목록을 정상적으로 가져온다.")
+    @Test
+    void whenGetSubCommentList_thenReturnsPagedComments() {
+        // given
+        Long parentCommentId = 1L;
+        int page = 0;
+        int size = 10;
+
+        // 테스트에서 예상되는 반환 값. (여기서는 두개의 대댓글 데이터만 포함)
+        List<SubCommentListResponseDto> mockSubCommentList = List.of(
+                SubCommentListResponseDto.of(1L, 1L, 1L, "member-1-nickname", "first-subComment", "2024-01-14", false),
+                SubCommentListResponseDto.of(2L, 1L, 2L, "member-2-nickname", "second-subComment", "2024-01-14", false)
+        );
+
+        // PageImpl을 사용해 mockPage 객체 생성
+        Page<SubCommentListResponseDto> mockPage = new PageImpl<>(mockSubCommentList);
+
+        // mock 설정
+        when(commentPort.getSubCommentList(eq(parentCommentId), any(Pageable.class)))
+                .thenReturn(mockPage);
+
+        // when
+        PagingResponseDto<SubCommentListResponseDto> result = sut.getSubCommentList(parentCommentId, page, size);
+
+        // then
+        assertThat(result.getContent()).hasSize(mockSubCommentList.size());
+        assertThat(result.getContent()).containsExactlyElementsOf(mockSubCommentList);
+    }
+
 
 
 }

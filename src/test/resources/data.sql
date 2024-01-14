@@ -55,9 +55,11 @@ VALUES (1, 1, 'comment', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 대댓글 추가
 INSERT INTO subcomment (comment_id, member_id, subcomment_text, del_yn, create_dttm, update_dttm)
-VALUES (1, 1, 'subComment', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, 1, 'first-subComment', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (1, 2, 'second-subComment', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 -- 닉네임 추가
 INSERT INTO nickname (member_id, nickname)
-VALUES (1, 'nickname');
+VALUES (1, 'member-1-nickname'),
+       (2, 'member-2-nickname');

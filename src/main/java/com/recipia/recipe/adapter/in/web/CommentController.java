@@ -1,9 +1,6 @@
 package com.recipia.recipe.adapter.in.web;
 
-import com.recipia.recipe.adapter.in.web.dto.request.CommentDeleteRequestDto;
-import com.recipia.recipe.adapter.in.web.dto.request.CommentRegistRequestDto;
-import com.recipia.recipe.adapter.in.web.dto.request.CommentUpdateRequestDto;
-import com.recipia.recipe.adapter.in.web.dto.request.SubCommentRegistRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.*;
 import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
@@ -84,6 +81,17 @@ public class CommentController {
         Long createdSubCommentId = subCommentUseCase.createSubComment(subCommentConverter.registRequestDtoToDomain(dto));
         return ResponseEntity.ok(
                 ResponseDto.success(createdSubCommentId)
+        );
+    }
+
+    /**
+     * 대댓글 수정
+     */
+    @PostMapping("/update/subComment")
+    public ResponseEntity<ResponseDto<Void>> updateSubComment(@Valid @RequestBody SubCommentUpdateRequestDto dto) {
+        subCommentUseCase.updateSubcomment(subCommentConverter.updateRequestDtoToDomain(dto));
+        return ResponseEntity.ok(
+                ResponseDto.success()
         );
     }
 

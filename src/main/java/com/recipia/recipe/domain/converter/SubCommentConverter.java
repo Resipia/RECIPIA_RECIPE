@@ -1,6 +1,7 @@
 package com.recipia.recipe.domain.converter;
 
 import com.recipia.recipe.adapter.in.web.dto.request.SubCommentRegistRequestDto;
+import com.recipia.recipe.adapter.in.web.dto.request.SubCommentUpdateRequestDto;
 import com.recipia.recipe.adapter.out.persistence.entity.CommentEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.SubCommentEntity;
 import com.recipia.recipe.common.utils.SecurityUtil;
@@ -27,6 +28,11 @@ public class SubCommentConverter {
     public SubComment registRequestDtoToDomain(SubCommentRegistRequestDto dto) {
         Long memberId = securityUtil.getCurrentMemberId();
         return SubComment.of(dto.getParentCommentId(), memberId, dto.getSubCommentText(), "N");
+    }
+
+    public SubComment updateRequestDtoToDomain(SubCommentUpdateRequestDto dto) {
+        Long memberId = securityUtil.getCurrentMemberId();
+        return SubComment.of(dto.getId(), memberId, dto.getSubCommentText(), "N");
     }
 
 }

@@ -55,7 +55,7 @@ public class CommentAdapter implements CommentPort {
      */
     @Override
     public boolean checkIsCommentExistAndMine(Comment comment) {
-        Optional<CommentEntity> commentEntity = commentRepository.findByIdAndMemberIdAndDelYn(comment.getId(), comment.getMemberId(), comment.getDelYn());
+        Optional<CommentEntity> commentEntity = commentRepository.findByIdAndMemberIdAndDelYn(comment.getId(), comment.getMemberId(), "N");
         return commentEntity.isPresent();
     }
 
@@ -105,7 +105,7 @@ public class CommentAdapter implements CommentPort {
      */
     @Override
     public boolean checkIsSubCommentExistAndMine(SubComment subComment) {
-        Optional<SubCommentEntity> subCommentEntity = subCommentRepository.findByIdAndMemberIdAndDelYn(subComment.getId(), subComment.getMemberId(), subComment.getDelYn());
+        Optional<SubCommentEntity> subCommentEntity = subCommentRepository.findByIdAndMemberIdAndDelYn(subComment.getId(), subComment.getMemberId(), "N");
         return subCommentEntity.isPresent();
     }
 
@@ -116,6 +116,15 @@ public class CommentAdapter implements CommentPort {
     @Override
     public Long updateSubComment(SubComment subComment) {
         return subCommentQueryRepository.updateSubComment(subComment);
+    }
+
+    /**
+     * [DELETE] 대댓글 삭제
+     * 대댓글 삭제(del_yn = "Y"로 컬럼 update)에 성공하면 업데이트 된 row의 갯수를 반환한다.
+     */
+    @Override
+    public Long softDeleteSubComment(SubComment subComment) {
+        return subCommentQueryRepository.softDeleteSubComment(subComment.getId());
     }
 
 }

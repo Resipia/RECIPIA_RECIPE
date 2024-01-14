@@ -24,4 +24,6 @@ public interface CommentPort {
     boolean checkIsSubCommentExistAndMine(SubComment subComment);
 
     Long updateSubComment(SubComment subComment);
+
+    Long softDeleteSubComment(SubComment subComment);
 }

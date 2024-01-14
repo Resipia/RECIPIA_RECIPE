@@ -23,4 +23,15 @@ public class SubCommentQueryRepository {
                 .where(subCommentEntity.id.eq(subComment.getId()))
                 .execute();
     }
+
+    /**
+     * [DELETE] subCommentId에 해당하는 댓글을 삭제처리(del_yn = 'Y')한다.
+     */
+    public Long softDeleteSubComment(Long subCommentId) {
+        return queryFactory
+                .update(subCommentEntity)
+                .set(subCommentEntity.delYn, "Y")
+                .where(subCommentEntity.id.eq(subCommentId))
+                .execute();
+    }
 }

@@ -37,6 +37,7 @@ spring:
         auto: false
       sqs:
         nickname-sqs-name: dev-sqs-test
+        signup-sqs-name: signup-sqs
       s3:
         bucketName: recipia-file
       stack:

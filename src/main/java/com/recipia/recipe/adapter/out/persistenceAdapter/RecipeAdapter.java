@@ -4,7 +4,6 @@ import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
-import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.*;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
 import com.recipia.recipe.application.port.out.RecipePort;
@@ -231,6 +230,23 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
+     * [READ] recipeId에 해당하는 파일의 최대 file order값을 반환한다.
+     * 만약에 데이터가 없으면 0을, max값이 존재하면 max값을 반환한다.
+     */
+    @Override
+    public Integer findMaxFileOrder(Long savedRecipeId) {
+        return recipeFileRepository.findMaxFileOrderByRecipeEntity_Id(savedRecipeId).orElse(0);
+    }
+
+    /**
+     * [DELETE] - 유저가 삭제를 요청한 파일은 모두 soft delete 한다.
+     */
+    @Override
+    public Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder) {
+        return querydslRepository.softDeleteRecipeFile(domain, deleteFileOrder);
+    }
+
+    /**
      * [CREATE] - S3에 업로드된 파일(이미지) 정보 저장
      * 서비스에서 s3에 이미지 업로드가 완료된 후 호출되어 s3 object의 url정보를 rdb에 저장한다.
      */
@@ -317,17 +333,6 @@ public class RecipeAdapter implements RecipePort {
                 )));
     }
 
-    /**
-     * [DELETE] - 레시피에 연관된 파일 모두 삭제
-     * S3에 이미지를 업로드할 때 날짜-UUID 이런식으로 저장되어서 RDB의 조건문으로 검색해서 update하기에는 무리가 있어 모두 삭제하고 다시 넣기로 결정
-     */
-    @Override
-    public Long softDeleteRecipeFilesByRecipeId(Long recipeId) {
-        // soft delete로 del_yn을 모두 "Y"로 변경한다.
-        Long softDeletedFileCount = querydslRepository.softDeleteRecipeFilesByRecipeId(recipeId);
-        log.info("recipeId : {}, softDeletedFileCount : {}", recipeId, softDeletedFileCount);
-        return softDeletedFileCount;
-    }
 
     /**
      * [EXTRACT METHOD]

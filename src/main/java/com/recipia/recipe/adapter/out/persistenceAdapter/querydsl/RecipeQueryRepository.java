@@ -11,8 +11,8 @@ import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDt
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfoEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
+import com.recipia.recipe.domain.Recipe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -183,16 +183,6 @@ public class RecipeQueryRepository {
                 .execute();
     }
 
-    /**
-     * 레시피와 연관된 파일을 soft delete 처리한다.
-     * 업데이트된 엔티티의 개수를 반환한다.
-     */
-    public Long softDeleteRecipeFilesByRecipeId(Long recipeId) {
-        return queryFactory.update(recipeFileEntity)
-                .where(recipeFileEntity.recipeEntity.id.eq(recipeId))
-                .set(recipeFileEntity.delYn, "Y")
-                .execute();
-    }
 
     /**
      * 레시피를 soft delete 처리한다.
@@ -214,4 +204,16 @@ public class RecipeQueryRepository {
                 .execute();
     }
 
+    /**
+     * 유저가 삭제 시도한 파일을 soft delete 처리한다.
+     */
+    public Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder) {
+        return queryFactory.update(recipeFileEntity)
+                .where(
+                        recipeFileEntity.recipeEntity.id.eq(domain.getId()),
+                        recipeFileEntity.fileOrder.in(deleteFileOrder)
+                )
+                .set(recipeFileEntity.delYn, "Y")
+                .execute();
+    }
 }

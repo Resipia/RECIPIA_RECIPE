@@ -10,6 +10,7 @@ import com.recipia.recipe.adapter.out.persistenceAdapter.NutritionalInfoReposito
 import com.recipia.recipe.adapter.out.persistenceAdapter.RecipeFileRepository;
 import com.recipia.recipe.adapter.out.persistenceAdapter.RecipeRepository;
 import com.recipia.recipe.config.TotalTestSupport;
+import com.recipia.recipe.domain.Recipe;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -183,17 +184,17 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         // given
         RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
         Long recipeId = savedRecipeEntity.getId();
+        Recipe domain = Recipe.of(recipeId, 1L);
 
         RecipeFileEntity recipeFileEntity = RecipeFileEntity.of(savedRecipeEntity, 1, "/", "url", "nm", "nm2", "jpg", 100, "N");
         RecipeFileEntity savedFileEntity = recipeFileRepository.save(recipeFileEntity);
 
         // when
-        Long result = sut.softDeleteRecipeFilesByRecipeId(recipeId);
+        sut.softDeleteRecipeFile(domain, List.of(1));
         entityManager.flush();
         entityManager.clear();
 
         // then
-        assertThat(result).isGreaterThan(0); // 실제로 업데이트된 행의 수 검증
         List<RecipeFileEntity> deletedFileList = recipeFileRepository.findAllSoftDeletedFileList(recipeId);
         Assertions.assertThat(deletedFileList).isNotEmpty();
         Assertions.assertThat(deletedFileList).allMatch(file -> file.getDelYn().equals("Y"));
@@ -204,12 +205,13 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     void softDeleteRecipeFilesByInvalidRecipeId() {
         // given
         Long invalidRecipeId = 9999L; // 존재하지 않는 레시피 ID
+        Recipe domain = Recipe.of(invalidRecipeId, 1L);
 
         // when
-        Long result = sut.softDeleteRecipeFilesByRecipeId(invalidRecipeId);
+        Long updatedCount = sut.softDeleteRecipeFile(domain, List.of(1));
 
         // then
-        assertThat(result).isEqualTo(0); // 업데이트된 행이 없어야 함
+        assertThat(updatedCount).isEqualTo(0); // 업데이트된 행이 없어야 함
     }
 
     @DisplayName("[happy] 레시피 삭제를 시도하면 Soft Delete에 성공하여 del_yn이 'Y'가 된다.")

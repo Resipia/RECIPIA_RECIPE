@@ -58,7 +58,8 @@ public class RecipeConverter {
                 "N",
                 0L, // todo: 저장할때라서 일단 0L을 넣어줬다.
                 0,
-                false
+                false,
+                dto.getDeleteFileOrder()
         );
     }
 

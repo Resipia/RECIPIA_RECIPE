@@ -24,10 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -373,15 +370,18 @@ class RecipeAdapterTest extends TotalTestSupport {
     void deleteRecipeFilesByRecipeIdHappy() {
         //given
         RecipeEntity savedRecipeEntity = recipeRepository.findById(1L).orElseThrow();
-        Long recipeId = savedRecipeEntity.getId();
+        Recipe domain = Recipe. of(savedRecipeEntity.getId(), savedRecipeEntity.getMemberId());
 
         RecipeFileEntity recipeFileEntity = RecipeFileEntity.of(savedRecipeEntity, 1, "/", "url", "nm", "nm2", "jpg", 100, "N");
         RecipeFileEntity savedFileEntity = recipeFileRepository.save(recipeFileEntity);
         entityManager.flush();
         entityManager.clear();
 
+        List<Integer> orderList = new ArrayList<>();
+        orderList.add(1);
+
         //when
-        sut.softDeleteRecipeFilesByRecipeId(recipeId);
+        Long updatedCount = sut.softDeleteRecipeFile(domain, orderList);
         entityManager.flush();
         entityManager.clear();
 
@@ -425,7 +425,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 "N",
                 0L,
                 0,
-                false
+                false,
+                Collections.emptyList()
         );
     }
 
@@ -444,7 +445,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 "N",
                 0L,
                 0,
-                false
+                false,
+                Collections.emptyList()
         );
     }
 

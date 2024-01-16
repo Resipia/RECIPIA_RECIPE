@@ -165,7 +165,8 @@ class RecipeControllerTest extends TotalTestSupport {
                 "N",
                 0L,
                 0,
-                false
+                false,
+                Collections.emptyList()
         );
     }
 

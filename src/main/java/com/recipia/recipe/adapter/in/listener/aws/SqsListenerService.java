@@ -27,27 +27,32 @@ public class SqsListenerService {
 
 
     /**
-     * 아래의 Sqs리스너는 멤버 서버로 FeignClient 요청을 하는 스프링 이벤트를 발행한다.
-     *
+     * [SQS 리스너] - 2가지 역할을 수행
+     * 1. 유저 회원가입 시 동작
+     * 2. 유저 닉네임 변경 시 동작
      */
-    @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
-    public void receiveMessage(String messageJson) throws JsonProcessingException {
+    @SqsListener(value = {"${spring.cloud.aws.sqs.nickname-sqs-name}", "${spring.cloud.aws.sqs.signup-sqs-name}"})
+    public void receiveNicknameChangeMessage(String messageJson) throws JsonProcessingException {
 
+        // 1. SNS 메타데이터 정보를 추출해서 dto 객체로 만든다.
         SnsNotificationDto snsNotificationDto = objectMapper.readValue(messageJson, SnsNotificationDto.class);
-
         TraceIdDto traceIdDto = snsNotificationDto.MessageAttributes().traceId();
         String traceId = traceIdDto.Value();
+
+        // 2. SNS 토픽 이름을 추출하고 span 메시지를 생성한다.
+        String topicName = extractSnsTopicName(snsNotificationDto.TopicArn());
+        String spanName = String.format("[RECIPE] TopicName: %s SQS Received", topicName);
+
+        // 3. SNS 내부의 메시지를 Dto로 만든다. (이벤트 발행할 때 사용)
         MessageMemberIdDto snsMessageDto = objectMapper.readValue(snsNotificationDto.Message(), MessageMemberIdDto.class);
 
-
-
-        // 이전 서버에서 보낸 traceId를 사용하여 새로운 TraceContext를 생성
+        // 4. 이전 서버에서 보낸 traceId를 사용하여 새로운 TraceContext를 생성한다.
         TraceContext context = buildTraceContext(traceId);
         Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context))
-                .name("[RECIPE] nickname-change SQS Received")
+                .name(spanName)
                 .start();
 
-        // 추출된 memberId로 이벤트 발행 및 로깅
+        // 5. SNS 메시지에 담겨있던 memberId로 이벤트 발행 및 로깅 진행
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
             eventPublisher.publishEvent(new NicknameChangeEvent(snsMessageDto.memberId()));
         } catch (Exception e) {
@@ -58,6 +63,7 @@ public class SqsListenerService {
         }
 
     }
+
 
     /**
      * [Extract Method] - TraceContext 생성
@@ -86,6 +92,18 @@ public class SqsListenerService {
         // 새로운 Span ID를 생성 하고 TraceContext 객체를 빌드해서 반환한다.
         contextBuilder.spanId(tracer.nextSpan().context().spanId());
         return contextBuilder.build();
+    }
+
+    /**
+     * SNS의 ARN을 받아서 맨 뒤의 Topic 이름만 추출한다.
+     */
+    public String extractSnsTopicName(String input) {
+        int lastIndex = input.lastIndexOf(":");
+        if (lastIndex != -1) {
+            return input.substring(lastIndex + 1);
+        } else {
+            return "";  // ':'이 없으면 빈 문자열 반환
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.domain.Recipe;
@@ -33,6 +34,8 @@ public class ImageS3Service {
 
     private final AmazonS3 amazonS3;
 
+    private final RecipePort recipePort;
+
     @Value("${spring.cloud.aws.s3.bucketName}")
     private String bucketName; //버킷 이름
 
@@ -40,7 +43,7 @@ public class ImageS3Service {
     /**
      * 데이터베이스에 저장할 RecipeFileEntity 객체를 생성하여 반환한다.
      */
-    public RecipeFile createRecipeFile(MultipartFile image, Integer fileOrder, Long savedRecipeId) {
+    public RecipeFile createRecipeFile(MultipartFile image, Long savedRecipeId) {
 
         // 1. input 파라미터 검증
         validateInput(image, savedRecipeId);
@@ -50,7 +53,10 @@ public class ImageS3Service {
         String fileExtension = getFileExtension(originFileName);
         validateFileExtension(fileExtension);
 
-        // 3. 파일 도메인을 만들기 위한 값 세팅
+        // 3. file order는 1부터 시작
+        Integer fileOrder = recipePort.findMaxFileOrder(savedRecipeId) + 1;
+
+        // 4. 파일 도메인을 만들기 위한 값 세팅
         String storedFileNameWithExtension = changeFileName(fileExtension); // 새로 생성된 이미지 이름 (UUID 적용)
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")); // 현재 날짜를 [년/월/일] 형식으로 가져와서 최종 저장될 파일 경로를 만들어 준다.
         String finalPath = "recipe/" + datePath + "/" + savedRecipeId + "/" + storedFileNameWithExtension; // s3 파일 저장 경로

@@ -60,7 +60,7 @@ class ImageS3ServiceTest extends TotalTestSupport {
         Integer fileOrder = 0;
 
         //when
-        RecipeFile recipeFile = sut.createRecipeFile(mockImage, fileOrder, recipeId);
+        RecipeFile recipeFile = sut.createRecipeFile(mockImage, recipeId);
 
         //then
         assertNotNull(recipeFile);
@@ -79,7 +79,7 @@ class ImageS3ServiceTest extends TotalTestSupport {
                 "file", "test.txt", "text/plain", "This is a text file.".getBytes());
 
         //when & then
-        Assertions.assertThatThrownBy(() -> sut.createRecipeFile(mockFile, 0, 1L))
+        Assertions.assertThatThrownBy(() -> sut.createRecipeFile(mockFile, 1L))
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("S3에 업로드 할 수 없는 파일 타입입니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_FILE_TYPE);
@@ -93,7 +93,7 @@ class ImageS3ServiceTest extends TotalTestSupport {
                 "image", "empty.jpg", "image/jpeg", new byte[100]);
 
         //when & then
-        Assertions.assertThatThrownBy(() -> sut.createRecipeFile(mockImage, 0, null))
+        Assertions.assertThatThrownBy(() -> sut.createRecipeFile(mockImage, null))
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("레시피가 존재하지 않습니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECIPE_NOT_FOUND);
@@ -106,7 +106,7 @@ class ImageS3ServiceTest extends TotalTestSupport {
         Integer fileOrder = 0;
 
         //when & then
-        Assertions.assertThatThrownBy(() -> sut.createRecipeFile(null, fileOrder, recipeId))
+        Assertions.assertThatThrownBy(() -> sut.createRecipeFile(null, recipeId))
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("업로드할 파일이 존재하지 않습니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.S3_UPLOAD_FILE_NOT_FOUND);

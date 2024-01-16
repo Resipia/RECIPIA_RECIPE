@@ -204,7 +204,7 @@ class RecipeServiceTest {
         // given
         Recipe recipe = createRecipeDomain();
         List<MultipartFile> mockFiles = createMockMultipartFileList();
-        when(imageS3Service.createRecipeFile(any(MultipartFile.class), anyInt(), anyLong()))
+        when(imageS3Service.createRecipeFile(any(MultipartFile.class), anyLong()))
                 .thenThrow(new RecipeApplicationException(ErrorCode.S3_UPLOAD_ERROR));
 
         // when & then
@@ -222,8 +222,8 @@ class RecipeServiceTest {
 
         when(recipePort.checkIsRecipeMineExist(recipe)).thenReturn(true);
         when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
-        when(recipePort.softDeleteRecipeFilesByRecipeId(updatedRecipeId)).thenReturn(3L);
-        when(imageS3Service.createRecipeFile(any(MultipartFile.class), anyInt(), eq(updatedRecipeId)))
+        when(recipePort.softDeleteRecipeFile(recipe, Collections.emptyList())).thenReturn(3L);
+        when(imageS3Service.createRecipeFile(any(MultipartFile.class), eq(updatedRecipeId)))
                 .thenReturn(RecipeFile.of(recipe, 0, "/", "/", "nm", "nm", "jpg", 100, "N"));
         when(recipePort.saveRecipeFile(anyList())).thenReturn(savedFileIdList);
 
@@ -233,7 +233,7 @@ class RecipeServiceTest {
         //then
         verify(recipePort).updateRecipe(recipe);
         verify(recipePort).updateNutritionalInfo(recipe);
-        verify(recipePort).softDeleteRecipeFilesByRecipeId(updatedRecipeId);
+        verify(recipePort).softDeleteRecipeFile(recipe, Collections.emptyList());
         verify(recipePort).saveRecipeFile(anyList());
         then(eventPublisher).should().publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
     }
@@ -249,7 +249,7 @@ class RecipeServiceTest {
         //when
         when(recipePort.checkIsRecipeMineExist(recipe)).thenReturn(true);
         when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
-        when(recipePort.softDeleteRecipeFilesByRecipeId(updatedRecipeId)).thenReturn(3L);
+        when(recipePort.softDeleteRecipeFile(recipe, Collections.emptyList())).thenReturn(3L);
         when(recipePort.saveRecipeFile(anyList())).thenReturn(Collections.emptyList());
 
         //then
@@ -319,7 +319,8 @@ class RecipeServiceTest {
                 "N",
                 0L,
                 0,
-                false
+                false,
+                Collections.emptyList()
         );
     }
 

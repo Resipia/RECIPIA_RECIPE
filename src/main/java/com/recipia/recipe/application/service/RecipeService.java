@@ -55,8 +55,9 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         if (!files.isEmpty()) {
 
             // 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
-            List<RecipeFile> recipeFileList = IntStream.range(0, files.size())
-                    .mapToObj(fileOrder -> imageS3Service.createRecipeFile(files.get(fileOrder), fileOrder, savedRecipeId))
+            List<RecipeFile> recipeFileList = files
+                    .stream()
+                    .map(file -> imageS3Service.createRecipeFile(file, savedRecipeId))
                     .collect(Collectors.toList());
 
             // db에 레시피 파일(이미지)를 저장한다.
@@ -137,27 +138,28 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         recipePort.updateNutritionalInfo(domain);
         recipePort.updateCategoryMapping(domain);
 
-        // 3. 파일이 null이면 저장을 하지 않는다.
+        // 3. 유저가 파일 삭제만 하고 업데이트를 했을수도 있으니 이 로직은 무조건 동작시킨다.
+        recipePort.softDeleteRecipeFile(domain, domain.getDeleteFileOrder());
+
+        // 4. 파일이 null이면 저장을 하지 않는다.
         if (!files.isEmpty()) {
 
-            // 3-1. 기존 파일 전부 soft delete 처리
-            recipePort.softDeleteRecipeFilesByRecipeId(recipeId);
-
-            // 3-2. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
-            List<RecipeFile> recipeFileList = IntStream.range(0, files.size())
-                    .mapToObj(fileOrder -> imageS3Service.createRecipeFile(files.get(fileOrder), fileOrder, recipeId))
+            // 4-1. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
+            List<RecipeFile> recipeFileList = files
+                    .stream()
+                    .map(file -> imageS3Service.createRecipeFile(file, recipeId))
                     .collect(Collectors.toList());
 
-            // 3-3. rdb에 레시피 파일(이미지)을 저장
+            // 4-2. rdb에 레시피 파일(이미지)을 저장
             List<Long> savedFileIdList = recipePort.saveRecipeFile(recipeFileList);
 
-            // 3-4. 만약 저장 후 반환받은 id값이 없다면 예외처리
+            // 4-3. 만약 저장 후 반환받은 id값이 없다면 예외처리
             if (savedFileIdList.isEmpty()) {
                 throw new RecipeApplicationException(ErrorCode.RECIPE_FILE_SAVE_ERROR);
             }
         }
 
-        // 4. 비관심사: 스프링 이벤트 발행 (몽고db: 재료, 해시태그 저장)
+        // 5. 비관심사: 스프링 이벤트 발행 (몽고db: 재료, 해시태그 저장)
         eventPublisher.publishEvent(new RecipeCreationEvent(domain.getIngredient(), domain.getHashtag()));
     }
 

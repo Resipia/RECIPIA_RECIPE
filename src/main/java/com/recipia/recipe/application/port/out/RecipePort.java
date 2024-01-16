@@ -37,8 +37,6 @@ public interface RecipePort {
 
     void updateCategoryMapping(Recipe recipe);
 
-    Long softDeleteRecipeFilesByRecipeId(Long recipeId);
-
     NutritionalInfo getNutritionalInfo(Long recipeId);
 
     List<RecipeFile> getRecipeFile(Long recipeId);
@@ -48,4 +46,8 @@ public interface RecipePort {
     boolean checkIsRecipeMineExist(Recipe recipe);
 
     boolean checkIsRecipeExist(Recipe recipe);
+
+    Integer findMaxFileOrder(Long savedRecipeId);
+
+    Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder);
 }

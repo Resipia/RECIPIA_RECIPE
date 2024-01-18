@@ -99,22 +99,18 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType) {
-
         // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 securityContext에서 id를 꺼내서 사용한다.
         Long currentMemberId = securityUtil.getCurrentMemberId();
 
         // 2. 조건에 맞는 모든 레시피 리스트를 가져온다.
         Page<RecipeMainListResponseDto> recipeResponseDtoList = querydslRepository.getAllRecipeList(currentMemberId, pageable, sortType);
 
-        // 3. 받아온 데이터의 모든 recipeId값을 사용해서 관련된 서브 카테고리정보를 받아온다.
-        List<SubCategoryDto> subCategoryDtoList = recipeResponseDtoList.getContent()
-                .stream()
-                .map(RecipeMainListResponseDto::getId)
-                .flatMap(recipeId -> querydslRepository.findSubCategoryDtoListForRecipeId(recipeId).stream())
-                .toList();
+        // 3. 각 레시피 ID에 대해 해당하는 서브 카테고리 리스트를 조회하고 설정한다.
+        recipeResponseDtoList.getContent().forEach(dto -> {
+            List<SubCategoryDto> subCategoryDtoListForRecipe = querydslRepository.findSubCategoryDtoListForRecipeId(dto.getId());
+            dto.setSubCategoryList(subCategoryDtoListForRecipe);
+        });
 
-        // 4. 응답할 dto에 서브 카테고리 dto 정보를 추가한 후 반환한다.
-        recipeResponseDtoList.getContent().forEach(dto -> dto.setSubCategoryList(subCategoryDtoList));
         return recipeResponseDtoList;
     }
 

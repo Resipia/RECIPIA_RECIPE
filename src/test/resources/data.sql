@@ -10,47 +10,31 @@ VALUES (10, 10, 10, 10, 10, 1);
 
 INSERT INTO category (category_nm, sort_no, del_yn, create_dttm, update_dttm)
 VALUES ('한식', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       ('중식', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('분식', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        ('일식', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        ('양식', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 -- 한식 서브 카테고리 추가
-INSERT INTO sub_category (category_id, sub_category_nm, sort_no, del_yn, create_dttm, update_dttm)
-VALUES (1, '김치찌개', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (1, '된장찌개', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (1, '비빔밥', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (1, '불고기', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
--- 추가적인 한식 서브 카테고리 ...
+INSERT INTO sub_category (sub_category_nm, del_yn, create_dttm, update_dttm)
+VALUES ('냉면', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('국밥', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('한식3', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('한식4', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- 중식 서브 카테고리 추가
-INSERT INTO sub_category (category_id, sub_category_nm, sort_no, del_yn, create_dttm, update_dttm)
-VALUES (2, '짜장면', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (2, '짬뽕', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (2, '마파두부', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (2, '꿔바로우', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
--- 추가적인 중식 서브 카테고리 ...
+-- category_sub_map 테이블에 데이터 삽입
+INSERT INTO public.category_sub_map (category_id, sub_category_id, create_dttm)
+VALUES
+    (1, 1, CURRENT_TIMESTAMP),
+    (1, 2, CURRENT_TIMESTAMP),
+    (1, 3, CURRENT_TIMESTAMP),
+    (1, 4, CURRENT_TIMESTAMP);
 
--- 일식 서브 카테고리 추가
-INSERT INTO sub_category (category_id, sub_category_nm, sort_no, del_yn, create_dttm, update_dttm)
-VALUES (3, '초밥', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (3, '라멘', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (3, '돈부리', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (3, '우동', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
--- 추가적인 일식 서브 카테고리 ...
-
--- 양식 서브 카테고리 추가
-INSERT INTO sub_category (category_id, sub_category_nm, sort_no, del_yn, create_dttm, update_dttm)
-VALUES (4, '파스타', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (4, '스테이크', 2, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (4, '피자', 3, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-       (4, '샐러드', 4, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
--- 추가적인 양식 서브 카테고리 ...
 
 INSERT INTO recipe_category_map (recipe_id, sub_category_id, create_dttm)
-VALUES (1, 5, CURRENT_TIMESTAMP),
-       (1, 6, CURRENT_TIMESTAMP),
-       (1, 7, CURRENT_TIMESTAMP);
+VALUES (1, 1, CURRENT_TIMESTAMP),
+       (1, 2, CURRENT_TIMESTAMP),
+       (1, 3, CURRENT_TIMESTAMP);
 
 -- 댓글 추가
 INSERT INTO comment (recipe_id, member_id, comment_text, del_yn, create_dttm, update_dttm)

@@ -19,39 +19,30 @@ public class SubCategoryEntity extends UpdateDateTimeForEntity {
     @Column(name = "sub_category_id", nullable = false)
     private Long id;
 
-    @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private CategoryEntity categoryEntity;
-
     @Column(name = "sub_category_nm", nullable = false)
     private String subCategoryNm;
-
-    @Column(name = "sort_no", nullable = false)
-    private Integer sortNo;
 
     @Column(name = "del_yn", nullable = false)
     private String delYn;
 
     @Builder
-    private SubCategoryEntity(Long id, CategoryEntity categoryEntity, String subCategoryNm, Integer sortNo, String delYn) {
+    private SubCategoryEntity(Long id, String subCategoryNm, String delYn) {
         this.id = id;
-        this.categoryEntity = categoryEntity;
         this.subCategoryNm = subCategoryNm;
-        this.sortNo = sortNo;
         this.delYn = delYn;
     }
 
-    public static SubCategoryEntity of(Long id, CategoryEntity categoryEntity, String subCategoryNm, Integer sortNo, String delYn) {
-        return new SubCategoryEntity(id, categoryEntity, subCategoryNm, sortNo, delYn);
+    public static SubCategoryEntity of(Long id, String subCategoryNm, String delYn) {
+        return new SubCategoryEntity(id, subCategoryNm, delYn);
     }
 
-    public static SubCategoryEntity of(CategoryEntity categoryEntity, String subCategoryNm, Integer sortNo, String delYn) {
-        return new SubCategoryEntity(null, categoryEntity, subCategoryNm, sortNo, delYn);
+    public static SubCategoryEntity of(String subCategoryNm, String delYn) {
+        return new SubCategoryEntity(null, subCategoryNm, delYn);
     }
+
 
     public static SubCategoryEntity of(Long id) {
-        return new SubCategoryEntity(id, null, null, null, null);
+        return new SubCategoryEntity(id, null, null);
     }
 
     @Override

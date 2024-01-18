@@ -11,7 +11,10 @@ import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
-import com.recipia.recipe.domain.*;
+import com.recipia.recipe.domain.NutritionalInfo;
+import com.recipia.recipe.domain.Recipe;
+import com.recipia.recipe.domain.RecipeFile;
+import com.recipia.recipe.domain.SubCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -81,12 +83,12 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      * page=1과 size=10이면 '두 번째 페이지에 10개의 항목을 보여달라'는 요청이다.
      */
     @Override
-    public PagingResponseDto<RecipeMainListResponseDto> getAllRecipeList(int page, int size, String sortType) {
+    public PagingResponseDto<RecipeMainListResponseDto> getAllRecipeList(int page, int size, String sortType, List<Long> subCategoryList) {
         // 1. 정렬조건을 정한 뒤 Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
 
         // 2. 데이터를 받아온다.
-        Page<RecipeMainListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType);
+        Page<RecipeMainListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType, subCategoryList);
 
         // 3. 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해 준다.
         List<RecipeMainListResponseDto> content = allRecipeList.getContent();

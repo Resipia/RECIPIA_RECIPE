@@ -87,13 +87,14 @@ class RecipeServiceTest {
         int page = 0;
         int size = 10;
         String sortType = "new";
+        List<Long> subCategoryList = List.of();
         List<RecipeMainListResponseDto> recipeList = createMockRecipeList(size);
         Page<RecipeMainListResponseDto> mockPage = new PageImpl<>(recipeList);
 
-        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType))).thenReturn(mockPage);
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList())).thenReturn(mockPage);
 
         // When
-        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllRecipeList(page, size, sortType);
+        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList);
 
         // Then
         Assertions.assertThat(result.getContent()).hasSize(size);
@@ -107,12 +108,13 @@ class RecipeServiceTest {
         int page = 0;
         int size = 10;
         String sortType = "new";
+        List<Long> subCategoryList = List.of();
         Page<RecipeMainListResponseDto> emptyPage = Page.empty();
 
-        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType))).thenReturn(emptyPage);
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList())).thenReturn(emptyPage);
 
         // When
-        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllRecipeList(page, size, sortType);
+        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList);
 
         // Then
         Assertions.assertThat(result.getContent()).isEmpty();
@@ -128,7 +130,7 @@ class RecipeServiceTest {
         String sortType = "new";
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> sut.getAllRecipeList(invalidPage, size, sortType));
+        assertThrows(IllegalArgumentException.class, () -> sut.getAllRecipeList(invalidPage, size, sortType, null));
     }
 
     // todo: 예외처리가 필요하다.
@@ -151,10 +153,10 @@ class RecipeServiceTest {
         int page = 0;
         int size = 10;
         String sortType = "new";
-        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType))).thenThrow(new RuntimeException("DB Error"));
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList())).thenThrow(new RuntimeException("DB Error"));
 
         // When & Then
-        assertThrows(RuntimeException.class, () -> sut.getAllRecipeList(page, size, sortType));
+        assertThrows(RuntimeException.class, () -> sut.getAllRecipeList(page, size, sortType, null));
     }
 
     @Test
@@ -301,7 +303,7 @@ class RecipeServiceTest {
 
     private List<RecipeMainListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> RecipeMainListResponseDto.of((long) i, "Recipe " + i, "Nickname", false))
+                .mapToObj(i -> RecipeMainListResponseDto.of((long) i, "Recipe " + i, "Nickname", null))
                 .collect(Collectors.toList());
     }
 

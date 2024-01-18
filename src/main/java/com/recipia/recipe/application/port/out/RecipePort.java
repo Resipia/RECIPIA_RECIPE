@@ -2,7 +2,6 @@ package com.recipia.recipe.application.port.out;
 
 
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
-import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
@@ -23,7 +22,7 @@ public interface RecipePort {
 
     void createRecipeCategoryMap(Recipe recipe, Long savedRecipeId);
 
-    Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType);
+    Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList);
 
     Recipe getRecipeDetailView(Recipe domain);
 

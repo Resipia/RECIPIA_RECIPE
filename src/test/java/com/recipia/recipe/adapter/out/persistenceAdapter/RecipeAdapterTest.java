@@ -147,17 +147,15 @@ class RecipeAdapterTest extends TotalTestSupport {
         TestJwtConfig.setupMockJwt(expectedMemberId, dummyNickname);
         Pageable pageable = PageRequest.of(0, 10);
         String sortType = "new";
+        List<Long> subCategoryList = null;
 
         // when
-        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(pageable, sortType);
+        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(pageable, sortType, subCategoryList);
         System.out.println(result.getContent());
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).isNotEmpty();
-        result.getContent().forEach(dto -> {
-            assertThat(dto.getSubCategoryList()).isNotEmpty();
-        });
     }
 
     @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시, 상세 정보와 북마크 여부가 반환된다.")

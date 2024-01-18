@@ -33,10 +33,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 클라이언트로부터 전달받은 Authorization 헤더값을 추출
         String token = request.getHeader("Authorization");
+        log.debug("Authorization header: {}", token);
 
         // 토큰이 Bearer 스키마를 따르는지 확인
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // "Bearer " 접두어 제거
+            log.debug("Extracted JWT token: {}", token);
 
             // 토큰 유효성 검사
             if (validateToken(token)) {
@@ -60,7 +62,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
                 // SecurityContext에 인증 객체 넣어주기 (이렇게 하면 꺼내다 쓸 수 있다.)
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else {
+                log.debug("Invalid JWT token: {}", token);
             }
+        } else {
+            log.debug("No JWT token found in request headers");
         }
         // 필터 체인 실행
         filterChain.doFilter(request, response);

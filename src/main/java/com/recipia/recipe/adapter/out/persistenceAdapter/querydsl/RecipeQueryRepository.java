@@ -45,9 +45,9 @@ public class RecipeQueryRepository {
      */
     public Page<RecipeMainListResponseDto> getAllRecipeList(Long memberId, Pageable pageable, String sortType, List<Long> subCategoryList) {
 
-        // 북마크 여부 서브쿼리
-        JPQLQuery<Boolean> bookmarkSubQuery = JPAExpressions
-                .select(bookmarkEntity.count().gt(0L))
+        // 북마크 id 가져오는 서브쿼리
+        JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
+                .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
                 .where(bookmarkEntity.memberId.eq(memberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
@@ -74,7 +74,7 @@ public class RecipeQueryRepository {
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
-                        ExpressionUtils.as(bookmarkSubQuery, "isBookmarked")
+                        ExpressionUtils.as(bookmarkSubQuery, "bookmarkId")
                 ))
                 .from(recipeEntity)
                 .where(whereContidion);

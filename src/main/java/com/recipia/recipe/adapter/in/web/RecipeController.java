@@ -61,9 +61,10 @@ public class RecipeController {
     public ResponseEntity<PagingResponseDto<RecipeMainListResponseDto>> getAllRecipeList(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sortType", defaultValue = "new") String sortType
+            @RequestParam(value = "sortType", defaultValue = "new") String sortType,
+            @RequestParam(value = "subCategoryList", required = false) List<Long> subCategoryList
     ) {
-        PagingResponseDto<RecipeMainListResponseDto> allRecipeList = readRecipeUseCase.getAllRecipeList(page, size, sortType);
+        PagingResponseDto<RecipeMainListResponseDto> allRecipeList = readRecipeUseCase.getAllRecipeList(page, size, sortType, subCategoryList);
         return ResponseEntity.ok(allRecipeList);
     }
 

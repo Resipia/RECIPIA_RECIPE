@@ -82,6 +82,17 @@ public class RecipeQueryRepository {
                 .limit(pageable.getPageSize()) // 페이지당 보여질 개수(size)
                 .fetch();
 
+        // 레시피와 맵핑된 서브 카테고리 이름 조회 쿼리
+        resultList.forEach(dto -> {
+            List<String> subCategories = queryFactory
+                    .select(recipeCategoryMapEntity.subCategoryEntity.subCategoryNm)
+                    .from(recipeCategoryMapEntity)
+                    .where(recipeCategoryMapEntity.recipeEntity.id.eq(dto.getId()))
+                    .fetch();
+            dto.setSubCategoryList(subCategories);
+        });
+
+
         // 전체 카운트 (결과가 null일 경우 0으로 세팅하여 NPE 방지)
         Long totalCount = Optional.ofNullable(queryFactory
                         .select(recipeEntity.count())

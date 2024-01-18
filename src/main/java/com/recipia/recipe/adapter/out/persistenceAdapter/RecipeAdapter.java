@@ -105,12 +105,6 @@ public class RecipeAdapter implements RecipePort {
         // 2. 조건에 맞는 모든 레시피 리스트를 가져온다.
         Page<RecipeMainListResponseDto> recipeResponseDtoList = querydslRepository.getAllRecipeList(currentMemberId, pageable, sortType);
 
-        // 3. 각 레시피 ID에 대해 해당하는 서브 카테고리 리스트를 조회하고 설정한다.
-//        recipeResponseDtoList.getContent().forEach(dto -> {
-//            List<SubCategoryDto> subCategoryDtoListForRecipe = querydslRepository.findSubCategoryDtoListForRecipeId(dto.getId());
-//            dto.setSubCategoryList(subCategoryDtoListForRecipe);
-//        });
-
         return recipeResponseDtoList;
     }
 

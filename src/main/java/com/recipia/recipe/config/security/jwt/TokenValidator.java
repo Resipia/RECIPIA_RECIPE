@@ -1,7 +1,9 @@
 package com.recipia.recipe.config.security.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,7 +26,14 @@ public class TokenValidator {
             // 입력된 토큰 유형과 일치하는지 확인
             return type.equals(tokenType);
         } catch (JwtException jwtException) {
-            log.error("Invalid token: {}", jwtException.getMessage());
+            log.debug("JWT validation error: {}", jwtException.getMessage());
+            if (jwtException instanceof ExpiredJwtException) {
+                log.debug("Expired JWT token: {}", token);
+            } else if (jwtException instanceof MalformedJwtException) {
+                log.debug("Malformed JWT token: {}", token);
+            } else {
+                log.debug("Other JWT error: {}", jwtException.getClass().getSimpleName());
+            }
             return false;
         }
     }

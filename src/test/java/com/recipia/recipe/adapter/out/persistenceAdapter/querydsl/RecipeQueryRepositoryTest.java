@@ -43,16 +43,17 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     @Autowired
     private EntityManager entityManager;
 
-    @DisplayName("[happy] 전체 레시피 목록을 페이징하여 조회한다.")
+    @DisplayName("[happy] 서브 카테고리를 선택하지 않은 상황에서 전체 레시피 목록을 페이징하여 조회한다.")
     @Test
     void getAllRecipeListTest() {
         //given
         Long memberId = 1L; // 예시로 사용할 멤버 ID
         Pageable pageable = PageRequest.of(0, 10);
         String sortType = "new";
+        List<Long> subCategoryList = null;
 
         //when
-        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType);
+        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
 
         //then
         assertThat(result).isNotNull();
@@ -61,6 +62,30 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
             assertThat(recipe.getId()).isNotNull();
             assertThat(recipe.getRecipeName()).isNotNull();
             assertThat(recipe.getNickname()).isNotNull();
+            // 북마크 여부는 memberId에 따라 다를 수 있으므로, 테스트 케이스 작성시 주의 필요
+        });
+    }
+
+    @DisplayName("[happy] 서브 카테고리를 선택한 상황에서 전체 레시피 목록을 페이징하여 조회한다.")
+    @Test
+    void getAllRecipeListTestWithSubCategory() {
+        //given
+        Long memberId = 1L; // 예시로 사용할 멤버 ID
+        Pageable pageable = PageRequest.of(0, 10);
+        String sortType = "new";
+        List<Long> subCategoryList = List.of(1L);
+
+        //when
+        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
+
+        //then
+        assertThat(result).isNotNull();
+        Assertions.assertThat(result.getContent()).isNotEmpty();
+        result.getContent().forEach(recipe -> {
+            assertThat(recipe.getId()).isNotNull();
+            assertThat(recipe.getRecipeName()).isNotNull();
+            assertThat(recipe.getNickname()).isNotNull();
+            assertThat(recipe.getSubCategoryList().contains(1L));
             // 북마크 여부는 memberId에 따라 다를 수 있으므로, 테스트 케이스 작성시 주의 필요
         });
     }

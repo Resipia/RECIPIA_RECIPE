@@ -26,8 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -70,10 +69,10 @@ class RecipeControllerTest extends TotalTestSupport {
     @Test
     void test() throws Exception {
         //given
-        RecipeMainListResponseDto dto = RecipeMainListResponseDto.of("레시피명", "닉네임", false);
+        RecipeMainListResponseDto dto = RecipeMainListResponseDto.of("레시피명", "닉네임", null);
         PagingResponseDto<RecipeMainListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
-        when(readRecipeUseCase.getAllRecipeList(anyInt(), anyInt(), eq("new"))).thenReturn(pagingResponseDto);
+        when(readRecipeUseCase.getAllRecipeList(0, 10, "new", null)).thenReturn(pagingResponseDto);
 
         //when & then
         mockMvc.perform(get("/recipe/getAllRecipeList")

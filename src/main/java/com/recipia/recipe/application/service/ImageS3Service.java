@@ -1,10 +1,8 @@
 package com.recipia.recipe.application.service;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -17,9 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -156,5 +156,29 @@ public class ImageS3Service {
         DeleteObjectRequest deleteRequest = new DeleteObjectRequest(bucketName, key);
         amazonS3.deleteObject(deleteRequest);
     }
+
+    /**
+     * Pre-Signed URL을 생성하고 반환한다.
+     * @param filePath 버킷에서의 파일 경로
+     * @param duration URL의 유효 시간(분 단위)
+     * @return 생성된 Pre-Signed URL
+     */
+    public String generatePreSignedUrl(String filePath, int duration) {
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * duration; // 예: 60분
+        expiration.setTime(expTimeMillis);
+
+        // Pre-Signed URL 요청 생성
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                new GeneratePresignedUrlRequest(bucketName, filePath)
+                        .withMethod(HttpMethod.GET)
+                        .withExpiration(expiration);
+
+        // Pre-Signed URL 생성
+        URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
+    }
+
 
 }

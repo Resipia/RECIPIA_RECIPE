@@ -2,7 +2,6 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.*;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
@@ -110,23 +109,12 @@ public class RecipeAdapter implements RecipePort {
 
     /**
      * [READ] - 레시피 단건 상세조회
-     * 유저가 작성한 레시피 정보를 상세조회한다.
+     * 레시피 정보를 상세조회한다.
      */
     @Override
     public Recipe getRecipeDetailView(Recipe domain) {
-        // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 security에서 id를 받아서 사용한다.
-        RecipeDetailViewResponseDto dto = querydslRepository.getRecipeDetailView(domain.getId(), domain.getMemberId())
-                .orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
-
-        // 2. 레시피 도메인 객체를 생성해서 반환한다.
-        Recipe recipe = Recipe.builder()
-                .id(dto.getId())
-                .recipeName(dto.getRecipeName())
-                .recipeDesc(dto.getRecipeDesc())
-                .nickname(dto.getNickname())
-                .isBookmarked(dto.isBookmarked())
-                .memberId(domain.getMemberId())
-                .build();
+        // recipe 기본 정보를 가져온다.
+        Recipe recipe = querydslRepository.getRecipeDetailView(domain.getId(), domain.getMemberId()).orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         return recipe;
     }
@@ -155,7 +143,7 @@ public class RecipeAdapter implements RecipePort {
     @Override
     public NutritionalInfo getNutritionalInfo(Long recipeId) {
 
-        NutritionalInfoEntity nutritionalInfoEntity = nutritionalInfoRepository.findById(recipeId).orElseThrow(
+        NutritionalInfoEntity nutritionalInfoEntity = nutritionalInfoRepository.findByRecipe_Id(recipeId).orElseThrow(
                 () -> new RecipeApplicationException(ErrorCode.NUTRITIONAL_INFO_NOT_FOUND)
         );
 
@@ -165,13 +153,14 @@ public class RecipeAdapter implements RecipePort {
 
     /**
      * [READ] - 파일(이미지)정보 조회
-     * recipeId를 통해 관련된 파일 정보를 조회한다.
+     * recipeId를 통해 관련된 파일 정보 중 id, file order, file path를 조회한다.
      */
     @Override
-    public List<RecipeFile> getRecipeFile(Long recipeId) {
+    public List<RecipeFile> getRecipeFileList(Long recipeId) {
         List<RecipeFileEntity> resultEntityList = recipeFileRepository.findAllByRecipeId(recipeId);
+
         return resultEntityList.stream()
-                .map(recipeFileConverter::entityToDomain)
+                .map(recipeFileConverter::entityToDomainIdOrderPath)
                 .collect(Collectors.toList());
     }
 

@@ -38,7 +38,7 @@ public interface RecipePort {
 
     NutritionalInfo getNutritionalInfo(Long recipeId);
 
-    List<RecipeFile> getRecipeFile(Long recipeId);
+    List<RecipeFile> getRecipeFileList(Long recipeId);
 
     Long softDeleteByRecipeId(Recipe domain);
 

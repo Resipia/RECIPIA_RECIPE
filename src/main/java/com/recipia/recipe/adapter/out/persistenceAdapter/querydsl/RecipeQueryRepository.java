@@ -133,11 +133,11 @@ public class RecipeQueryRepository {
     /**
      * 레시피 단건에 대한 정보를 상세조회
      */
-    public Optional<RecipeDetailViewResponseDto> getRecipeDetailView(Long recipeId, Long currentMemberId) {
+    public Optional<Recipe> getRecipeDetailView(Long recipeId, Long currentMemberId) {
 
-        // 북마크 여부 서브쿼리
-        JPQLQuery<Boolean> bookmarkSubQuery = JPAExpressions
-                .select(bookmarkEntity.count().gt(0L))
+        // 북마크 id 서브쿼리
+        JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
+                .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
                 .where(bookmarkEntity.memberId.eq(currentMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
@@ -145,27 +145,26 @@ public class RecipeQueryRepository {
         JPQLQuery<String> nicknameSubQuery = JPAExpressions
                 .select(nicknameEntity.nickname)
                 .from(nicknameEntity)
-                .where(nicknameEntity.memberId.eq(currentMemberId));
+                .where(nicknameEntity.memberId.eq(recipeEntity.memberId));
 
-
-        // todo: RecipeLikeEntity의 id값 보내기 (없으면 NuLL)
+        // 좋아요 id 서브쿼리
         JPQLQuery<Long> recipeLikeSubQuery = JPAExpressions
                 .select(recipeLikeEntity.id)
                 .from(recipeLikeEntity)
-                .where(recipeEntity.id.eq(recipeLikeEntity.recipeEntity.id));
+                .where(recipeLikeEntity.memberId.eq(currentMemberId), recipeEntity.id.eq(recipeLikeEntity.recipeEntity.id));
 
         // 레시피 상세조회
         return Optional.ofNullable(queryFactory
-                .select(Projections.constructor(RecipeDetailViewResponseDto.class,
+                .select(Projections.fields(Recipe.class,
                         recipeEntity.id,
+                        recipeEntity.memberId,
                         recipeEntity.recipeName,
                         recipeEntity.recipeDesc,
                         recipeEntity.timeTaken,
                         recipeEntity.ingredient,
                         recipeEntity.hashtag,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
-                        recipeEntity.delYn,
-                        ExpressionUtils.as(bookmarkSubQuery, "isBookmarked"),
+                        ExpressionUtils.as(bookmarkSubQuery, "bookmarkId"),
                         ExpressionUtils.as(recipeLikeSubQuery, "recipeLikeId")
                 ))
                 .from(recipeEntity)

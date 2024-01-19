@@ -2,7 +2,6 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.*;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
@@ -154,13 +153,14 @@ public class RecipeAdapter implements RecipePort {
 
     /**
      * [READ] - 파일(이미지)정보 조회
-     * recipeId를 통해 관련된 파일 정보를 조회한다.
+     * recipeId를 통해 관련된 파일 정보 중 id, file order, file path를 조회한다.
      */
     @Override
-    public List<RecipeFile> getRecipeFile(Long recipeId) {
+    public List<RecipeFile> getRecipeFileList(Long recipeId) {
         List<RecipeFileEntity> resultEntityList = recipeFileRepository.findAllByRecipeId(recipeId);
+
         return resultEntityList.stream()
-                .map(recipeFileConverter::entityToDomain)
+                .map(recipeFileConverter::entityToDomainIdOrderPath)
                 .collect(Collectors.toList());
     }
 

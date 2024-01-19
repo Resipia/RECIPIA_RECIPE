@@ -98,7 +98,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         Long memberId = 1L;
 
         //when
-        Optional<RecipeDetailViewResponseDto> recipeDetailView = sut.getRecipeDetailView(invalidRecipeId, memberId);
+        Optional<Recipe> recipeDetailView = sut.getRecipeDetailView(invalidRecipeId, memberId);
 
         //then
         Assertions.assertThat(recipeDetailView).isEmpty();

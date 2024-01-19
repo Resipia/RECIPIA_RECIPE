@@ -72,7 +72,7 @@ class RecipeServiceTest {
         when(recipePort.createNutritionalInfo(recipe, savedRecipeId)).thenReturn(savedNutritionalInfoId);
 
         // when
-        Long result = sut.createRecipe(recipe, Collections.emptyList());
+        Long result = sut.createRecipe(recipe, null);
 
         // then
         verify(recipePort).createRecipeCategoryMap(recipe, savedRecipeId); // 카테고리 맵핑 저장 메서드는 실행되었는가
@@ -321,7 +321,7 @@ class RecipeServiceTest {
                 "N",
                 0L,
                 0,
-                false,
+                null,
                 Collections.emptyList()
         );
     }

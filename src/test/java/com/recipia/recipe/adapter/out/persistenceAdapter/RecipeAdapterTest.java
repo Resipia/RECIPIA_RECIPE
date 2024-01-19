@@ -28,6 +28,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("[통합] 레시피 Adapter 테스트")
 class RecipeAdapterTest extends TotalTestSupport {
@@ -158,7 +159,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         assertThat(result.getContent()).isNotEmpty();
     }
 
-    @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시, 상세 정보와 북마크 여부가 반환된다.")
+    @DisplayName("[happy] 유효한 레시피 ID로 상세 조회 시, 상세 정보가 반환된다.")
     @Test
     void getRecipeDetailViewWithValidRecipeIdTest() {
         // Given
@@ -175,7 +176,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         assertThat(result.getRecipeName()).isNotNull();
         assertThat(result.getNickname()).isNotNull();
         assertThat(result.getRecipeDesc()).isNotNull();
-        assertThat(result.isBookmarked()).isFalse(); // 북마크 여부 확인
+        assertNull(result.getBookmarkId());
     }
 
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 상세 조회 시, 예외가 발생한다.")
@@ -423,7 +424,7 @@ class RecipeAdapterTest extends TotalTestSupport {
                 "N",
                 0L,
                 0,
-                false,
+                null,
                 Collections.emptyList()
         );
     }
@@ -443,7 +444,7 @@ class RecipeAdapterTest extends TotalTestSupport {
                 "N",
                 0L,
                 0,
-                false,
+                null,
                 Collections.emptyList()
         );
     }

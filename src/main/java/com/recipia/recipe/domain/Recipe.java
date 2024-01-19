@@ -16,22 +16,22 @@ import java.util.List;
 @Setter
 public class Recipe {
 
-    private Long id;             // recipe pk
-    private Long memberId;       // 회원 ID
-    private String recipeName;   // 레시피명
-    private String recipeDesc;   // 레시피 설명
-    private Integer timeTaken;   // 레시피 따라하는데 필요한 시간
-    private String ingredient;   // 재료
-    private String hashtag;      // 해시태그
-    private NutritionalInfo nutritionalInfo;   // 영양소 도메인
-    private List<SubCategory> subCategory; // 맵핑된 서브 카테고리 도메인
-    private String nickname;     // 회원 닉네임
-    private List<RecipeFile> recipeFileList; // 레시피와 연관된 파일 리스트 도메인
-    private String delYn;        // 레시피 삭제여부
-    private Long recipeLikeId;   // 좋아요 id
-    private Integer likeCount;   // 레시피 좋아유 개수
-    private Long bookmarkId;    // 북마크 id
-    private List<Integer> deleteFileOrder; // 삭제할 이미지의 order
+    private Long id;                            // recipe pk
+    private Long memberId;                      // 회원 ID
+    private String recipeName;                  // 레시피명
+    private String recipeDesc;                  // 레시피 설명
+    private Integer timeTaken;                  // 레시피 따라하는데 필요한 시간
+    private String ingredient;                  // 재료
+    private String hashtag;                     // 해시태그
+    private NutritionalInfo nutritionalInfo;    // 영양소 도메인
+    private List<SubCategory> subCategory;      // 맵핑된 서브 카테고리 도메인
+    private String nickname;                    // 회원 닉네임
+    private List<RecipeFile> recipeFileList;    // 레시피와 연관된 파일 리스트 도메인
+    private String delYn;                       // 레시피 삭제여부
+    private Long recipeLikeId;                  // 좋아요 id
+    private Integer likeCount;                  // 레시피 좋아유 개수
+    private Long bookmarkId;                    // 북마크 id
+    private List<Integer> deleteFileOrder;      // 삭제할 이미지의 order
 
     @Builder
     public Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, List<Integer> deleteFileOrder) {

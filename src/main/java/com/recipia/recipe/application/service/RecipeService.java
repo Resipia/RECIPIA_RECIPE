@@ -1,6 +1,7 @@
 package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeFileResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
@@ -54,7 +55,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         recipePort.createRecipeCategoryMap(recipe, savedRecipeId);
 
         // 파일이 null이면 저장을 하지 않는다.
-        if (!files.isEmpty()) {
+        if (files != null) {
 
             // 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
             List<RecipeFile> recipeFileList = files
@@ -114,9 +115,21 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         NutritionalInfo nutritionalInfo = recipePort.getNutritionalInfo(recipeId);
         recipe.setNutritionalInfo(nutritionalInfo);
 
-        // 4. 이미지(파일)을 받아와서 도메인에 세팅한다.
-        List<RecipeFile> recipeFileList = recipePort.getRecipeFile(recipeId);
-        recipe.setRecipeFileList(recipeFileList);
+        // 4-1. 레시피 이미지의 id, file order, path를 리스트로 조회한다.
+        List<RecipeFile> recipeFileList = recipePort.getRecipeFileList(recipeId);
+
+        // 4-2. full path로 pre-signed-url을 생성하고 도메인에 세팅한다.
+        List<RecipeFile> recipeFileListWithPreUrl = recipeFileList.stream().map(
+                recipeFile -> {
+                    // Pre-Signed URL 생성
+                    String preSignedUrl = imageS3Service.generatePreSignedUrl(recipeFile.getStoredFilePath(), 60);
+
+                    // RecipeFileResponseDto 객체 생성 및 반환
+                    return RecipeFile.of(recipeFile.getId(), recipeFile.getFileOrder(), preSignedUrl);
+                }).toList();
+
+
+        recipe.setRecipeFileList(recipeFileListWithPreUrl);
 
         // 조회수 증가 로직 호출 (트랜잭션에 포함되지 않음)
         redisPort.incrementViewCount(recipeId);

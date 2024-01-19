@@ -25,8 +25,7 @@ public class RecipeDetailViewResponseDto {
     private List<SubCategoryDto> subCategoryDtoList; // 서브 카테고리
     private String nickname;            // 회원 닉네임
     private List<RecipeFileDto> recipeFileDtoList; // 레시피와 연관된 파일(이미지) 리스트
-    private String delYn;               // 레시피 삭제여부
-    private boolean isBookmarked;       // 북마크 여부
+    private Long bookmarkId;       // 북마크 여부
     private Long recipeLikeId;          // 좋아요 id
 //    private int viewCount; //todo: 조회수 나중에 추가
 
@@ -35,7 +34,7 @@ public class RecipeDetailViewResponseDto {
      * 모든 필드를 다 생성자에 넣으면 querydsl Projection에서 오류가 나서 필요한 데이터는 setter로 넣도록 함
      */
     @Builder
-    public RecipeDetailViewResponseDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn, boolean isBookmarked, Long recipeLikeId) {
+    public RecipeDetailViewResponseDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId) {
         this.id = id;
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
@@ -43,13 +42,12 @@ public class RecipeDetailViewResponseDto {
         this.ingredient = ingredient;
         this.hashtag = hashtag;
         this.nickname = nickname;
-        this.delYn = delYn;
-        this.isBookmarked = isBookmarked;
+        this.bookmarkId = bookmarkId;
         this.recipeLikeId = recipeLikeId;
     }
 
-    public static RecipeDetailViewResponseDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, String delYn, boolean isBookmarked, Long recipeLikeId) {
-        return new RecipeDetailViewResponseDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, delYn, isBookmarked, recipeLikeId);
+    public static RecipeDetailViewResponseDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId) {
+        return new RecipeDetailViewResponseDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, bookmarkId, recipeLikeId);
     }
 
 }

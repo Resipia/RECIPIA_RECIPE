@@ -58,7 +58,7 @@ public class RecipeConverter {
                 "N",
                 0L, // todo: 저장할때라서 일단 0L을 넣어줬다.
                 0,
-                false,
+                null,
                 dto.getDeleteFileOrder()
         );
     }
@@ -143,8 +143,7 @@ public class RecipeConverter {
                 domain.getIngredient(),
                 domain.getHashtag(),
                 domain.getNickname(),
-                domain.getDelYn(),
-                domain.isBookmarked(),
+                domain.getBookmarkId(),
                 domain.getRecipeLikeId() // 이 값은 꼭 존재해야 한다.(좋아요를 안했다면 0L 반환)
         );
 

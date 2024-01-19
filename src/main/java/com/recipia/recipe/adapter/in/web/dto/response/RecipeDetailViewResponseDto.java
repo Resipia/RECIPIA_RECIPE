@@ -1,7 +1,6 @@
 package com.recipia.recipe.adapter.in.web.dto.response;
 
 import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
-import com.recipia.recipe.adapter.in.web.dto.request.RecipeFileDto;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import lombok.Builder;
 import lombok.Data;
@@ -15,18 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class RecipeDetailViewResponseDto {
-    private Long id;                    // 레시피 id
-    private String recipeName;          // 레시피명
-    private String recipeDesc;          // 레시피 설명
-    private Integer timeTaken;          // 레시피 따라하는데 필요한 시간
-    private String ingredient;          // 재료
-    private String hashtag;             // 해시태그
-    private NutritionalInfoDto nutritionalInfoDto;   // 영양소 dto
-    private List<SubCategoryDto> subCategoryDtoList; // 서브 카테고리
-    private String nickname;            // 회원 닉네임
-    private List<RecipeFileDto> recipeFileDtoList; // 레시피와 연관된 파일(이미지) 리스트
-    private Long bookmarkId;       // 북마크 여부
-    private Long recipeLikeId;          // 좋아요 id
+    private Long id;                                    // 레시피 id
+    private String recipeName;                          // 레시피명
+    private String recipeDesc;                          // 레시피 설명
+    private Integer timeTaken;                          // 레시피 따라하는데 필요한 시간
+    private String ingredient;                          // 재료
+    private String hashtag;                             // 해시태그
+    private NutritionalInfoDto nutritionalInfoDto;      // 영양소 dto
+    private List<SubCategoryDto> subCategoryDtoList;    // 서브 카테고리
+    private String nickname;                            // 레시피 작성자 닉네임
+    private List<RecipeFileResponseDto> recipeFileUrlList;             // 레시피와 연관된 파일(이미지) 리스트
+    private Long bookmarkId;                            // 북마크 id
+    private Long recipeLikeId;                          // 좋아요 id
 //    private int viewCount; //todo: 조회수 나중에 추가
 
 

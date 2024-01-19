@@ -2,9 +2,9 @@ package com.recipia.recipe.domain.converter;
 
 import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
-import com.recipia.recipe.adapter.in.web.dto.request.RecipeFileDto;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeFileResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
@@ -124,17 +124,19 @@ public class RecipeConverter {
      */
     public RecipeDetailViewResponseDto domainToDetailViewResponseDto(Recipe domain) {
 
-        // 1. 도메인 객체를 dto로 변환한다.
+        // 1. 영양 정보 도메인 객체를 dto로 변환한다.
         NutritionalInfoDto nutritionalInfoDto = nutritionalInfoConverter.domainToDto(domain.getNutritionalInfo());
 
+        // 2. 서브 카테고리 도메인 객체를 dto로 변환한다.
         List<SubCategoryDto> subCategoryDtoList = domain.getSubCategory().stream()
                 .map(categoryConverter::domainToDto).toList();
 
-        List<RecipeFileDto> recipeFileDtoList = domain.getRecipeFileList().stream()
+        // 3. 레시피 파일 도메인 객체를 dto로 변환한다.
+        List<RecipeFileResponseDto> recipeFileDtoList = domain.getRecipeFileList().stream()
                 .map(recipeFileConverter::domainToDto)
                 .toList();
 
-        // 2. 변환된 dto 리스트를 추가시켜 준다. (쿼리 Projection을 위해서 setter로 따로 추가)
+        // 4. 변환된 dto 리스트를 추가시켜 준다. (쿼리 Projection을 위해서 setter로 따로 추가)
         RecipeDetailViewResponseDto recipeDetailViewResponseDto = RecipeDetailViewResponseDto.of(
                 domain.getId(),
                 domain.getRecipeName(),
@@ -144,12 +146,12 @@ public class RecipeConverter {
                 domain.getHashtag(),
                 domain.getNickname(),
                 domain.getBookmarkId(),
-                domain.getRecipeLikeId() // 이 값은 꼭 존재해야 한다.(좋아요를 안했다면 0L 반환)
+                domain.getRecipeLikeId() // 이 값은 꼭 존재해야 한다.(좋아요를 안했다면 0L 반환),
         );
 
         recipeDetailViewResponseDto.setNutritionalInfoDto(nutritionalInfoDto);
         recipeDetailViewResponseDto.setSubCategoryDtoList(subCategoryDtoList);
-        recipeDetailViewResponseDto.setRecipeFileDtoList(recipeFileDtoList);
+        recipeDetailViewResponseDto.setRecipeFileUrlList(recipeFileDtoList);
         return recipeDetailViewResponseDto;
     }
 }

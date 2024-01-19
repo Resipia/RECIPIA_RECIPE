@@ -75,6 +75,7 @@ public class NutritionalInfoConverter {
 
     public NutritionalInfoDto domainToDto(NutritionalInfo domain) {
         return NutritionalInfoDto.of(
+                domain.getId(),
                 domain.getCarbohydrates(),
                 domain.getProtein(),
                 domain.getFat(),

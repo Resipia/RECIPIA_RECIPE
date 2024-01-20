@@ -20,8 +20,8 @@ public class BookmarkConverter {
      */
     public Bookmark requestDtoToDomain(BookmarkRequestDto bookmarkRequestDto) {
         return Bookmark.of(
-                securityUtil.getCurrentMemberId(),
-                bookmarkRequestDto.getRecipeId()
+                bookmarkRequestDto.getRecipeId(),
+                securityUtil.getCurrentMemberId()
         );
     }
 

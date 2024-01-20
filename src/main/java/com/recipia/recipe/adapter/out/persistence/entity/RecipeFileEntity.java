@@ -1,5 +1,7 @@
 package com.recipia.recipe.adapter.out.persistence.entity;
 
+import com.recipia.recipe.adapter.out.persistence.entity.auditingfield.CreateDateTimeForEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.auditingfield.UpdateDateTimeForEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +12,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "recipe_file")
-public class RecipeFileEntity {
+public class RecipeFileEntity extends UpdateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

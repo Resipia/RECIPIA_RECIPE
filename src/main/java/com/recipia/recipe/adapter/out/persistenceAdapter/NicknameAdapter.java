@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
+import com.recipia.recipe.adapter.out.persistence.entity.NicknameEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.NicknameQuerydslRepository;
 import com.recipia.recipe.application.port.out.NicknamePort;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 public class NicknameAdapter implements NicknamePort {
 
     private final NicknameQuerydslRepository nicknameQuerydslRepository;
+    private final NicknameRepository nicknameRepository;
 
     /**
      * [UPDATE] - 닉네임 테이블의 닉네임 컬럼 변경
@@ -28,7 +30,7 @@ public class NicknameAdapter implements NicknamePort {
      * 여기서는 memberId로 유저의 닉네임 컬럼을 변경한다.
      */
     @Override
-    public Long updateNicknames(NicknameDto nicknameDto) {
+    public Long updateNickname(NicknameDto nicknameDto) {
         Long updateCount = nicknameQuerydslRepository.updateNicknames(nicknameDto);
 
         if (updateCount <= 0) {
@@ -36,5 +38,19 @@ public class NicknameAdapter implements NicknamePort {
         }
         log.info("Updated {} nickname entity with new nickname '{}' for memberId {}", updateCount, nicknameDto.nickname(), nicknameDto.memberId());
         return updateCount;
+    }
+
+    /**
+     * [CREATE] - 닉네임 테이블에 새로운 닉네임 저장
+     */
+    @Override
+    public Long saveNickname(NicknameDto nicknameDto) {
+
+        NicknameEntity nicknameEntity = NicknameEntity.of(
+                nicknameDto.memberId(),
+                nicknameDto.nickname()
+        );
+
+        return nicknameRepository.save(nicknameEntity).getId();
     }
 }

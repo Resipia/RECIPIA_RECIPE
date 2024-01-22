@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("[통합] 닉네임 Adapter 테스트")
 class NicknameAdapterTest extends TotalTestSupport {
@@ -36,7 +35,7 @@ class NicknameAdapterTest extends TotalTestSupport {
         NicknameDto nicknameDto = NicknameDto.of(1L, "changedNickname");
 
         //when
-        Long updatedCount = sut.updateNicknames(nicknameDto);
+        Long updatedCount = sut.updateNickname(nicknameDto);
 
         //then
         String nickname = nicknameRepository.findByMemberId(nicknameDto.memberId()).get().getNickname();
@@ -52,7 +51,7 @@ class NicknameAdapterTest extends TotalTestSupport {
         NicknameDto nicknameDto = NicknameDto.of(100L, "NotValidNickname");
 
         //when & then
-        assertThatThrownBy(() -> sut.updateNicknames(nicknameDto))
+        assertThatThrownBy(() -> sut.updateNickname(nicknameDto))
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("유저를 찾을 수 없습니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);

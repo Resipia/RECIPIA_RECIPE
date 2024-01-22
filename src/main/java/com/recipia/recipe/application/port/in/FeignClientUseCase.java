@@ -5,6 +5,7 @@ import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 
 public interface FeignClientUseCase {
 
-    Long updateNicknames(NicknameDto nicknameDto);
+    Long updateNickname(NicknameDto nicknameDto);
 
+    Long saveNickname(NicknameDto nicknameDto);
 }

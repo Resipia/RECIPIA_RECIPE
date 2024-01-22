@@ -7,6 +7,7 @@ import com.recipia.recipe.adapter.out.feign.MemberFeignClient;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.application.port.in.FeignClientUseCase;
 import com.recipia.recipe.common.event.NicknameChangeEvent;
+import com.recipia.recipe.common.event.SignUpEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -39,7 +40,35 @@ public class RequestFeignListener {
 
             // Feign 요청으로 받은 dto가 존재하면 Nickname 엔티티에서 유저 닉네임 변경
             if (nicknameDto != null) {
-                feignClientUseCase.updateNicknames(nicknameDto);
+                feignClientUseCase.updateNickname(nicknameDto);
+            }
+
+        } catch (Exception e) {
+            // 에러 태그 추가
+            feignRequestSpan.tag("error", e.toString());
+
+            // 에러 로깅
+            log.error("Feign request error: ", e);
+        } finally {
+            feignRequestSpan.finish();
+        }
+    }
+
+    /**
+     * Feign 클라이언트로 Member서버에서 회원가입되어 저장된 닉네임을 요청하는 리스너
+     */
+    @Transactional
+    @EventListener
+    public void requestSignUpMemberNickname(SignUpEvent event) {
+        Span feignRequestSpan = tracer.nextSpan().name("[RECIPE] /feign/member/getNickname request").start();
+        Long memberId = event.memberId();
+
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(feignRequestSpan)) {
+            NicknameDto nicknameDto = memberFeignClient.getNickname(memberId);
+
+            // Feign 요청으로 받은 dto가 존재하면 Nickname 엔티티에서 유저 닉네임 변경
+            if (nicknameDto != null) {
+                feignClientUseCase.saveNickname(nicknameDto);
             }
 
         } catch (Exception e) {

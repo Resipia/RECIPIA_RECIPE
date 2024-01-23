@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 public class RecipeDetailViewResponseDto {
     private Long id;                                    // 레시피 id
+    private Long memberId;                              // 멤버 id
     private String recipeName;                          // 레시피명
     private String recipeDesc;                          // 레시피 설명
     private Integer timeTaken;                          // 레시피 따라하는데 필요한 시간
@@ -33,8 +34,9 @@ public class RecipeDetailViewResponseDto {
      * 모든 필드를 다 생성자에 넣으면 querydsl Projection에서 오류가 나서 필요한 데이터는 setter로 넣도록 함
      */
     @Builder
-    public RecipeDetailViewResponseDto(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId) {
+    private RecipeDetailViewResponseDto(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId) {
         this.id = id;
+        this.memberId = memberId;
         this.recipeName = recipeName;
         this.recipeDesc = recipeDesc;
         this.timeTaken = timeTaken;
@@ -45,8 +47,8 @@ public class RecipeDetailViewResponseDto {
         this.recipeLikeId = recipeLikeId;
     }
 
-    public static RecipeDetailViewResponseDto of(Long id, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId) {
-        return new RecipeDetailViewResponseDto(id, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, bookmarkId, recipeLikeId);
+    public static RecipeDetailViewResponseDto of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId) {
+        return new RecipeDetailViewResponseDto(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, bookmarkId, recipeLikeId);
     }
 
 }

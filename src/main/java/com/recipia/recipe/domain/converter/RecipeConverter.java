@@ -139,6 +139,7 @@ public class RecipeConverter {
         // 4. 변환된 dto 리스트를 추가시켜 준다. (쿼리 Projection을 위해서 setter로 따로 추가)
         RecipeDetailViewResponseDto recipeDetailViewResponseDto = RecipeDetailViewResponseDto.of(
                 domain.getId(),
+                domain.getMemberId(),
                 domain.getRecipeName(),
                 domain.getRecipeDesc(),
                 domain.getTimeTaken(),

@@ -44,7 +44,7 @@ public class RecipeAdapter implements RecipePort {
     private final RecipeFileConverter recipeFileConverter;
     private final CategoryConverter categoryConverter;
 
-    private final RecipeQueryRepository querydslRepository;
+    private final RecipeQueryRepository recipeQuerydslRepository;
     private final RecipeRepository recipeRepository;
     private final NutritionalInfoRepository nutritionalInfoRepository;
     private final SubCategoryEntityRepository subCategoryEntityRepository;
@@ -79,8 +79,8 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [CREATE] - 카테고리 저장
-     * 카테고리 Map 테이블에 서브 카테고리 정보를 저장한다.
+     * [CREATE] - 레시피랑 카테고리 맵핑 저장
+     * 레시피와카테고리 Map 테이블에 레시피와 서브카테고리 정보를 저장한다.
      */
     @Override
     public void createRecipeCategoryMap(Recipe recipe, Long savedRecipeId) {
@@ -102,7 +102,7 @@ public class RecipeAdapter implements RecipePort {
         Long currentMemberId = securityUtil.getCurrentMemberId();
 
         // 2. 조건에 맞는 모든 레시피 리스트를 가져온다.
-        Page<RecipeMainListResponseDto> recipeResponseDtoList = querydslRepository.getAllRecipeList(currentMemberId, pageable, sortType, subCategoryList);
+        Page<RecipeMainListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllRecipeList(currentMemberId, pageable, sortType, subCategoryList);
 
         return recipeResponseDtoList;
     }
@@ -114,7 +114,7 @@ public class RecipeAdapter implements RecipePort {
     @Override
     public Recipe getRecipeDetailView(Recipe domain) {
         // recipe 기본 정보를 가져온다.
-        Recipe recipe = querydslRepository.getRecipeDetailView(domain.getId(), domain.getMemberId()).orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
+        Recipe recipe = recipeQuerydslRepository.getRecipeDetailView(domain.getId(), domain.getMemberId()).orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
         return recipe;
     }
@@ -127,7 +127,7 @@ public class RecipeAdapter implements RecipePort {
     public List<SubCategory> getSubCategories(Long recipeId) {
 
         // 1. 레시피 id로 관련된 서브 카테고리를 모두 찾는다.
-        List<SubCategoryDto> subCategoriesForRecipe = querydslRepository.findSubCategoryDtoListForRecipeId(recipeId);
+        List<SubCategoryDto> subCategoriesForRecipe = recipeQuerydslRepository.findSubCategoryDtoListForRecipeId(recipeId);
 
         List<SubCategory> subCategoryDomainList = subCategoriesForRecipe.stream()
                 .map(categoryConverter::dtoToDomain)
@@ -173,7 +173,7 @@ public class RecipeAdapter implements RecipePort {
     public Long softDeleteByRecipeId(Recipe domain) {
 
         // 1. soft delete로 del_yn을 모두 "Y"로 변경한다.
-        Long softDeletedRecipeCount = querydslRepository
+        Long softDeletedRecipeCount = recipeQuerydslRepository
                 .softDeleteRecipeByRecipeId(domain.getId());
 
         // 2. 로그를 남겨서 삭제 여부를 확인할 수 있도록 한다.
@@ -222,7 +222,7 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder) {
-        return querydslRepository.softDeleteRecipeFile(domain, deleteFileOrder);
+        return recipeQuerydslRepository.softDeleteRecipeFile(domain, deleteFileOrder);
     }
 
     /**
@@ -231,6 +231,29 @@ public class RecipeAdapter implements RecipePort {
     @Override
     public Long getMyRecipeCount(Long memberId) {
         return recipeRepository.countByMemberIdAndDelYn(memberId, "N");
+    }
+
+    /**
+     * [READ] 내가 작성한 recipe id 목록을 반환한다.
+     */
+    @Override
+    public List<Long> getAllMyRecipeIds(Long memberId) {
+        return recipeQuerydslRepository.findMyRecipeIds(memberId);
+    }
+
+    /**
+     * [READ] 내가 작성한 recipe중에서 조회수가 높은 5개의 목록을 가져온다.
+     */
+    @Override
+    public List<RecipeMainListResponseDto> getMyHighRecipeList(Long memberId, List<Long> myHighRecipeIds) {
+        List<RecipeMainListResponseDto> resultList = recipeQuerydslRepository.getMyHighRecipeList(memberId, myHighRecipeIds);
+
+        Map<Long, RecipeMainListResponseDto> recipesMap = resultList.stream()
+                .collect(Collectors.toMap(RecipeMainListResponseDto::getId, dto -> dto));
+
+        return myHighRecipeIds.stream()
+                .map(recipesMap::get)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -269,7 +292,7 @@ public class RecipeAdapter implements RecipePort {
 
         // 2. 도메인을 엔티티로 변환하고 레시피를 업데이트 한다.
         RecipeEntity recipeEntity = recipeConverter.domainToRecipeEntity(recipe);
-        return querydslRepository.updateRecipe(recipeEntity);
+        return recipeQuerydslRepository.updateRecipe(recipeEntity);
     }
 
     /**
@@ -290,7 +313,7 @@ public class RecipeAdapter implements RecipePort {
 
         // 3. 업데이트할 값을 엔티티로 변환하고 업데이트 한다.
         NutritionalInfoEntity updateNutritionalInfoEntity = nutritionalInfoConverter.domainToEntityUpdate(recipe.getNutritionalInfo());
-        Long updatedNutritionalInfoId = querydslRepository.updateNutritionalInfo(updateNutritionalInfoEntity);
+        Long updatedNutritionalInfoId = recipeQuerydslRepository.updateNutritionalInfo(updateNutritionalInfoEntity);
     }
 
 

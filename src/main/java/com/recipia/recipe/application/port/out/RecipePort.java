@@ -51,4 +51,9 @@ public interface RecipePort {
     Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder);
 
     Long getMyRecipeCount(Long memberId);
+
+    List<Long> getAllMyRecipeIds(Long memberId);
+
+    List<RecipeMainListResponseDto> getMyHighRecipeList(Long memberId, List<Long> myHighRecipeIds);
+
 }

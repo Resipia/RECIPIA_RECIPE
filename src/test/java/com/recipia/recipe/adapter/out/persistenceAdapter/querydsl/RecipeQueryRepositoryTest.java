@@ -1,8 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
-import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
@@ -50,7 +48,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         Long memberId = 1L; // 예시로 사용할 멤버 ID
         Pageable pageable = PageRequest.of(0, 10);
         String sortType = "new";
-        List<Long> subCategoryList = null;
+        List<Long> subCategoryList = List.of();
 
         //when
         Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
@@ -296,7 +294,39 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         Assertions.assertThat(updatedResult).isEqualTo(0);
     }
 
+    @DisplayName("[happy] 내가 작성한 레시피의 id를 목록으로 반환한다.")
+    @Test
+    void findMyRecipeIdsSuccess() {
+        // given
+        Long memberId = 1L;
+        // when
+        List<Long> myRecipeIds = sut.findMyRecipeIds(memberId);
+        // then
+        assertThat(myRecipeIds.size()).isEqualTo(2L);
+    }
+
+    @DisplayName("[happy] 내가 작성한 레시피 목록중에서 썸네일이 존재하면 썸네일도 포함해서 데이터를 반환한다.")
+    @Test
+    void getMyHighRecipeListWithThumbnail() {
+        // given
+        Long memberId = 1L;
+        List<Long> myHighRecipeIds = List.of(1L, 2L);
+        // when
+        List<RecipeMainListResponseDto> result = sut.getMyHighRecipeList(memberId, myHighRecipeIds);
+        // then
+        assertThat(result.get(0).getThumbnailFullPath()).isNotNull();
+    }
 
 
-
+    @DisplayName("[happy] 내가 작성한 레시피 목록중에서 썸네일이 존재하지 않으면 썸네일을 포함하지 않은 데이터를 반환한다.")
+    @Test
+    void getMyHighRecipeListWithoutThumbnail() {
+        // given
+        Long memberId = 1L;
+        List<Long> myHighRecipeIds = List.of(1L, 2L);
+        // when
+        List<RecipeMainListResponseDto> result = sut.getMyHighRecipeList(memberId, myHighRecipeIds);
+        // then
+        assertThat(result.get(1).getThumbnailFullPath()).isNull();
+    }
 }

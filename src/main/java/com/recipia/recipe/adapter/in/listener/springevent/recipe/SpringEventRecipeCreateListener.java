@@ -49,22 +49,26 @@ public class SpringEventRecipeCreateListener {
      * [extract] mongoDB에 재료 저장을 시도한다.
      */
     private void processIngredients(String ingredients) {
-        // 1. 저장하기 전에 재료를 , 단위로 분리한다.
-        List<String> splitIngredients = splitData(ingredients);
+        if (ingredients != null && !ingredients.isBlank()) {
+            // 1. 저장하기 전에 재료를 , 단위로 분리한다.
+            List<String> splitIngredients = splitData(ingredients);
 
-        // 2. 저장을 시도한다.
-        mongoUseCase.saveIngredientsIntoMongo(splitIngredients);
+            // 2. 저장을 시도한다.
+            mongoUseCase.saveIngredientsIntoMongo(splitIngredients);
+        }
     }
 
     /**
      * [extract] mongoDB에 해시태그 저장을 시도한다.
      */
     private void processHashtags(String hashtags) {
-        // 1. 저장하기 전에 재료를 , 단위로 분리한다.
-        List<String> splitHashtags = splitData(hashtags);
+        if (hashtags != null && !hashtags.isBlank()) {
+            // 1. 저장하기 전에 재료를 , 단위로 분리한다.
+            List<String> splitHashtags = splitData(hashtags);
 
-        // 2. 저장을 시도한다.
-        mongoUseCase.saveHashtagsIntoMongo(splitHashtags);
+            // 2. 저장을 시도한다.
+            mongoUseCase.saveHashtagsIntoMongo(splitHashtags);
+        }
     }
 
     // String 타입의 재료를 , 단위로 분리하여 리스트로 만들어준다.

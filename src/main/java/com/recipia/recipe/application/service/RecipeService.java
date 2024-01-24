@@ -92,9 +92,19 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         Page<RecipeMainListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType, subCategoryList);
 
         // 3. 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해 준다.
-        List<RecipeMainListResponseDto> content = allRecipeList.getContent();
+        List<RecipeMainListResponseDto> beforeContent = allRecipeList.getContent();
+
+        List<RecipeMainListResponseDto> finalResult = beforeContent.stream().map(dto -> {
+            if (dto.getThumbnailFullPath() != null) {
+                String preSignedUrl = imageS3Service.generatePreSignedUrl(dto.getThumbnailFullPath(), 60);
+                return RecipeMainListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl);
+            }
+            return dto;
+        }).collect(Collectors.toList());
+
+
         Long totalCount = allRecipeList.getTotalElements();
-        return PagingResponseDto.of(content, totalCount);
+        return PagingResponseDto.of(finalResult, totalCount);
     }
 
     /**

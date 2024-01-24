@@ -74,7 +74,16 @@ public class RecipeQueryRepository {
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
-                        ExpressionUtils.as(bookmarkSubQuery, "bookmarkId")
+                        ExpressionUtils.as(bookmarkSubQuery, "bookmarkId"),
+                        ExpressionUtils.as(JPAExpressions
+                                .select(recipeFileEntity.storedFilePath)
+                                .from(recipeFileEntity)
+                                .where(recipeFileEntity.id.eq(
+                                        JPAExpressions
+                                                .select(recipeFileEntity.id.min())
+                                                .from(recipeFileEntity)
+                                                .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
+                                )), "thumbnailFullPath")
                 ))
                 .from(recipeEntity)
                 .where(whereCondition);

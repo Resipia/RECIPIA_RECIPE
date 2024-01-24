@@ -1,5 +1,6 @@
 package com.recipia.recipe.adapter.in.web;
 
+import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.MyPageUseCase;
@@ -7,9 +8,7 @@ import com.recipia.recipe.common.utils.SecurityUtil;
 import com.recipia.recipe.domain.MyPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -46,6 +45,20 @@ public class MyPageController {
         return ResponseEntity.ok(
                 ResponseDto.success(result)
         );
+    }
+
+    /**
+     * 마이페이지에서 내가 작성한 레시피 조회
+     * page와 size는 각각 '현재 페이지'와 '페이지 당 항목 수'를 의미한다.
+     */
+    @GetMapping("/mypage/getAllMyRecipeList")
+    public ResponseEntity<PagingResponseDto<RecipeMainListResponseDto>> getAllMyRecipeList(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortType", defaultValue = "new") String sortType
+    ) {
+        PagingResponseDto<RecipeMainListResponseDto> allMyRecipeList = myPageUseCase.getAllMyRecipeList(page, size, sortType);
+        return ResponseEntity.ok(allMyRecipeList);
     }
 
 }

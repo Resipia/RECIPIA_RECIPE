@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 @DisplayName("[통합] 레시피 queryDsl 테스트")
 class RecipeQueryRepositoryTest extends TotalTestSupport {
@@ -305,7 +307,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         assertThat(myRecipeIds.size()).isEqualTo(2L);
     }
 
-    @DisplayName("[happy] 내가 작성한 레시피 목록중에서 썸네일이 존재하면 썸네일도 포함해서 데이터를 반환한다.")
+    @DisplayName("[happy] 내가 작성한 레시피 목록중에서 썸네일이 존재하면 썸네일 저장경로도 포함해서 데이터를 반환한다.")
     @Test
     void getMyHighRecipeListWithThumbnail() {
         // given
@@ -318,7 +320,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     }
 
 
-    @DisplayName("[happy] 내가 작성한 레시피 목록중에서 썸네일이 존재하지 않으면 썸네일을 포함하지 않은 데이터를 반환한다.")
+    @DisplayName("[happy] 내가 작성한 레시피 목록중에서 썸네일이 존재하지 않으면 썸네일 저장경로를 포함하지 않은 데이터를 반환한다.")
     @Test
     void getMyHighRecipeListWithoutThumbnail() {
         // given
@@ -329,4 +331,22 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         // then
         assertThat(result.get(1).getThumbnailFullPath()).isNull();
     }
+
+
+    @DisplayName("[happy] 내가 작성한 레시피 목록을 가져온다.")
+    @Test
+    void getAllMyRecipeListSuccess() {
+        // given
+        Long currentMemberId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+        String sortType = "new";
+
+        // when
+        Page<RecipeMainListResponseDto> allMyRecipeList = sut.getAllMyRecipeList(currentMemberId, pageable, sortType);
+
+        // then
+        assertThat(allMyRecipeList).isNotNull();
+    }
+
+
 }

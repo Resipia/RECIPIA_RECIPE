@@ -85,7 +85,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      */
     @Override
     public PagingResponseDto<RecipeMainListResponseDto> getAllRecipeList(int page, int size, String sortType, List<Long> subCategoryList) {
-        // 1. 정렬조건을 정한 뒤 Pageable 객체 생성
+        // 1. Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
 
         // 2. 데이터를 받아온다.

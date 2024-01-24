@@ -1,11 +1,15 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.in.MyPageUseCase;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.domain.MyPage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,14 +55,47 @@ public class MyPageService implements MyPageUseCase {
         List<RecipeMainListResponseDto> databaseResult = recipePort.getMyHighRecipeList(memberId, myHighRecipeIds);
 
         List<RecipeMainListResponseDto> finalResult = databaseResult.stream().map(dto -> {
+            // 만약 저장된 썸네일이 있다면, S3 pre-signed-url을 생성한다.
             if (dto.getThumbnailFullPath() != null) {
                 String preSignedUrl = imageS3Service.generatePreSignedUrl(dto.getThumbnailFullPath(), 60);
+                // 생성된 pre-signed-url을 세팅해주고 반환한다.
                 return RecipeMainListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl);
             }
+            // 만약 저장된 썸네일이 없다면 기존 데이터를 반환한다.
             return dto;
         }).collect(Collectors.toList());
 
         return finalResult;
+    }
+
+    /**
+     * [READ] 내가 작성한 모든 레시피 목록을 가져온다
+     */
+    @Override
+    public PagingResponseDto<RecipeMainListResponseDto> getAllMyRecipeList(int page, int size, String sortType) {
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 데이터를 받아온다.
+        Page<RecipeMainListResponseDto> databaseResult = recipePort.getAllMyRecipeList(pageable, sortType);
+
+        // 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해 준다.
+        List<RecipeMainListResponseDto> beforeContent = databaseResult.getContent();
+
+        List<RecipeMainListResponseDto> finalResult = beforeContent.stream().map(dto -> {
+            // 만약 저장된 썸네일이 있다면, S3 pre-signed-url을 생성한다.
+            if (dto.getThumbnailFullPath() != null) {
+                String preSignedUrl = imageS3Service.generatePreSignedUrl(dto.getThumbnailFullPath(), 60);
+                // 생성된 pre-signed-url을 세팅해주고 반환한다.
+                return RecipeMainListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl);
+            }
+            // 만약 저장된 썸네일이 없다면 기존 데이터를 반환한다.
+            return dto;
+        }).collect(Collectors.toList());
+
+
+        Long totalCount = databaseResult.getTotalElements();
+        return PagingResponseDto.of(finalResult, totalCount);
     }
 
     /**

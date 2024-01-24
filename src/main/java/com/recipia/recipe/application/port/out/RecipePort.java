@@ -56,4 +56,5 @@ public interface RecipePort {
 
     List<RecipeMainListResponseDto> getMyHighRecipeList(Long memberId, List<Long> myHighRecipeIds);
 
+    Page<RecipeMainListResponseDto> getAllMyRecipeList(Pageable pageable, String sortType);
 }

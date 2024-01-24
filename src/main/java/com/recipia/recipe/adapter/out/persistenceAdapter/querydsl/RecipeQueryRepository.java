@@ -55,13 +55,13 @@ public class RecipeQueryRepository {
         JPQLQuery<String> nicknameSubQuery = JPAExpressions
                 .select(nicknameEntity.nickname)
                 .from(nicknameEntity)
-                .where(nicknameEntity.memberId.eq(memberId));
+                .where(nicknameEntity.memberId.eq(recipeEntity.memberId));
 
         // where 조건 생성
-        BooleanExpression whereContidion = recipeEntity.delYn.eq("N");      // 삭제 여부는 필수
+        BooleanExpression whereCondition = recipeEntity.delYn.eq("N");      // 삭제 여부는 필수
         // 서브 카테고리는 옵션값
         if (subCategoryList != null && !subCategoryList.isEmpty()) {
-            whereContidion = whereContidion.and(recipeEntity.id.in(
+            whereCondition = whereCondition.and(recipeEntity.id.in(
                     JPAExpressions.select(recipeCategoryMapEntity.recipeEntity.id)
                             .from(recipeCategoryMapEntity)
                             .where(recipeCategoryMapEntity.subCategoryEntity.id.in(subCategoryList))
@@ -70,14 +70,14 @@ public class RecipeQueryRepository {
 
         // sort 이전 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
         JPAQuery<RecipeMainListResponseDto> query = queryFactory
-                .select(Projections.constructor(RecipeMainListResponseDto.class, //subCategory 주의가 필요 (일단 null로 들어가고 아래에서 데이터를 추가해줌)
+                .select(Projections.fields(RecipeMainListResponseDto.class, //subCategory 주의가 필요 (일단 null로 들어가고 아래에서 데이터를 추가해줌)
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
                         ExpressionUtils.as(bookmarkSubQuery, "bookmarkId")
                 ))
                 .from(recipeEntity)
-                .where(whereContidion);
+                .where(whereCondition);
 
         // 정렬 조건(sortType) 적용
         query = switch (sortType) {
@@ -108,7 +108,7 @@ public class RecipeQueryRepository {
         Long totalCount = Optional.ofNullable(queryFactory
                         .select(recipeEntity.count())
                         .from(recipeEntity)
-                        .where(whereContidion)
+                        .where(whereCondition)
                         .fetchOne())
                 .orElse(0L);
 
@@ -236,5 +236,72 @@ public class RecipeQueryRepository {
                 )
                 .set(recipeFileEntity.delYn, "Y")
                 .execute();
+    }
+
+    /**
+     * [READ] 내가 작성한 레시피의 id 목록을 반환한다.
+     */
+    public List<Long> findMyRecipeIds(Long memberId) {
+        return queryFactory.select(recipeEntity.id)
+                .from(recipeEntity)
+                .where(recipeEntity.memberId.eq(memberId), recipeEntity.delYn.eq("N"))
+                .fetch();
+
+    }
+
+    /**
+     * [READ] myHighRecipeIds에 해당하는 레시피 정보를 목록형으로 가져온다.
+     */
+    public List<RecipeMainListResponseDto> getMyHighRecipeList(Long memberId, List<Long> myHighRecipeIds) {
+
+        // 북마크 id 가져오는 서브쿼리
+        JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
+                .select(bookmarkEntity.id)
+                .from(bookmarkEntity)
+                .where(bookmarkEntity.memberId.eq(memberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
+
+        // 닉네임 엔티티에서 닉네임 조회 서브쿼리
+        JPQLQuery<String> nicknameSubQuery = JPAExpressions
+                .select(nicknameEntity.nickname)
+                .from(nicknameEntity)
+                .where(nicknameEntity.memberId.eq(memberId));
+
+        // where 조건 생성
+        // 삭제 안된 레시피
+        // 내가 작성한 레시피
+        BooleanExpression whereCondition = recipeEntity.delYn.eq("N").and(recipeEntity.id.in(myHighRecipeIds));
+
+        // 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
+        List<RecipeMainListResponseDto> resultList = queryFactory
+                .select(Projections.fields(RecipeMainListResponseDto.class,
+                        recipeEntity.id,
+                        recipeEntity.recipeName,
+                        ExpressionUtils.as(nicknameSubQuery, "nickname"),
+                        ExpressionUtils.as(bookmarkSubQuery, "bookmarkId"),
+                        ExpressionUtils.as(JPAExpressions
+                                .select(recipeFileEntity.storedFilePath)
+                                .from(recipeFileEntity)
+                                .where(recipeFileEntity.id.eq(
+                                        JPAExpressions
+                                                .select(recipeFileEntity.id.min())
+                                                .from(recipeFileEntity)
+                                                .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
+                                )), "thumbnailFullPath")))
+                .from(recipeEntity)
+                .where(whereCondition)
+                .fetch();
+
+
+        // 메인 쿼리 종료 후, 레시피와 맵핑된 서브 카테고리 이름 조회 쿼리 실행 후 세팅
+        resultList.forEach(dto -> {
+            List<String> subCategories = queryFactory
+                    .select(recipeCategoryMapEntity.subCategoryEntity.subCategoryNm)
+                    .from(recipeCategoryMapEntity)
+                    .where(recipeCategoryMapEntity.recipeEntity.id.eq(dto.getId()))
+                    .fetch();
+            dto.setSubCategoryList(subCategories);
+        });
+
+        return resultList;
     }
 }

@@ -49,4 +49,6 @@ public interface RecipePort {
     Integer findMaxFileOrder(Long savedRecipeId);
 
     Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder);
+
+    Long getMyRecipeCount(Long memberId);
 }

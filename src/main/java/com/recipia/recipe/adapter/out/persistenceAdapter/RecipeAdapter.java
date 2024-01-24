@@ -226,6 +226,14 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
+     * [READ] memberId에 해당하는 회원이 작성한 레시피의 갯수를 반환한다.
+     */
+    @Override
+    public Long getMyRecipeCount(Long memberId) {
+        return recipeRepository.countByMemberIdAndDelYn(memberId, "N");
+    }
+
+    /**
      * [CREATE] - S3에 업로드된 파일(이미지) 정보 저장
      * 서비스에서 s3에 이미지 업로드가 완료된 후 호출되어 s3 object의 url정보를 rdb에 저장한다.
      */

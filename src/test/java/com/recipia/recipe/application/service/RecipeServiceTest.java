@@ -303,7 +303,7 @@ class RecipeServiceTest {
 
     private List<RecipeMainListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> RecipeMainListResponseDto.of((long) i, "Recipe " + i, "Nickname", null))
+                .mapToObj(i -> RecipeMainListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null))
                 .collect(Collectors.toList());
     }
 

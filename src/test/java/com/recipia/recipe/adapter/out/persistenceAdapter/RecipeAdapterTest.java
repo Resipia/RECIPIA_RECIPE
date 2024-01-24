@@ -2,7 +2,6 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
-import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
@@ -409,6 +408,17 @@ class RecipeAdapterTest extends TotalTestSupport {
         Assertions.assertThat(deleteCount).isEqualTo(1);
     }
 
+    @DisplayName("[happy] 유효한 memberId가 들어왔을때 이 사용자가 작성한 레시피 갯수를 반환한다.")
+    @Test
+    void getRecipeCountSuccess() {
+        // given
+        Long memberId = 2L;
+        // when
+        Long myRecipeCount = sut.getMyRecipeCount(memberId);
+        // then
+        assertThat(myRecipeCount).isEqualTo(0L);
+
+    }
 
     private Recipe createRecipeDomain(long memberId, List<SubCategory> subCategory) {
         return Recipe.of(

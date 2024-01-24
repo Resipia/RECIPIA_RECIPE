@@ -1,17 +1,25 @@
 package com.recipia.recipe.application.service;
 
+import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.domain.MyPage;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -91,4 +99,30 @@ class MyPageServiceTest {
     }
 
 
+    @Test
+    @DisplayName("[happy] 기본 페이징으로 내가 작성한 레시피 목록을 정상적으로 가져온다.")
+    void whenGetAllMyRecipeList_thenReturnsPagedRecipes() {
+        // Given
+        int page = 0;
+        int size = 10;
+        Pageable pageable = PageRequest.of(page, size);
+        String sortType = "new";
+        List<RecipeMainListResponseDto> recipeList = createMockRecipeList(size);
+        Page<RecipeMainListResponseDto> mockPage = new PageImpl<>(recipeList);
+
+        when(recipePort.getAllMyRecipeList(pageable, sortType)).thenReturn(mockPage);
+
+        // When
+        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllMyRecipeList(page, size, sortType);
+
+        // Then
+        Assertions.assertThat(result.getContent()).hasSize(size);
+        Assertions.assertThat(result.getTotalCount()).isEqualTo(size);
+    }
+
+    private List<RecipeMainListResponseDto> createMockRecipeList(int size) {
+        return IntStream.range(0, size)
+                .mapToObj(i -> RecipeMainListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null))
+                .collect(Collectors.toList());
+    }
 }

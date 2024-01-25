@@ -1,7 +1,7 @@
 package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
@@ -88,13 +88,13 @@ class RecipeServiceTest {
         int size = 10;
         String sortType = "new";
         List<Long> subCategoryList = List.of();
-        List<RecipeMainListResponseDto> recipeList = createMockRecipeList(size);
-        Page<RecipeMainListResponseDto> mockPage = new PageImpl<>(recipeList);
+        List<RecipeListResponseDto> recipeList = createMockRecipeList(size);
+        Page<RecipeListResponseDto> mockPage = new PageImpl<>(recipeList);
 
         when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList())).thenReturn(mockPage);
 
         // When
-        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList);
+        PagingResponseDto<RecipeListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList);
 
         // Then
         Assertions.assertThat(result.getContent()).hasSize(size);
@@ -109,12 +109,12 @@ class RecipeServiceTest {
         int size = 10;
         String sortType = "new";
         List<Long> subCategoryList = List.of();
-        Page<RecipeMainListResponseDto> emptyPage = Page.empty();
+        Page<RecipeListResponseDto> emptyPage = Page.empty();
 
         when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList())).thenReturn(emptyPage);
 
         // When
-        PagingResponseDto<RecipeMainListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList);
+        PagingResponseDto<RecipeListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList);
 
         // Then
         Assertions.assertThat(result.getContent()).isEmpty();
@@ -301,9 +301,9 @@ class RecipeServiceTest {
         );
     }
 
-    private List<RecipeMainListResponseDto> createMockRecipeList(int size) {
+    private List<RecipeListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> RecipeMainListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null))
+                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null))
                 .collect(Collectors.toList());
     }
 

@@ -74,4 +74,17 @@ public class MyPageController {
         return ResponseEntity.ok(allMyBookmarkRecipeList);
     }
 
+    /**
+     * 마이페이지에서 내가 좋아요한 레시피 조회
+     * page와 size는 각각 '현재 페이지'와 '페이지 당 항목 수'를 의미한다.
+     */
+    @GetMapping("/mypage/myLikeRecipeList")
+    public ResponseEntity<PagingResponseDto<RecipeListResponseDto>> getAllMyLikeRecipeList(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        PagingResponseDto<RecipeListResponseDto> allMyLikeRecipeList = myPageUseCase.getAllMyLikeList(page, size);
+        return ResponseEntity.ok(allMyLikeRecipeList);
+    }
+
 }

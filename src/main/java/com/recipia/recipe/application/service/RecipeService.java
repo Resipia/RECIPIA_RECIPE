@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -56,10 +57,16 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         // 파일이 null이면 저장을 하지 않는다.
         if (files != null) {
 
+            // 순차적으로 file order를 올리기 위한 변수 선언
+            AtomicInteger currentMaxFileOrder = new AtomicInteger(recipePort.findMaxFileOrder(savedRecipeId));
+
             // 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
             List<RecipeFile> recipeFileList = files
                     .stream()
-                    .map(file -> imageS3Service.createRecipeFile(file, savedRecipeId))
+                    .map(file -> {
+
+                        return imageS3Service.createRecipeFile(file, savedRecipeId, currentMaxFileOrder.incrementAndGet());
+                    })
                     .collect(Collectors.toList());
 
             // db에 레시피 파일(이미지)를 저장한다.
@@ -168,10 +175,14 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         // 4. 파일이 null이면 저장을 하지 않는다.
         if (!files.isEmpty()) {
 
+            // 순차적으로 file order를 올리기 위한 변수 선언
+            AtomicInteger currentMaxFileOrder = new AtomicInteger(recipePort.findMaxFileOrder(domain.getId()));
+
+
             // 4-1. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
             List<RecipeFile> recipeFileList = files
                     .stream()
-                    .map(file -> imageS3Service.createRecipeFile(file, recipeId))
+                    .map(file -> imageS3Service.createRecipeFile(file, recipeId, currentMaxFileOrder.incrementAndGet()))
                     .collect(Collectors.toList());
 
             // 4-2. rdb에 레시피 파일(이미지)을 저장

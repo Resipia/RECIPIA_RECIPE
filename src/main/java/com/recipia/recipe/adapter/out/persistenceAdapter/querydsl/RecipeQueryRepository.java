@@ -78,9 +78,9 @@ public class RecipeQueryRepository {
                         ExpressionUtils.as(JPAExpressions
                                 .select(recipeFileEntity.storedFilePath)
                                 .from(recipeFileEntity)
-                                .where(recipeFileEntity.fileOrder.eq(
+                                .where(recipeFileEntity.id.eq(
                                         JPAExpressions
-                                                .select(recipeFileEntity.fileOrder.min())
+                                                .select(recipeFileEntity.id.min())
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
                                 )), "thumbnailFullPath")
@@ -290,9 +290,9 @@ public class RecipeQueryRepository {
                         ExpressionUtils.as(JPAExpressions
                                 .select(recipeFileEntity.storedFilePath)
                                 .from(recipeFileEntity)
-                                .where(recipeFileEntity.fileOrder.eq(
+                                .where(recipeFileEntity.id.eq(
                                         JPAExpressions
-                                                .select(recipeFileEntity.fileOrder.min())
+                                                .select(recipeFileEntity.id.min())
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
                                 )), "thumbnailFullPath")))
@@ -340,9 +340,9 @@ public class RecipeQueryRepository {
                         ExpressionUtils.as(JPAExpressions
                                 .select(recipeFileEntity.storedFilePath)
                                 .from(recipeFileEntity)
-                                .where(recipeFileEntity.fileOrder.eq(
+                                .where(recipeFileEntity.id.eq(
                                         JPAExpressions
-                                                .select(recipeFileEntity.fileOrder.min())
+                                                .select(recipeFileEntity.id.min())
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
                                 )), "thumbnailFullPath")

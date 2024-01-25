@@ -2,7 +2,7 @@ package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.*;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
 import com.recipia.recipe.application.port.out.RecipePort;
@@ -97,12 +97,12 @@ public class RecipeAdapter implements RecipePort {
      * querydsl을 사용해서 데이터를 조회를 최적화 했다. (목록, count)
      */
     @Override
-    public Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList) {
+    public Page<RecipeListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList) {
         // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 securityContext에서 id를 꺼내서 사용한다.
         Long currentMemberId = securityUtil.getCurrentMemberId();
 
         // 2. 조건에 맞는 모든 레시피 리스트를 가져온다.
-        Page<RecipeMainListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllRecipeList(currentMemberId, pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllRecipeList(currentMemberId, pageable, sortType, subCategoryList);
 
         return recipeResponseDtoList;
     }
@@ -226,45 +226,54 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [READ] memberId에 해당하는 회원이 작성한 레시피의 갯수를 반환한다.
+     * [READ] targetMemberId에 해당하는 회원이 작성한 레시피의 갯수를 반환한다.
      */
     @Override
-    public Long getMyRecipeCount(Long memberId) {
-        return recipeRepository.countByMemberIdAndDelYn(memberId, "N");
+    public Long getTargetMemberIdRecipeCount(Long targetMemberId) {
+        return recipeRepository.countByMemberIdAndDelYn(targetMemberId, "N");
     }
 
     /**
-     * [READ] 내가 작성한 recipe id 목록을 반환한다.
+     * [READ] targetMember가 작성한 recipe id 목록을 반환한다.
      */
     @Override
-    public List<Long> getAllMyRecipeIds(Long memberId) {
-        return recipeQuerydslRepository.findMyRecipeIds(memberId);
+    public List<Long> getTargetMemberRecipeIds(Long targetMemberId) {
+        return recipeQuerydslRepository.findTargetMemberRecipeIds(targetMemberId);
     }
 
     /**
-     * [READ] 내가 작성한 recipe중에서 조회수가 높은 5개의 목록을 가져온다.
+     * [READ] targetMember가 작성한 recipe중에서 조회수가 높은 5개의 목록을 가져온다.
      */
     @Override
-    public List<RecipeMainListResponseDto> getMyHighRecipeList(Long memberId, List<Long> myHighRecipeIds) {
-        List<RecipeMainListResponseDto> resultList = recipeQuerydslRepository.getMyHighRecipeList(memberId, myHighRecipeIds);
+    public List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, List<Long> highRecipeIds) {
+        List<RecipeListResponseDto> resultList = recipeQuerydslRepository.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
 
-        Map<Long, RecipeMainListResponseDto> recipesMap = resultList.stream()
-                .collect(Collectors.toMap(RecipeMainListResponseDto::getId, dto -> dto));
+        Map<Long, RecipeListResponseDto> recipesMap = resultList.stream()
+                .collect(Collectors.toMap(RecipeListResponseDto::getId, dto -> dto));
 
-        return myHighRecipeIds.stream()
+        return highRecipeIds.stream()
                 .map(recipesMap::get)
                 .collect(Collectors.toList());
     }
 
     /**
-     * [READ] 내가 작성한 레시피 목록을 page 객체로 가져온다.
+     * [READ] targetMember가 작성한 레시피 목록을 page 객체로 가져온다.
      */
-    public Page<RecipeMainListResponseDto> getAllMyRecipeList(Pageable pageable, String sortType) {
-        // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 securityContext에서 id를 꺼내서 사용한다.
+    public Page<RecipeListResponseDto> getTargetMemberRecipeList(Long targetMemberId, Pageable pageable, String sortType) {
+        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getTargetRecipeList(targetMemberId, pageable, sortType);
+
+        return recipeResponseDtoList;
+    }
+
+    /**
+     * [READ] 내가 북마크한 레시피 목록을 page 객체로 가져온다.
+     */
+    @Override
+    public Page<RecipeListResponseDto> getAllMyBookmarkList(Pageable pageable) {
         Long currentMemberId = securityUtil.getCurrentMemberId();
 
-        // 2. 조건에 맞는 모든 레시피 리스트를 가져온다.
-        Page<RecipeMainListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllMyRecipeList(currentMemberId, pageable, sortType);
+        // 조건에 맞는 모든 레시피 리스트를 가져온다.
+        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllMyBookmarkList(currentMemberId, pageable);
 
         return recipeResponseDtoList;
     }

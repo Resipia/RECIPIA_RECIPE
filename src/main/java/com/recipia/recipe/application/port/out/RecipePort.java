@@ -1,7 +1,7 @@
 package com.recipia.recipe.application.port.out;
 
 
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
@@ -22,7 +22,7 @@ public interface RecipePort {
 
     void createRecipeCategoryMap(Recipe recipe, Long savedRecipeId);
 
-    Page<RecipeMainListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList);
+    Page<RecipeListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList);
 
     Recipe getRecipeDetailView(Recipe domain);
 
@@ -50,11 +50,13 @@ public interface RecipePort {
 
     Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder);
 
-    Long getMyRecipeCount(Long memberId);
+    Long getTargetMemberIdRecipeCount(Long targetMemberId);
 
-    List<Long> getAllMyRecipeIds(Long memberId);
+    List<Long> getTargetMemberRecipeIds(Long targetMemberId);
 
-    List<RecipeMainListResponseDto> getMyHighRecipeList(Long memberId, List<Long> myHighRecipeIds);
+    List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, List<Long> highRecipeIds);
 
-    Page<RecipeMainListResponseDto> getAllMyRecipeList(Pageable pageable, String sortType);
+    Page<RecipeListResponseDto> getTargetMemberRecipeList(Long targetMemberId, Pageable pageable, String sortType);
+
+    Page<RecipeListResponseDto> getAllMyBookmarkList(Pageable pageable);
 }

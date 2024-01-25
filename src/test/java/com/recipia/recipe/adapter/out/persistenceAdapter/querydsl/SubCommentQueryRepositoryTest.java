@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -71,4 +73,15 @@ class SubCommentQueryRepositoryTest extends TotalTestSupport {
         });
     }
 
+    @DisplayName("[happy] commentId에 해당하는 대댓글이 존재할때 soft delete한다.")
+    @Test
+    void findAllByRecipeEntity_Id() {
+        // given
+        List<Long> commentIds = List.of(1L);
+        // when
+        sut.softDeleteSubCommentByCommentIds(commentIds);
+        // then
+        List<SubCommentEntity> allByCommentEntityId = subCommentRepository.findAllByCommentEntity_Id(commentIds.get(0));
+        assertEquals(allByCommentEntityId.get(0).getDelYn(), "Y");
+    }
 }

@@ -2,10 +2,7 @@ package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
-import com.recipia.recipe.application.port.out.BookmarkPort;
-import com.recipia.recipe.application.port.out.RecipeLikePort;
-import com.recipia.recipe.application.port.out.RecipePort;
-import com.recipia.recipe.application.port.out.RedisPort;
+import com.recipia.recipe.application.port.out.*;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -48,23 +45,20 @@ class RecipeServiceTest {
 
     @Mock
     private RecipePort recipePort;
-
     @Mock
     private RedisPort redisPort;
-
     @Mock
     private ApplicationEventPublisher eventPublisher;
-
     @Mock
     private ImageS3Service imageS3Service;
-
     @InjectMocks
     private RecipeService sut;
-
     @Mock
     private BookmarkPort bookmarkPort;
     @Mock
     private RecipeLikePort recipeLikePort;
+    @Mock
+    private CommentPort commentPort;
 
     @DisplayName("[happy] 레시피 저장 시 저장된 레시피 ID를 반환하고 이벤트를 발생시킨다.")
     @Test
@@ -275,9 +269,6 @@ class RecipeServiceTest {
         Recipe domain = Recipe.of(1L);
         when(recipePort.checkIsRecipeMineExist(domain)).thenReturn(true);
         when(recipePort.softDeleteByRecipeId(domain)).thenReturn(1L);
-        when(recipePort.softDeleteRecipeFileByRecipeId(domain.getId())).thenReturn(1L);
-        when(bookmarkPort.deleteBookmarkByRecipeId(domain.getId())).thenReturn(1L);
-        when(recipeLikePort.deleteRecipeLikeByRecipeId(domain.getId())).thenReturn(1L);
 
         // when
         Long deletedCount = sut.deleteRecipeByRecipeId(domain);

@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Transactional
@@ -69,5 +71,28 @@ class CommentQueryRepositoryTest extends TotalTestSupport {
             assertThat(commentDto.getMemberId()).isNotNull();
             assertThat(commentDto.getNickname()).isNotNull();
         });
+    }
+
+    @DisplayName("[happy] recipeId에 해당하는 Comment pk값인 id를 List 형태로 반환한다.")
+    @Test
+    void findCommentIdsByRecipeId() {
+        // given
+        Long recipeId = 1L;
+        // when
+        List<Long> commentIdsByRecipeId = sut.findCommentIdsByRecipeId(recipeId);
+        // then
+        assertThat(commentIdsByRecipeId.size()).isEqualTo(1);
+    }
+
+    @DisplayName("[happy] recipeId에 해당하는 댓글이 존재할때 soft delete 한다.")
+    @Test
+    void softDeleteCommentByRecipeId() {
+        // given
+        Long recipeId = 1L;
+        // when
+        sut.softDeleteCommentByRecipeId(recipeId);
+        // then
+        List<CommentEntity> allByRecipeEntityId = commentRepository.findAllByRecipeEntity_Id(recipeId);
+        assertThat(allByRecipeEntityId.get(0).getDelYn()).isEqualTo("Y");
     }
 }

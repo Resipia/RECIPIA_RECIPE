@@ -1,6 +1,6 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeFileEntity;
@@ -53,7 +53,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         List<Long> subCategoryList = List.of();
 
         //when
-        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
 
         //then
         assertThat(result).isNotNull();
@@ -76,7 +76,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         List<Long> subCategoryList = List.of(1L);
 
         //when
-        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
 
         //then
         assertThat(result).isNotNull();
@@ -296,57 +296,71 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         Assertions.assertThat(updatedResult).isEqualTo(0);
     }
 
-    @DisplayName("[happy] 내가 작성한 레시피의 id를 목록으로 반환한다.")
+    @DisplayName("[happy] targetMember가 작성한 레시피의 id를 목록으로 반환한다.")
     @Test
-    void findMyRecipeIdsSuccess() {
+    void findTargetMemberRecipeIdsSuccess() {
         // given
-        Long memberId = 1L;
+        Long targetMemberId = 1L;
         // when
-        List<Long> myRecipeIds = sut.findMyRecipeIds(memberId);
+        List<Long> recipeIds = sut.findTargetMemberRecipeIds(targetMemberId);
         // then
-        assertThat(myRecipeIds.size()).isEqualTo(2L);
+        assertThat(recipeIds.size()).isEqualTo(2L);
     }
 
-    @DisplayName("[happy] 내가 작성한 레시피 목록중에서 썸네일이 존재하면 썸네일 저장경로도 포함해서 데이터를 반환한다.")
+    @DisplayName("[happy] targetMember가 작성한 레시피 목록중에서 썸네일이 존재하면 썸네일 저장경로도 포함해서 데이터를 반환한다.")
     @Test
-    void getMyHighRecipeListWithThumbnail() {
+    void getTargetMemberHighRecipeListWithThumbnail() {
         // given
-        Long memberId = 1L;
-        List<Long> myHighRecipeIds = List.of(1L, 2L);
+        Long targetMemberId = 1L;
+        List<Long> highRecipeIds = List.of(1L, 2L);
         // when
-        List<RecipeMainListResponseDto> result = sut.getMyHighRecipeList(memberId, myHighRecipeIds);
+        List<RecipeListResponseDto> result = sut.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
         // then
         assertThat(result.get(0).getThumbnailFullPath()).isNotNull();
     }
 
 
-    @DisplayName("[happy] 내가 작성한 레시피 목록중에서 썸네일이 존재하지 않으면 썸네일 저장경로를 포함하지 않은 데이터를 반환한다.")
+    @DisplayName("[happy] targetMember가 작성한 레시피 목록중에서 썸네일이 존재하지 않으면 썸네일 저장경로를 포함하지 않은 데이터를 반환한다.")
     @Test
-    void getMyHighRecipeListWithoutThumbnail() {
+    void getTargetMemberHighRecipeListWithoutThumbnail() {
         // given
-        Long memberId = 1L;
-        List<Long> myHighRecipeIds = List.of(1L, 2L);
+        Long targetMemberId = 1L;
+        List<Long> highRecipeIds = List.of(1L, 2L);
         // when
-        List<RecipeMainListResponseDto> result = sut.getMyHighRecipeList(memberId, myHighRecipeIds);
+        List<RecipeListResponseDto> result = sut.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
         // then
         assertThat(result.get(1).getThumbnailFullPath()).isNull();
     }
 
 
-    @DisplayName("[happy] 내가 작성한 레시피 목록을 가져온다.")
+    @DisplayName("[happy] targetMember가 작성한 레시피 목록을 가져온다.")
     @Test
-    void getAllMyRecipeListSuccess() {
+    void getTargetRecipeListSuccess() {
         // given
-        Long currentMemberId = 1L;
+        Long targetMemberId = 1L;
         Pageable pageable = PageRequest.of(0, 10);
         String sortType = "new";
 
         // when
-        Page<RecipeMainListResponseDto> allMyRecipeList = sut.getAllMyRecipeList(currentMemberId, pageable, sortType);
+        Page<RecipeListResponseDto> allMyRecipeList = sut.getTargetRecipeList(targetMemberId, pageable, sortType);
 
         // then
         assertThat(allMyRecipeList).isNotNull();
     }
 
+    @DisplayName("[happy] 내가 북마크한 레시피 목록을 가져온다.")
+    @Test
+    void getAllMyBookmarkList() {
+        // given
+        Long currentMemberId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+        // when
+        Page<RecipeListResponseDto> allMyBookmarkRecipeList = sut.getAllMyBookmarkList(currentMemberId, pageable);
+        // then
+        assertThat(allMyBookmarkRecipeList).isNotNull();
+        List<RecipeListResponseDto> content = allMyBookmarkRecipeList.getContent();
+        assertThat(content.size()).isEqualTo(2);
+        assertThat(content.get(0).getBookmarkId()).isEqualTo(2L);
+    }
 
 }

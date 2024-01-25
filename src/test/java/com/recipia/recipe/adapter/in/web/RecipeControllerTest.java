@@ -3,7 +3,7 @@ package com.recipia.recipe.adapter.in.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
@@ -69,8 +69,8 @@ class RecipeControllerTest extends TotalTestSupport {
     @Test
     void test() throws Exception {
         //given
-        RecipeMainListResponseDto dto = RecipeMainListResponseDto.of("레시피명", "닉네임", null, null, null);
-        PagingResponseDto<RecipeMainListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
+        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null);
+        PagingResponseDto<RecipeListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(readRecipeUseCase.getAllRecipeList(0, 10, "new", null)).thenReturn(pagingResponseDto);
 

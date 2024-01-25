@@ -279,6 +279,19 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
+     * [READ] 내가 좋아요한 레시피 목록을 page 객체로 가져온다.
+     */
+    @Override
+    public Page<RecipeListResponseDto> getAllMyLikeList(Pageable pageable) {
+        Long currentMemberId = securityUtil.getCurrentMemberId();
+
+        // 조건에 맞는 모든 레시피 리스트를 가져온다.
+        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllMyLikeList(currentMemberId, pageable);
+
+        return recipeResponseDtoList;
+    }
+
+    /**
      * [CREATE] - S3에 업로드된 파일(이미지) 정보 저장
      * 서비스에서 s3에 이미지 업로드가 완료된 후 호출되어 s3 object의 url정보를 rdb에 저장한다.
      */

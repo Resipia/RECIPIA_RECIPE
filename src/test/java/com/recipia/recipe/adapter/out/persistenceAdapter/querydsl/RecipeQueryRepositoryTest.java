@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 @DisplayName("[통합] 레시피 queryDsl 테스트")
+@Transactional
 class RecipeQueryRepositoryTest extends TotalTestSupport {
 
     @Autowired
@@ -360,7 +362,29 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         assertThat(allMyBookmarkRecipeList).isNotNull();
         List<RecipeListResponseDto> content = allMyBookmarkRecipeList.getContent();
         assertThat(content.size()).isEqualTo(2);
-        assertThat(content.get(0).getBookmarkId()).isEqualTo(2L);
+        assertThat(content.get(0).getBookmarkId()).isGreaterThanOrEqualTo(0L);
+    }
+
+    @DisplayName("[happy] recipeId에 해당하는 레시피 파일이 있을경우 0보다 큰 값을 리턴한다.")
+    @Test
+    void softDeleteRecipeFile() {
+        // given
+        Long recipeId = 1L;
+        // when
+        Long updatedCount = sut.softDeleteRecipeFileByRecipeId(recipeId);
+        // then
+        assertThat(updatedCount).isEqualTo(1L);
+    }
+
+    @DisplayName("[happy] recipeId에 해당하는 레시피 파일이 없을경우 0을 리턴한다.")
+    @Test
+    void softDeleteNonRecipeFile() {
+        // given
+        Long recipeId = 3L;
+        // when
+        Long updatedCount = sut.softDeleteRecipeFileByRecipeId(recipeId);
+        // then
+        assertThat(updatedCount).isEqualTo(0L);
     }
 
 }

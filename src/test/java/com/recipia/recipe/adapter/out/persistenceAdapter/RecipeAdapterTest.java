@@ -50,6 +50,9 @@ class RecipeAdapterTest extends TotalTestSupport {
     @Autowired
     private RecipeFileRepository recipeFileRepository;
 
+    @Autowired
+    private BookmarkRepository bookmarkRepository;
+
 
     @DisplayName("[happy] 유저가 레시피 저장에 성공하면 생성된 레시피의 id가 반환된다.")
     @Transactional
@@ -416,7 +419,6 @@ class RecipeAdapterTest extends TotalTestSupport {
         Long myRecipeCount = sut.getTargetMemberIdRecipeCount(targetMemberId);
         // then
         assertThat(myRecipeCount).isEqualTo(0L);
-
     }
 
     private Recipe createRecipeDomain(long memberId, List<SubCategory> subCategory) {

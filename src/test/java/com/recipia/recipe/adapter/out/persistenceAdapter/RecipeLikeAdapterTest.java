@@ -1,5 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
+import com.recipia.recipe.adapter.out.persistence.entity.BookmarkEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeLikeEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -9,6 +11,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("[통합] 레시피 queryDsl 테스트")
 class RecipeLikeAdapterTest extends TotalTestSupport {
@@ -92,6 +98,18 @@ class RecipeLikeAdapterTest extends TotalTestSupport {
                 .isInstanceOf(RecipeApplicationException.class)
                 .hasMessageContaining("좋아요가 존재하지 않습니다.")
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_LIKE);
+    }
+
+    @DisplayName("[happy] recipeId에 해당하는 좋아요 데이터를 삭제한다.")
+    @Test
+    void deleteRecipeLikeByRecipeId() {
+        // given
+        Long recipeId = 1L;
+        // when
+        Long deletedCount = sut.deleteRecipeLikeByRecipeId(recipeId);
+        // then
+        List<RecipeLikeEntity> allByRecipeEntityId = recipeLikeRepository.findAllByRecipeEntity_Id(recipeId);
+        assertThat(allByRecipeEntityId.size()).isEqualTo(0);
     }
 
 }

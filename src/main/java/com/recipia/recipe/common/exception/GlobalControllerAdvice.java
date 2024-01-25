@@ -3,11 +3,14 @@ package com.recipia.recipe.common.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 중앙 집중 예외처리를 위한 GlobalControllerAdvice 선언
@@ -23,7 +26,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(RecipeApplicationException.class)
     public ResponseEntity<?> handleRecipeApplicationException(RecipeApplicationException e) {
         log.error("RecipeApplicationException occurred", e);
-        return buildErrorResponse(e.getErrorCode(), e.getMessage());
+        return buildErrorResponse(e.getErrorCode(), null);
     }
 
     /**
@@ -42,6 +45,21 @@ public class GlobalControllerAdvice {
     public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
         log.error("IllegalArgumentException occurred", e);
         return buildErrorResponse(ErrorCode.BAD_REQUEST, "Invalid argument provided");
+    }
+
+    /**
+     * @Valid 어노테이션을 사용하고 @NotNull, @NotBlank 등 어노테이션이 달려있는 필수값이 누락된 채로 들어올때 아래 에러를 발생.
+     * MethodArgumentNotValidException 처리
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error("MethodArgumentNotValidException occurred", e);
+
+        String missingFields = e.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getField)
+                .collect(Collectors.joining(", "));  // 필드를 쉼표와 공백으로 구분하여 하나의 문자열로 합친다.
+
+        return buildErrorResponse(ErrorCode.BAD_REQUEST, missingFields);
     }
 
     /**

@@ -6,6 +6,8 @@ import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
+import com.recipia.recipe.application.port.out.BookmarkPort;
+import com.recipia.recipe.application.port.out.RecipeLikePort;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
@@ -39,6 +41,8 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     private final RedisPort redisPort;
     private final ApplicationEventPublisher eventPublisher;
     private final ImageS3Service imageS3Service;
+    private final BookmarkPort bookmarkPort;
+    private final RecipeLikePort recipeLikePort;
 
     /**
      * [CREATE] - 레시피 생성을 담당하는 메서드
@@ -204,12 +208,31 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      */
     @Transactional
     public Long deleteRecipeByRecipeId(Recipe domain) {
+        Long recipeId = domain.getId();
 
         // 1. 레시피가 존재하고 업데이트하려는 유저가 작성한 것이 맞는지 체크한다. (예외처리)
         checkIsRecipeExistAndMine(domain);
 
-        return recipePort.softDeleteByRecipeId(domain);
+        // 2. 레시피 삭제
+        Long updatedCount = recipePort.softDeleteByRecipeId(domain);
+
+        // 3. DB에서 레시피 파일 삭제
+        recipePort.softDeleteRecipeFileByRecipeId(recipeId);
+
+        // 4. 북마크 테이블에서 레시피 삭제
+        bookmarkPort.deleteBookmarkByRecipeId(recipeId);
+
+        // 5. 좋아요한 레시피 테이블에서 레시피 삭제
+        recipeLikePort.deleteRecipeLikeByRecipeId(recipeId);
+
+
+        // todo: redis에서 삭제된 레시피 조회수 삭제
+        // todo: 나중에 batch로 S3에서 삭제처리된 파일들 일괄삭제
+
+        return updatedCount;
     }
+
+
 
     /**
      * 레시피 도메인에서 recipeId, memberId, del_yn을 준비한다.

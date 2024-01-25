@@ -61,4 +61,8 @@ public interface RecipePort {
     Page<RecipeListResponseDto> getAllMyBookmarkList(Pageable pageable);
 
     Page<RecipeListResponseDto> getAllMyLikeList(Pageable pageable);
+
+
+    Long softDeleteRecipeFileByRecipeId(Long recipeId);
+
 }

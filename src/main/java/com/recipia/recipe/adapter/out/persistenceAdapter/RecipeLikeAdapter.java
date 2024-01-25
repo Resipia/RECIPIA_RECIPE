@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeLikeEntity;
+import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeLikeQuerydslRepository;
 import com.recipia.recipe.application.port.out.RecipeLikePort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -19,6 +20,7 @@ public class RecipeLikeAdapter implements RecipeLikePort {
     private final RecipeLikeRepository recipeLikeRepository;
     private final RecipeLikeConverter recipeLikeConverter;
     private final RecipeRepository recipeRepository;
+    private final RecipeLikeQuerydslRepository recipeLikeQuerydslRepository;
 
     /**
      * [CREATE]
@@ -51,6 +53,14 @@ public class RecipeLikeAdapter implements RecipeLikePort {
         // 3. 좋아요 삭제
         RecipeLikeEntity entity = recipeLikeConverter.domainToEntity(domain);
         recipeLikeRepository.delete(entity);
+    }
+
+    /**
+     * [DELETE] recipeId에 해당하는 좋아요 데이터를 삭제한다.
+     */
+    @Override
+    public Long deleteRecipeLikeByRecipeId(Long recipeId) {
+        return recipeLikeQuerydslRepository.deleteLikeByRecipeId(recipeId);
     }
 
     /**

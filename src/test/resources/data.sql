@@ -15,6 +15,7 @@ VALUES (1, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 -- 래시피 북마크 저장
 INSERT INTO bookmark (recipe_id, member_id, create_dttm)
 VALUES (1, 1, CURRENT_TIMESTAMP),
+       (1, 2, CURRENT_TIMESTAMP),
        (2, 1, DATEADD(MONTH, 1, CURRENT_DATE()));
 
 

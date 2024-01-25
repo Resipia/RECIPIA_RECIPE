@@ -59,4 +59,6 @@ public interface RecipePort {
     Page<RecipeListResponseDto> getTargetMemberRecipeList(Long targetMemberId, Pageable pageable, String sortType);
 
     Page<RecipeListResponseDto> getAllMyBookmarkList(Pageable pageable);
+
+    Page<RecipeListResponseDto> getAllMyLikeList(Pageable pageable);
 }

@@ -11,5 +11,6 @@ public interface MyPageUseCase {
     List<RecipeListResponseDto> getTargetMemberRecipeHigh(Long targetMemberId);
     PagingResponseDto<RecipeListResponseDto> getTargetMemberRecipeList(int page, int size, String sortType, Long targetMemberId);
     PagingResponseDto<RecipeListResponseDto> getAllMyBookmarkList(int page, int size);
+    PagingResponseDto<RecipeListResponseDto> getAllMyLikeList(int page, int size);
 
 }

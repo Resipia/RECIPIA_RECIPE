@@ -4,6 +4,8 @@ import com.querydsl.core.Tuple;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.*;
+import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.NutritionalInfoQueryRepository;
+import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeCategoryMapQueryRepository;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
 import com.recipia.recipe.application.port.out.RecipePort;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -51,8 +53,8 @@ public class RecipeAdapter implements RecipePort {
     private final RecipeCategoryMapRepository recipeCategoryMapRepository;
     private final RecipeFileRepository recipeFileRepository;
 
-    private final BookmarkRepository bookmarkRepository;
-
+    private final NutritionalInfoQueryRepository nutritionalInfoQueryRepository;
+    private final RecipeCategoryMapQueryRepository recipeCategoryMapQueryRepository;
     /**
      * [CREATE] - 레시피 저장
      * 저장에 성공하면 레시피 엔티티의 id값을 반환한다.
@@ -247,7 +249,8 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, List<Long> highRecipeIds) {
-        List<RecipeListResponseDto> resultList = recipeQuerydslRepository.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
+        Long loggedId = securityUtil.getCurrentMemberId();
+        List<RecipeListResponseDto> resultList = recipeQuerydslRepository.getTargetMemberHighRecipeList(targetMemberId, loggedId, highRecipeIds);
 
         Map<Long, RecipeListResponseDto> recipesMap = resultList.stream()
                 .collect(Collectors.toMap(RecipeListResponseDto::getId, dto -> dto));
@@ -261,7 +264,8 @@ public class RecipeAdapter implements RecipePort {
      * [READ] targetMember가 작성한 레시피 목록을 page 객체로 가져온다.
      */
     public Page<RecipeListResponseDto> getTargetMemberRecipeList(Long targetMemberId, Pageable pageable, String sortType) {
-        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getTargetRecipeList(targetMemberId, pageable, sortType);
+        Long loggedId = securityUtil.getCurrentMemberId();
+        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getTargetRecipeList(targetMemberId, loggedId, pageable, sortType);
 
         return recipeResponseDtoList;
     }
@@ -297,8 +301,23 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public Long softDeleteRecipeFileByRecipeId(Long recipeId) {
-        recipeQuerydslRepository.softDeleteRecipeFileByRecipeId(recipeId);
-        return null;
+        return recipeQuerydslRepository.softDeleteRecipeFileByRecipeId(recipeId);
+    }
+
+    /**
+     * [DELETE] recipeId에 해당하는 영양소 정보 삭제
+     */
+    @Override
+    public Long deleteNutritionalInfoByRecipeId(Long recipeId) {
+        return nutritionalInfoQueryRepository.deleteNutritionalInfoByRecipeId(recipeId);
+    }
+
+    /**
+     * [DELETE] recipeId에 해당하는 레시피-카테고리 맵펭 데이터 제거
+     */
+    @Override
+    public Long deleteRecipeCategoryMapByRecipeId(Long recipeId) {
+        return recipeCategoryMapQueryRepository.deleteRecipeCategoryMapByRecipeId(recipeId);
     }
 
     /**

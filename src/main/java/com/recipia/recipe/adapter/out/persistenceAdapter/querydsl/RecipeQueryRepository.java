@@ -44,7 +44,7 @@ public class RecipeQueryRepository {
      */
     public Page<RecipeListResponseDto> getAllRecipeList(Long memberId, Pageable pageable, String sortType, List<Long> subCategoryList) {
 
-        // 북마크 id 가져오는 서브쿼리
+        // 로그인 한 사용자가 북마크 한 레시피인지 확인하는 용도로 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
@@ -143,7 +143,7 @@ public class RecipeQueryRepository {
      */
     public Optional<Recipe> getRecipeDetailView(Long recipeId, Long currentMemberId) {
 
-        // 북마크 id 서브쿼리
+        // 로그인 한 사용자가 북마크 한 레시피인지 확인하는 용도로 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
@@ -260,13 +260,13 @@ public class RecipeQueryRepository {
     /**
      * [READ] highRecipeIds에 해당하는 레시피 정보를 목록형으로 가져온다.
      */
-    public List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, List<Long> highRecipeIds) {
+    public List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, Long memberId, List<Long> highRecipeIds) {
 
-        // 북마크 id 가져오는 서브쿼리
+        // 로그인 한 사용자가 북마크 한 레시피인지 확인하는 용도로 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
-                .where(bookmarkEntity.memberId.eq(targetMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
+                .where(bookmarkEntity.memberId.eq(memberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
         // 닉네임 엔티티에서 닉네임 조회 서브쿼리
         JPQLQuery<String> nicknameSubQuery = JPAExpressions
@@ -316,12 +316,12 @@ public class RecipeQueryRepository {
     /**
      * [READ] targetMember가 작성한 레시피 목록을 Page 객체로 가져온다.
      */
-    public Page<RecipeListResponseDto> getTargetRecipeList(Long targetMemberId, Pageable pageable, String sortType) {
-        // 북마크 id 가져오는 서브쿼리
+    public Page<RecipeListResponseDto> getTargetRecipeList(Long targetMemberId, Long loggedId, Pageable pageable, String sortType) {
+        // 로그인 한 사용자가 북마크 한 레시피인지 확인하는 용도로 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
-                .where(bookmarkEntity.memberId.eq(targetMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
+                .where(bookmarkEntity.memberId.eq(loggedId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
         // 닉네임 엔티티에서 닉네임 조회 서브쿼리
         JPQLQuery<String> nicknameSubQuery = JPAExpressions
@@ -387,7 +387,7 @@ public class RecipeQueryRepository {
      * [READ] 내가 북마크한 레시피 목록을 북마크 등록된 최신순으로 가져온다.
      */
     public Page<RecipeListResponseDto> getAllMyBookmarkList(Long currentMemberId, Pageable pageable) {
-        // 북마크 id 가져오는 서브쿼리
+        // 로그인 한 사용자가 북마크 한 레시피인지 확인하는 용도로 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
@@ -454,7 +454,7 @@ public class RecipeQueryRepository {
      */
     public Page<RecipeListResponseDto> getAllMyLikeList(Long currentMemberId, Pageable pageable) {
 
-        // 북마크 id 가져오는 서브쿼리
+        // 로그인 한 사용자가 북마크 한 레시피인지 확인하는 용도로 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.id)
                 .from(bookmarkEntity)

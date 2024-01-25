@@ -29,4 +29,6 @@ public interface CommentPort {
     Long softDeleteSubComment(SubComment subComment);
 
     Page<SubCommentListResponseDto> getSubCommentList(Long parentCommentId, Pageable pageable);
+
+    void softDeleteAllCommentsWithSubComments(Long recipeId);
 }

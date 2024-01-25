@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -136,6 +137,19 @@ public class CommentAdapter implements CommentPort {
     public Page<SubCommentListResponseDto> getSubCommentList(Long parentCommentId, Pageable pageable) {
         Page<SubCommentListResponseDto> subCommentDtoList = subCommentQueryRepository.getSubCommentDtoList(parentCommentId, pageable);
         return subCommentDtoList;
+    }
+
+    /**
+     * recipeId에 해당하는 댓글/대댓글 삭제처리(soft delete)
+     */
+    @Override
+    public void softDeleteAllCommentsWithSubComments(Long recipeId) {
+        // recipeId에 해당하는 commentId를 가져온다.
+        List<Long> commentIds = commentQueryRepository.findCommentIdsByRecipeId(recipeId);
+        // 그리고 댓글을 삭제처리한다.
+        commentQueryRepository.softDeleteCommentByRecipeId(recipeId);
+        // commentId에 해당하는 대댓글을 전부 삭제처리한다.
+        subCommentQueryRepository.softDeleteSubCommentByCommentIds(commentIds);
     }
 
 }

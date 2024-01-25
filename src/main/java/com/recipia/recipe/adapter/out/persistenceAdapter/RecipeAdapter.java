@@ -247,7 +247,8 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, List<Long> highRecipeIds) {
-        List<RecipeListResponseDto> resultList = recipeQuerydslRepository.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
+        Long loggedId = securityUtil.getCurrentMemberId();
+        List<RecipeListResponseDto> resultList = recipeQuerydslRepository.getTargetMemberHighRecipeList(targetMemberId, loggedId, highRecipeIds);
 
         Map<Long, RecipeListResponseDto> recipesMap = resultList.stream()
                 .collect(Collectors.toMap(RecipeListResponseDto::getId, dto -> dto));
@@ -261,7 +262,8 @@ public class RecipeAdapter implements RecipePort {
      * [READ] targetMember가 작성한 레시피 목록을 page 객체로 가져온다.
      */
     public Page<RecipeListResponseDto> getTargetMemberRecipeList(Long targetMemberId, Pageable pageable, String sortType) {
-        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getTargetRecipeList(targetMemberId, pageable, sortType);
+        Long loggedId = securityUtil.getCurrentMemberId();
+        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getTargetRecipeList(targetMemberId, loggedId, pageable, sortType);
 
         return recipeResponseDtoList;
     }
@@ -297,8 +299,7 @@ public class RecipeAdapter implements RecipePort {
      */
     @Override
     public Long softDeleteRecipeFileByRecipeId(Long recipeId) {
-        recipeQuerydslRepository.softDeleteRecipeFileByRecipeId(recipeId);
-        return null;
+        return recipeQuerydslRepository.softDeleteRecipeFileByRecipeId(recipeId);
     }
 
     /**

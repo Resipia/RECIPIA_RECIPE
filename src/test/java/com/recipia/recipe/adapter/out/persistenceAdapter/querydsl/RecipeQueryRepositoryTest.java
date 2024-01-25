@@ -314,9 +314,10 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     void getTargetMemberHighRecipeListWithThumbnail() {
         // given
         Long targetMemberId = 1L;
+        Long memberId = 2L;
         List<Long> highRecipeIds = List.of(1L, 2L);
         // when
-        List<RecipeListResponseDto> result = sut.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
+        List<RecipeListResponseDto> result = sut.getTargetMemberHighRecipeList(targetMemberId, memberId, highRecipeIds);
         // then
         assertThat(result.get(0).getThumbnailFullPath()).isNotNull();
     }
@@ -327,9 +328,10 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     void getTargetMemberHighRecipeListWithoutThumbnail() {
         // given
         Long targetMemberId = 1L;
+        Long memberId = 2L;
         List<Long> highRecipeIds = List.of(1L, 2L);
         // when
-        List<RecipeListResponseDto> result = sut.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
+        List<RecipeListResponseDto> result = sut.getTargetMemberHighRecipeList(targetMemberId, memberId, highRecipeIds);
         // then
         assertThat(result.get(1).getThumbnailFullPath()).isNull();
     }
@@ -342,9 +344,10 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         Long targetMemberId = 1L;
         Pageable pageable = PageRequest.of(0, 10);
         String sortType = "new";
+        Long memberId = 2L;
 
         // when
-        Page<RecipeListResponseDto> allMyRecipeList = sut.getTargetRecipeList(targetMemberId, pageable, sortType);
+        Page<RecipeListResponseDto> allMyRecipeList = sut.getTargetRecipeList(targetMemberId, memberId, pageable, sortType);
 
         // then
         assertThat(allMyRecipeList).isNotNull();

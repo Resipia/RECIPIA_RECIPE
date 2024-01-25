@@ -8,8 +8,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
@@ -43,7 +42,7 @@ public class RecipeQueryRepository {
      * fetch join을 사용하면 관련된 엔티티들이 메모리에 모두 로드되어서, 데이터베이스 레벨에서의 페이징이 아닌 메모리 레벨에서의 페이징이 발생할 수 있다.
      * 이는 대량의 데이터를 처리할 때 메모리 사용량이 증가하고, 성능 저하를 초래할 수 있다. 그래서 여기서는 fetchJoin을 사용하지 않는다.
      */
-    public Page<RecipeMainListResponseDto> getAllRecipeList(Long memberId, Pageable pageable, String sortType, List<Long> subCategoryList) {
+    public Page<RecipeListResponseDto> getAllRecipeList(Long memberId, Pageable pageable, String sortType, List<Long> subCategoryList) {
 
         // 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
@@ -69,8 +68,8 @@ public class RecipeQueryRepository {
         }
 
         // sort 이전 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
-        JPAQuery<RecipeMainListResponseDto> query = queryFactory
-                .select(Projections.fields(RecipeMainListResponseDto.class, //subCategory 주의가 필요 (일단 null로 들어가고 아래에서 데이터를 추가해줌)
+        JPAQuery<RecipeListResponseDto> query = queryFactory
+                .select(Projections.fields(RecipeListResponseDto.class, //subCategory 주의가 필요 (일단 null로 들어가고 아래에서 데이터를 추가해줌)
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
@@ -98,7 +97,7 @@ public class RecipeQueryRepository {
         };
 
         // sort 이후 메인 쿼리 (레시피 기본 정보 및 북마크 여부 조회) 실행
-        List<RecipeMainListResponseDto> resultList = query
+        List<RecipeListResponseDto> resultList = query
                 .offset(pageable.getOffset()) // 몇번째 페이지인지(page)
                 .limit(pageable.getPageSize()) // 페이지당 보여질 개수(size)
                 .fetch();
@@ -248,41 +247,41 @@ public class RecipeQueryRepository {
     }
 
     /**
-     * [READ] 내가 작성한 레시피의 id 목록을 반환한다.
+     * [READ] targetMember가 작성한 레시피의 id 목록을 반환한다.
      */
-    public List<Long> findMyRecipeIds(Long memberId) {
+    public List<Long> findTargetMemberRecipeIds(Long targetMemberId) {
         return queryFactory.select(recipeEntity.id)
                 .from(recipeEntity)
-                .where(recipeEntity.memberId.eq(memberId), recipeEntity.delYn.eq("N"))
+                .where(recipeEntity.memberId.eq(targetMemberId), recipeEntity.delYn.eq("N"))
                 .fetch();
 
     }
 
     /**
-     * [READ] myHighRecipeIds에 해당하는 레시피 정보를 목록형으로 가져온다.
+     * [READ] highRecipeIds에 해당하는 레시피 정보를 목록형으로 가져온다.
      */
-    public List<RecipeMainListResponseDto> getMyHighRecipeList(Long memberId, List<Long> myHighRecipeIds) {
+    public List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, List<Long> highRecipeIds) {
 
         // 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
-                .where(bookmarkEntity.memberId.eq(memberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
+                .where(bookmarkEntity.memberId.eq(targetMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
         // 닉네임 엔티티에서 닉네임 조회 서브쿼리
         JPQLQuery<String> nicknameSubQuery = JPAExpressions
                 .select(nicknameEntity.nickname)
                 .from(nicknameEntity)
-                .where(nicknameEntity.memberId.eq(memberId));
+                .where(nicknameEntity.memberId.eq(targetMemberId));
 
         // where 조건 생성
         // 삭제 안된 레시피
         // 내가 작성한 레시피
-        BooleanExpression whereCondition = recipeEntity.delYn.eq("N").and(recipeEntity.id.in(myHighRecipeIds));
+        BooleanExpression whereCondition = recipeEntity.delYn.eq("N").and(recipeEntity.id.in(highRecipeIds));
 
         // 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
-        List<RecipeMainListResponseDto> resultList = queryFactory
-                .select(Projections.fields(RecipeMainListResponseDto.class,
+        List<RecipeListResponseDto> resultList = queryFactory
+                .select(Projections.fields(RecipeListResponseDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
@@ -315,14 +314,14 @@ public class RecipeQueryRepository {
     }
 
     /**
-     * [READ] 내가 작성한 레시피 목록을 Page 객체로 가져온다.
+     * [READ] targetMember가 작성한 레시피 목록을 Page 객체로 가져온다.
      */
-    public Page<RecipeMainListResponseDto> getAllMyRecipeList(Long currentMemberId, Pageable pageable, String sortType) {
+    public Page<RecipeListResponseDto> getTargetRecipeList(Long targetMemberId, Pageable pageable, String sortType) {
         // 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
                 .select(bookmarkEntity.id)
                 .from(bookmarkEntity)
-                .where(bookmarkEntity.memberId.eq(currentMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
+                .where(bookmarkEntity.memberId.eq(targetMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
 
         // 닉네임 엔티티에서 닉네임 조회 서브쿼리
         JPQLQuery<String> nicknameSubQuery = JPAExpressions
@@ -331,8 +330,8 @@ public class RecipeQueryRepository {
                 .where(nicknameEntity.memberId.eq(recipeEntity.memberId));
 
         // sort 이전 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
-        JPAQuery<RecipeMainListResponseDto> query = queryFactory
-                .select(Projections.fields(RecipeMainListResponseDto.class,
+        JPAQuery<RecipeListResponseDto> query = queryFactory
+                .select(Projections.fields(RecipeListResponseDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
@@ -348,7 +347,7 @@ public class RecipeQueryRepository {
                                 )), "thumbnailFullPath")
                 ))
                 .from(recipeEntity)
-                .where(recipeEntity.delYn.eq("N"), recipeEntity.memberId.eq(currentMemberId));
+                .where(recipeEntity.delYn.eq("N"), recipeEntity.memberId.eq(targetMemberId));
 
         // 정렬 조건(sortType) 적용
         query = switch (sortType) {
@@ -358,7 +357,7 @@ public class RecipeQueryRepository {
         };
 
         // sort 이후 메인 쿼리 (레시피 기본 정보 및 북마크 여부 조회) 실행
-        List<RecipeMainListResponseDto> resultList = query
+        List<RecipeListResponseDto> resultList = query
                 .offset(pageable.getOffset()) // 몇번째 페이지인지(page)
                 .limit(pageable.getPageSize()) // 페이지당 보여질 개수(size)
                 .fetch();
@@ -377,10 +376,144 @@ public class RecipeQueryRepository {
         Long totalCount = Optional.ofNullable(queryFactory
                         .select(recipeEntity.count())
                         .from(recipeEntity)
-                        .where(recipeEntity.delYn.eq("N"), recipeEntity.memberId.eq(currentMemberId))
+                        .where(recipeEntity.delYn.eq("N"), recipeEntity.memberId.eq(targetMemberId))
                         .fetchOne())
                 .orElse(0L);
 
         return new PageImpl<>(resultList, pageable, totalCount);
+    }
+
+    /**
+     * [READ] 내가 북마크한 레시피 목록을 북마크 등록된 최신순으로 가져온다.
+     */
+    public Page<RecipeListResponseDto> getAllMyBookmarkList(Long currentMemberId, Pageable pageable) {
+        // 북마크 id 가져오는 서브쿼리
+        JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
+                .select(bookmarkEntity.id)
+                .from(bookmarkEntity)
+                .where(bookmarkEntity.memberId.eq(currentMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
+
+        // 닉네임 엔티티에서 닉네임 조회 서브쿼리
+        JPQLQuery<String> nicknameSubQuery = JPAExpressions
+                .select(nicknameEntity.nickname)
+                .from(nicknameEntity)
+                .where(nicknameEntity.memberId.eq(recipeEntity.memberId));
+
+        // 메인 쿼리
+        JPAQuery<RecipeListResponseDto> query = queryFactory
+                .select(Projections.fields(RecipeListResponseDto.class,
+                        recipeEntity.id,
+                        recipeEntity.recipeName,
+                        ExpressionUtils.as(nicknameSubQuery, "nickname"),
+                        ExpressionUtils.as(bookmarkSubQuery, "bookmarkId"),
+                        ExpressionUtils.as(JPAExpressions
+                                .select(recipeFileEntity.storedFilePath)
+                                .from(recipeFileEntity)
+                                .where(recipeFileEntity.id.eq(
+                                        JPAExpressions
+                                                .select(recipeFileEntity.id.min())
+                                                .from(recipeFileEntity)
+                                                .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
+                                )), "thumbnailFullPath")
+                ))
+                .from(bookmarkEntity)
+                .join(bookmarkEntity.recipeEntity, recipeEntity)
+                .where(bookmarkEntity.memberId.eq(currentMemberId)
+                        .and(recipeEntity.delYn.eq("N")))
+                .orderBy(bookmarkEntity.createDateTime.desc());
+
+        // 페이징 적용
+        List<RecipeListResponseDto> resultList = query
+                .offset(pageable.getOffset()) // 몇번째 페이지인지(page)
+                .limit(pageable.getPageSize()) // 페이지당 보여질 개수(size)
+                .fetch();
+
+        // 메인 쿼리 종료 후, 레시피와 맵핑된 서브 카테고리 이름 조회 쿼리 실행 후 세팅
+        resultList.forEach(dto -> {
+            List<String> subCategories = queryFactory
+                    .select(recipeCategoryMapEntity.subCategoryEntity.subCategoryNm)
+                    .from(recipeCategoryMapEntity)
+                    .where(recipeCategoryMapEntity.recipeEntity.id.eq(dto.getId()))
+                    .fetch();
+            dto.setSubCategoryList(subCategories);
+        });
+
+        // 전체 카운트 (결과가 null일 경우 0으로 세팅하여 NPE 방지)
+        Long totalCount = Optional.ofNullable(queryFactory
+                        .select(bookmarkEntity.count())
+                        .from(bookmarkEntity)
+                        .where(bookmarkEntity.memberId.eq(currentMemberId))
+                        .fetchOne())
+                .orElse(0L);
+
+        return new PageImpl<>(resultList, pageable, totalCount);
+    }
+
+    /**
+     * 내가 좋아요한 레시피 목록을 가져온다.
+     */
+    public Page<RecipeListResponseDto> getAllMyLikeList(Long currentMemberId, Pageable pageable) {
+
+        // 북마크 id 가져오는 서브쿼리
+        JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
+                .select(bookmarkEntity.id)
+                .from(bookmarkEntity)
+                .where(bookmarkEntity.memberId.eq(currentMemberId), bookmarkEntity.recipeEntity.id.eq(recipeEntity.id));
+
+        // 닉네임 엔티티에서 닉네임 조회 서브쿼리
+        JPQLQuery<String> nicknameSubQuery = JPAExpressions
+                .select(nicknameEntity.nickname)
+                .from(nicknameEntity)
+                .where(nicknameEntity.memberId.eq(recipeEntity.memberId));
+
+        // 메인 쿼리
+        JPAQuery<RecipeListResponseDto> query = queryFactory
+                .select(Projections.fields(RecipeListResponseDto.class,
+                        recipeEntity.id,
+                        recipeEntity.recipeName,
+                        ExpressionUtils.as(nicknameSubQuery, "nickname"),
+                        ExpressionUtils.as(bookmarkSubQuery, "bookmarkId"),
+                        ExpressionUtils.as(JPAExpressions
+                                .select(recipeFileEntity.storedFilePath)
+                                .from(recipeFileEntity)
+                                .where(recipeFileEntity.id.eq(
+                                        JPAExpressions
+                                                .select(recipeFileEntity.id.min())
+                                                .from(recipeFileEntity)
+                                                .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
+                                )), "thumbnailFullPath")
+                ))
+                .from(recipeLikeEntity)
+                .join(recipeLikeEntity.recipeEntity, recipeEntity)
+                .where(recipeLikeEntity.memberId.eq(currentMemberId)
+                        .and(recipeEntity.delYn.eq("N")))
+                .orderBy(recipeLikeEntity.createDateTime.desc());
+
+        // 페이징 적용
+        List<RecipeListResponseDto> resultList = query
+                .offset(pageable.getOffset()) // 몇번째 페이지인지(page)
+                .limit(pageable.getPageSize()) // 페이지당 보여질 개수(size)
+                .fetch();
+
+        // 메인 쿼리 종료 후, 레시피와 맵핑된 서브 카테고리 이름 조회 쿼리 실행 후 세팅
+        resultList.forEach(dto -> {
+            List<String> subCategories = queryFactory
+                    .select(recipeCategoryMapEntity.subCategoryEntity.subCategoryNm)
+                    .from(recipeCategoryMapEntity)
+                    .where(recipeCategoryMapEntity.recipeEntity.id.eq(dto.getId()))
+                    .fetch();
+            dto.setSubCategoryList(subCategories);
+        });
+
+        // 전체 카운트 (결과가 null일 경우 0으로 세팅하여 NPE 방지)
+        Long totalCount = Optional.ofNullable(queryFactory
+                        .select(recipeLikeEntity.count())
+                        .from(recipeLikeEntity)
+                        .where(recipeLikeEntity.memberId.eq(currentMemberId))
+                        .fetchOne())
+                .orElse(0L);
+
+        return new PageImpl<>(resultList, pageable, totalCount);
+
     }
 }

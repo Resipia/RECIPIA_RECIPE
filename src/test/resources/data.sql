@@ -3,12 +3,20 @@ INSERT INTO recipe (member_id, recipe_nm, recipe_desc, time_taken, ingredient, h
 VALUES (1, '김치찌개', '매콤한 김치찌개 레시피', 30, '김치, 돼지고기, 두부', '#김치찌개', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        (1, '김치찌개2', '매콤한 김치찌개 레시피2', 30, '김치, 돼지고기, 두부', '#김치찌개', 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+-- 레시피 파일 저장
 INSERT INTO recipe_file (recipe_id, file_order, flpth, object_url, origin_file_nm, strd_file_nm, file_extsn, file_size, del_yn, create_dttm, update_dttm)
 VALUES (1, 1, 'fullpath', 'object-url', 'origin-name', 'strd-name', 'jpg', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 --        (1, 2, 'fullpath2', 'object-url2', 'origin-name2', 'strd-name2', 'jpg', 1, 'N', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+-- 레시피 좋아요 저장
 INSERT INTO recipe_like_count (recipe_id, like_count, create_dttm, update_dttm)
 VALUES (1, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- 래시피 북마크 저장
+INSERT INTO bookmark (recipe_id, member_id, create_dttm)
+VALUES (1, 1, CURRENT_TIMESTAMP),
+       (2, 1, DATEADD(MONTH, 1, CURRENT_DATE()));
+
 
 -- 영양소 정보 저장
 INSERT INTO nutritional_info (carbohydrates, protein, fat, vitamins, minerals, recipe_id)

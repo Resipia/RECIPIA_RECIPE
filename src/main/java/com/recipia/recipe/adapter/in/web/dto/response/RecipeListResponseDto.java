@@ -10,7 +10,7 @@ import java.util.List;
  */
 @NoArgsConstructor
 @Data
-public class RecipeMainListResponseDto {
+public class RecipeListResponseDto {
     private Long id;
     private String recipeName;                  // 제목
     private String nickname;                    // 닉네임
@@ -19,7 +19,7 @@ public class RecipeMainListResponseDto {
     private String thumbnailFullPath;           // 썸네일 이미지 저장경로
     private String thumbnailPreUrl;             // 썸네일 이미지 pre-signed-url
 
-    private RecipeMainListResponseDto(Long id, String recipeName, String nickname, Long bookmarkId, List<String> subCategoryList, String thumbnailFullPath, String thumbnailPreUrl) {
+    private RecipeListResponseDto(Long id, String recipeName, String nickname, Long bookmarkId, List<String> subCategoryList, String thumbnailFullPath, String thumbnailPreUrl) {
         this.id = id;
         this.recipeName = recipeName;
         this.nickname = nickname;
@@ -38,16 +38,16 @@ public class RecipeMainListResponseDto {
 //        this.thumbnailPreUrl = thumbnailPreUrl;
 //    }
 
-    public static RecipeMainListResponseDto of(Long id, String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl) {
-        return new RecipeMainListResponseDto(id, recipeName, nickname, bookmarkId, null, thumbnailFullPath, thumbnailPreUrl);
+    public static RecipeListResponseDto of(Long id, String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl) {
+        return new RecipeListResponseDto(id, recipeName, nickname, bookmarkId, null, thumbnailFullPath, thumbnailPreUrl);
     }
 
-    public static RecipeMainListResponseDto of(Long id, String recipeName, String nickname, Long bookmarkId, List<String> subCategoryList, String thumbnailFullPath, String thumbnailPreUrl) {
-        return new RecipeMainListResponseDto(id, recipeName, nickname, bookmarkId, subCategoryList, thumbnailFullPath, thumbnailPreUrl);
+    public static RecipeListResponseDto of(Long id, String recipeName, String nickname, Long bookmarkId, List<String> subCategoryList, String thumbnailFullPath, String thumbnailPreUrl) {
+        return new RecipeListResponseDto(id, recipeName, nickname, bookmarkId, subCategoryList, thumbnailFullPath, thumbnailPreUrl);
     }
 
-    public static RecipeMainListResponseDto of(String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl) {
-        return new RecipeMainListResponseDto(null, recipeName, nickname, bookmarkId, null, thumbnailFullPath, thumbnailPreUrl);
+    public static RecipeListResponseDto of(String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl) {
+        return new RecipeListResponseDto(null, recipeName, nickname, bookmarkId, null, thumbnailFullPath, thumbnailPreUrl);
     }
 
 }

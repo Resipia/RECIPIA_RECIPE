@@ -3,7 +3,7 @@ package com.recipia.recipe.adapter.in.web;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeDetailViewResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.ResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
@@ -58,13 +58,13 @@ public class RecipeController {
      * page와 size는 각각 '현재 페이지'와 '페이지 당 항목 수'를 의미한다.
      */
     @GetMapping("/getAllRecipeList")
-    public ResponseEntity<PagingResponseDto<RecipeMainListResponseDto>> getAllRecipeList(
+    public ResponseEntity<PagingResponseDto<RecipeListResponseDto>> getAllRecipeList(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "sortType", defaultValue = "new") String sortType,
             @RequestParam(value = "subCategoryList", required = false) List<Long> subCategoryList
     ) {
-        PagingResponseDto<RecipeMainListResponseDto> allRecipeList = readRecipeUseCase.getAllRecipeList(page, size, sortType, subCategoryList);
+        PagingResponseDto<RecipeListResponseDto> allRecipeList = readRecipeUseCase.getAllRecipeList(page, size, sortType, subCategoryList);
         return ResponseEntity.ok(allRecipeList);
     }
 

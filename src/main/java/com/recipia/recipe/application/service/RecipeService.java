@@ -1,8 +1,7 @@
 package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeFileResponseDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
@@ -84,20 +83,20 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      * page=1과 size=10이면 '두 번째 페이지에 10개의 항목을 보여달라'는 요청이다.
      */
     @Override
-    public PagingResponseDto<RecipeMainListResponseDto> getAllRecipeList(int page, int size, String sortType, List<Long> subCategoryList) {
-        // 1. 정렬조건을 정한 뒤 Pageable 객체 생성
+    public PagingResponseDto<RecipeListResponseDto> getAllRecipeList(int page, int size, String sortType, List<Long> subCategoryList) {
+        // 1. Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
 
         // 2. 데이터를 받아온다.
-        Page<RecipeMainListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType, subCategoryList);
 
         // 3. 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해 준다.
-        List<RecipeMainListResponseDto> beforeContent = allRecipeList.getContent();
+        List<RecipeListResponseDto> beforeContent = allRecipeList.getContent();
 
-        List<RecipeMainListResponseDto> finalResult = beforeContent.stream().map(dto -> {
+        List<RecipeListResponseDto> finalResult = beforeContent.stream().map(dto -> {
             if (dto.getThumbnailFullPath() != null) {
                 String preSignedUrl = imageS3Service.generatePreSignedUrl(dto.getThumbnailFullPath(), 60);
-                return RecipeMainListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl);
+                return RecipeListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl);
             }
             return dto;
         }).collect(Collectors.toList());

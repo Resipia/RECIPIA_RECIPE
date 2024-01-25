@@ -1,7 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.in.web.dto.request.NutritionalInfoDto;
-import com.recipia.recipe.adapter.in.web.dto.response.RecipeMainListResponseDto;
+import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeCategoryMapEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
@@ -150,7 +150,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         List<Long> subCategoryList = null;
 
         // when
-        Page<RecipeMainListResponseDto> result = sut.getAllRecipeList(pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> result = sut.getAllRecipeList(pageable, sortType, subCategoryList);
         System.out.println(result.getContent());
 
         // then
@@ -175,7 +175,6 @@ class RecipeAdapterTest extends TotalTestSupport {
         assertThat(result.getRecipeName()).isNotNull();
         assertThat(result.getNickname()).isNotNull();
         assertThat(result.getRecipeDesc()).isNotNull();
-        assertNull(result.getBookmarkId());
     }
 
     @DisplayName("[bad] 존재하지 않는 레시피 ID로 상세 조회 시, 예외가 발생한다.")
@@ -408,13 +407,13 @@ class RecipeAdapterTest extends TotalTestSupport {
         Assertions.assertThat(deleteCount).isEqualTo(1);
     }
 
-    @DisplayName("[happy] 유효한 memberId가 들어왔을때 이 사용자가 작성한 레시피 갯수를 반환한다.")
+    @DisplayName("[happy] 유효한 targetMemberId가 들어왔을때 이 사용자가 작성한 레시피 갯수를 반환한다.")
     @Test
     void getRecipeCountSuccess() {
         // given
-        Long memberId = 2L;
+        Long targetMemberId = 2L;
         // when
-        Long myRecipeCount = sut.getMyRecipeCount(memberId);
+        Long myRecipeCount = sut.getTargetMemberIdRecipeCount(targetMemberId);
         // then
         assertThat(myRecipeCount).isEqualTo(0L);
 

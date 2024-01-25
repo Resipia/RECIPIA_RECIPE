@@ -516,4 +516,14 @@ public class RecipeQueryRepository {
         return new PageImpl<>(resultList, pageable, totalCount);
 
     }
+
+    /**
+     * [DELETE] recipeId에 해당하는 레시피 파일을 soft delete 처리한다.
+     */
+    public Long softDeleteRecipeFileByRecipeId(Long recipeId) {
+        return queryFactory.update(recipeFileEntity)
+                .where(recipeFileEntity.recipeEntity.id.eq(recipeId))
+                .set(recipeFileEntity.delYn, "Y")
+                .execute();
+    }
 }

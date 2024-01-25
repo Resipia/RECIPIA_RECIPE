@@ -51,6 +51,7 @@ public class RecipeAdapter implements RecipePort {
     private final RecipeCategoryMapRepository recipeCategoryMapRepository;
     private final RecipeFileRepository recipeFileRepository;
 
+    private final BookmarkRepository bookmarkRepository;
 
     /**
      * [CREATE] - 레시피 저장
@@ -289,6 +290,15 @@ public class RecipeAdapter implements RecipePort {
         Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllMyLikeList(currentMemberId, pageable);
 
         return recipeResponseDtoList;
+    }
+
+    /**
+     * [DELETE] 레시피 id로 레시피 파일 삭제
+     */
+    @Override
+    public Long softDeleteRecipeFileByRecipeId(Long recipeId) {
+        recipeQuerydslRepository.softDeleteRecipeFileByRecipeId(recipeId);
+        return null;
     }
 
     /**

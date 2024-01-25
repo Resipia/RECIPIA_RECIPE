@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.persistence.entity.BookmarkEntity;
+import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.BookmarkQuerydslRepository;
 import com.recipia.recipe.application.port.out.BookmarkPort;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -18,6 +19,7 @@ public class BookmarkAdapter implements BookmarkPort {
     private final BookmarkConverter converter;
     private final BookmarkRepository bookmarkRepository;
     private final RecipeRepository recipeRepository;
+    private final BookmarkQuerydslRepository bookmarkQuerydslRepository;
 
     /**
      * 북마크 추가하는 메서드
@@ -44,6 +46,14 @@ public class BookmarkAdapter implements BookmarkPort {
                 .orElseThrow(() -> new RecipeApplicationException(ErrorCode.BOOKMARK_NOT_FOUND));
 
         bookmarkRepository.delete(bookmarkEntity);
+    }
+
+    /**
+     * [DELETE] 레시피 id로 북마크 삭제
+     */
+    @Override
+    public Long deleteBookmarkByRecipeId(Long recipeId) {
+        return bookmarkQuerydslRepository.deleteBookmarkByRecipeId(recipeId);
     }
 
 }

@@ -65,4 +65,7 @@ public interface RecipePort {
 
     Long softDeleteRecipeFileByRecipeId(Long recipeId);
 
+    Long deleteNutritionalInfoByRecipeId(Long recipeId);
+
+    Long deleteRecipeCategoryMapByRecipeId(Long recipeId);
 }

@@ -15,7 +15,7 @@ public class NicknameQuerydslRepository {
 
 
     /**
-     * 유저가 변경한 닉네임을 닉네임 엔티티에서 변경시켜준다.
+     * [UPDATE] 유저가 변경한 닉네임을 닉네임 엔티티에서 변경시켜준다.
      */
     public Long updateNicknames(NicknameDto nicknameDto) {
         return queryFactory

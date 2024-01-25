@@ -105,4 +105,25 @@ public class CommentQueryRepository {
         };
     }
 
+    /**
+     * [READ] recipeId에 해당하는 Comment entity의 id값을 List로 반환한다.
+     */
+    public List<Long> findCommentIdsByRecipeId(Long recipeId) {
+        return queryFactory
+                .select(commentEntity.id)
+                .from(commentEntity)
+                .where(commentEntity.recipeEntity.id.eq(recipeId))
+                .fetch();
+    }
+
+    /**
+     * [DELETE] recipeId에 해당하는 댓글을 삭제처리 (del_yn = Y)한다.
+     */
+    public Long softDeleteCommentByRecipeId(Long recipeId) {
+        return queryFactory
+                .update(commentEntity)
+                .set(commentEntity.delYn, "Y")
+                .where(commentEntity.recipeEntity.id.eq(recipeId))
+                .execute();
+    }
 }

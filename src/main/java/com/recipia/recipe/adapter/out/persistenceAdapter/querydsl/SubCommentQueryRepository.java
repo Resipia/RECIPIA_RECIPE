@@ -7,7 +7,6 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.domain.SubComment;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static com.recipia.recipe.adapter.out.persistence.entity.QCommentEntity.commentEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QNicknameEntity.nicknameEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QSubCommentEntity.subCommentEntity;
 
@@ -96,4 +94,14 @@ public class SubCommentQueryRepository {
         return new PageImpl<>(dtoList, pageable, totalCount);
     }
 
+    /**
+     * [DELETE] commentId에 해당하는 대댓글을 삭제처리(del_yn = "Y")한다.
+     */
+    public Long softDeleteSubCommentByCommentIds(List<Long> commentIds) {
+        return queryFactory
+                .update(subCommentEntity)
+                .set(subCommentEntity.delYn, "Y")
+                .where(subCommentEntity.commentEntity.id.in(commentIds))
+                .execute();
+    }
 }

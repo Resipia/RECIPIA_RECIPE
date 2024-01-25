@@ -6,10 +6,7 @@ import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
 import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
 import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
 import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
-import com.recipia.recipe.application.port.out.BookmarkPort;
-import com.recipia.recipe.application.port.out.RecipeLikePort;
-import com.recipia.recipe.application.port.out.RecipePort;
-import com.recipia.recipe.application.port.out.RedisPort;
+import com.recipia.recipe.application.port.out.*;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
@@ -43,6 +40,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
     private final ImageS3Service imageS3Service;
     private final BookmarkPort bookmarkPort;
     private final RecipeLikePort recipeLikePort;
+    private final CommentPort commentPort;
 
     /**
      * [CREATE] - 레시피 생성을 담당하는 메서드
@@ -224,6 +222,15 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
 
         // 5. 좋아요한 레시피 테이블에서 레시피 삭제
         recipeLikePort.deleteRecipeLikeByRecipeId(recipeId);
+
+        // 6. 영양소 정보 삭제
+        recipePort.deleteNutritionalInfoByRecipeId(recipeId);
+
+        // 7. 레시피-카테고리 맵핑 제거
+        recipePort.deleteRecipeCategoryMapByRecipeId(recipeId);
+
+        // 8. 댓글/대댓글 삭제
+        commentPort.softDeleteAllCommentsWithSubComments(recipeId);
 
 
         // todo: redis에서 삭제된 레시피 조회수 삭제

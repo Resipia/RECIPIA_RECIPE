@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +36,7 @@ public class CommentQueryRepository {
         return queryFactory
                 .update(commentEntity)
                 .set(commentEntity.commentText, comment.getCommentText())
+                .set(commentEntity.updateDateTime, LocalDateTime.now())
                 .where(commentEntity.id.eq(comment.getId()))
                 .execute();
     }
@@ -46,6 +48,7 @@ public class CommentQueryRepository {
         return queryFactory
                 .update(commentEntity)
                 .set(commentEntity.delYn, "Y")
+                .set(commentEntity.updateDateTime, LocalDateTime.now())
                 .where(commentEntity.id.eq(commentId))
                 .execute();
     }
@@ -131,6 +134,7 @@ public class CommentQueryRepository {
         return queryFactory
                 .update(commentEntity)
                 .set(commentEntity.delYn, "Y")
+                .set(commentEntity.updateDateTime, LocalDateTime.now())
                 .where(commentEntity.recipeEntity.id.eq(recipeId))
                 .execute();
     }

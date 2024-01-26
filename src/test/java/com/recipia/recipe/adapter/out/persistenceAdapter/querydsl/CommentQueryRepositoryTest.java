@@ -36,7 +36,7 @@ class CommentQueryRepositoryTest extends TotalTestSupport {
         // then
         CommentEntity updatedComment = commentRepository.findById(comment.getId()).orElseThrow();
         assertThat(updatedComment.getCommentText()).isEqualTo(comment.getCommentText());
-
+        assertThat(updatedComment.getCreateDateTime()).isNotEqualTo(updatedComment.getUpdateDateTime());
     }
 
     @DisplayName("[happy] 댓글이 성공적으로 삭제처리(del_yn = 'Y') 된다.")

@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface SubCommentRepository extends JpaRepository<SubCommentEntity, Long> {
     Optional<SubCommentEntity> findByIdAndMemberIdAndDelYn(Long id, Long memberId, String delYn);
     List<SubCommentEntity> findAllByCommentEntity_Id(Long commentId);
+
+    List<SubCommentEntity> findAllByMemberId(Long memberId);
 }

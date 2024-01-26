@@ -63,6 +63,10 @@ public class MemberWithdrawService implements MemberWithdrawUseCase {
         // 회원의 닉네임을 삭제한다.
         nicknamePort.deleteNickname(memberId);
 
+        // todo: redis에서 삭제된 레시피 조회수 삭제
+        // todo: 나중에 batch로 S3에서 삭제처리된 파일들 일괄삭제
+
+
         return 0L;
     }
 }

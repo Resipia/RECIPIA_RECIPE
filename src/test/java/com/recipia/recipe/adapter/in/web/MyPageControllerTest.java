@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -59,7 +60,7 @@ class MyPageControllerTest extends TotalTestSupport {
     void getHighRecipe() throws Exception {
         // given
         MyPageRequestDto dto = MyPageRequestDto.of(1L);
-        RecipeListResponseDto listDto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null);
+        RecipeListResponseDto listDto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, LocalDateTime.now());
         when(myPageUseCase.getTargetMemberRecipeHigh(dto.getTargetMemberId())).thenReturn(List.of(listDto));
 
         //when & then
@@ -74,7 +75,7 @@ class MyPageControllerTest extends TotalTestSupport {
     @Test
     void getAllTargetMemberRecipeList() throws Exception {
         //given
-        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null);
+        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, LocalDateTime.now());
         PagingResponseDto<RecipeListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(myPageUseCase.getTargetMemberRecipeList(0, 10, "new", 1L)).thenReturn(pagingResponseDto);
@@ -95,7 +96,7 @@ class MyPageControllerTest extends TotalTestSupport {
     @Test
     void getAllMyBookmarkRecipeList() throws Exception {
         //given
-        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null);
+        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, LocalDateTime.now());
         PagingResponseDto<RecipeListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(myPageUseCase.getAllMyBookmarkList(0, 10)).thenReturn(pagingResponseDto);

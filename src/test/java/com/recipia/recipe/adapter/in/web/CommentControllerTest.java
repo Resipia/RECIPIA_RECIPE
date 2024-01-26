@@ -107,7 +107,7 @@ class CommentControllerTest extends TotalTestSupport {
     @Test
     void getCommentListWithValidParams() throws Exception {
         // given
-        CommentListResponseDto dto = CommentListResponseDto.of(1L, 1L, "nickname", "commentValue", "2021-01-22", false);
+        CommentListResponseDto dto = CommentListResponseDto.of(1L, 1L, "nickname", "commentValue", "2021-01-22", false, 0L);
         PagingResponseDto<CommentListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(commentUseCase.getCommentList(anyLong(), anyInt(), anyInt(), eq("new"))).thenReturn(pagingResponseDto);

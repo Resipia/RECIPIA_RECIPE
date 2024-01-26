@@ -11,7 +11,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.recipia.recipe.adapter.in.web.dto.request.SubCategoryDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.NutritionalInfoEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfoEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
 import com.recipia.recipe.domain.Recipe;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
-import static com.recipia.recipe.adapter.out.persistence.entity.QCommentEntity.commentEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QNicknameEntity.nicknameEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfoEntity.nutritionalInfoEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
@@ -532,13 +530,36 @@ public class RecipeQueryRepository {
     }
 
     /**
-     * [DELETE] recipeId에 해당하는 레시피 파일을 soft delete 처리한다.
+     * [DELETE] recipeIds에 해당하는 레시피 파일들을 soft delete 처리한다.
      */
-    public Long softDeleteRecipeFileByRecipeId(Long recipeId) {
+    public Long softDeleteRecipeFilesInRecipeIds(List<Long> recipeIds) {
         return queryFactory.update(recipeFileEntity)
-                .where(recipeFileEntity.recipeEntity.id.eq(recipeId))
+                .where(recipeFileEntity.recipeEntity.id.in(recipeIds))
                 .set(recipeFileEntity.delYn, "Y")
                 .set(recipeFileEntity.updateDateTime, LocalDateTime.now())
+                .execute();
+    }
+
+    /**
+     * [READ] memberId가 작성한 레시피 id를 목록으로 반환한다.
+     */
+    public List<Long> getAllRecipeIdsByMemberId(Long memberId) {
+        return queryFactory
+                .select(recipeEntity.id)
+                .from(recipeEntity)
+                .where(recipeEntity.memberId.eq(memberId), recipeEntity.delYn.eq("N"))
+                .fetch();
+    }
+
+    /**
+     * [DELETE] memberId에 해당하는 레시피를 soft delete한다.
+     */
+    public Long softDeleteRecipeByMemberId(Long memberId) {
+        return queryFactory
+                .update(recipeEntity)
+                .set(recipeEntity.delYn, "Y")
+                .set(recipeEntity.updateDateTime, LocalDateTime.now())
+                .where(recipeEntity.memberId.eq(memberId))
                 .execute();
     }
 }

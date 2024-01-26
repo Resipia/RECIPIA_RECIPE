@@ -50,22 +50,13 @@ public interface RecipePort {
 
     Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder);
 
-    Long getTargetMemberIdRecipeCount(Long targetMemberId);
+    Long softDeleteRecipeFilesInRecipeIds(List<Long> recipeIds);
 
-    List<Long> getTargetMemberRecipeIds(Long targetMemberId);
+    Long deleteNutritionalInfosInRecipeIds(List<Long> recipeIds);
 
-    List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, List<Long> highRecipeIds);
+    Long deleteRecipeCategoryMapsInRecipeIds(List<Long> recipeIds);
 
-    Page<RecipeListResponseDto> getTargetMemberRecipeList(Long targetMemberId, Pageable pageable, String sortType);
+    List<Long> getAllRecipeIdsByMemberId(Long memberId);
 
-    Page<RecipeListResponseDto> getAllMyBookmarkList(Pageable pageable);
-
-    Page<RecipeListResponseDto> getAllMyLikeList(Pageable pageable);
-
-
-    Long softDeleteRecipeFileByRecipeId(Long recipeId);
-
-    Long deleteNutritionalInfoByRecipeId(Long recipeId);
-
-    Long deleteRecipeCategoryMapByRecipeId(Long recipeId);
+    Long softDeleteRecipeByMemberId(Long memberId);
 }

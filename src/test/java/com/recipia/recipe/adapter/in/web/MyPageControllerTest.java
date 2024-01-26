@@ -60,7 +60,7 @@ class MyPageControllerTest extends TotalTestSupport {
     void getHighRecipe() throws Exception {
         // given
         MyPageRequestDto dto = MyPageRequestDto.of(1L);
-        RecipeListResponseDto listDto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, LocalDateTime.now());
+        RecipeListResponseDto listDto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, "2020-12-12");
         when(myPageUseCase.getTargetMemberRecipeHigh(dto.getTargetMemberId())).thenReturn(List.of(listDto));
 
         //when & then
@@ -75,7 +75,7 @@ class MyPageControllerTest extends TotalTestSupport {
     @Test
     void getAllTargetMemberRecipeList() throws Exception {
         //given
-        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, LocalDateTime.now());
+        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, "2020-12-12");
         PagingResponseDto<RecipeListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(myPageUseCase.getTargetMemberRecipeList(0, 10, "new", 1L)).thenReturn(pagingResponseDto);
@@ -96,7 +96,7 @@ class MyPageControllerTest extends TotalTestSupport {
     @Test
     void getAllMyBookmarkRecipeList() throws Exception {
         //given
-        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, LocalDateTime.now());
+        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, "2020-12-12");
         PagingResponseDto<RecipeListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(myPageUseCase.getAllMyBookmarkList(0, 10)).thenReturn(pagingResponseDto);

@@ -61,7 +61,7 @@ class MyPageServiceTest {
         Long targetMemberId = 1L;
         List<Long> recipeIds = List.of(1L, 2L);
         String preSignedUrl = "https://example.com/s3/pre-signed-url";
-        RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl, LocalDateTime.now());
+        RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl, "2020-12-12");
 
         when(recipePort.getTargetMemberRecipeIds(targetMemberId)).thenReturn(recipeIds);
         when(recipePort.getTargetMemberHighRecipeList(eq(targetMemberId), anyList())).thenReturn(List.of(dtoWithPreSignedUrl));
@@ -83,7 +83,7 @@ class MyPageServiceTest {
         Long targetMemberId = 1L;
         List<Long> recipeIds = List.of(1L, 2L);
         String preSignedUrl = "https://example.com/s3/pre-signed-url";
-        RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl, LocalDateTime.now());
+        RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl, "2020-12-12");
         RecipeListResponseDto dtoWithoutPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, null);
         List<RecipeListResponseDto> finalResult = List.of(dtoWithPreSignedUrl, dtoWithoutPreSignedUrl);
 
@@ -146,7 +146,7 @@ class MyPageServiceTest {
 
     private List<RecipeListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null, LocalDateTime.now()))
+                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null, "2020-12-12"))
                 .collect(Collectors.toList());
     }
 }

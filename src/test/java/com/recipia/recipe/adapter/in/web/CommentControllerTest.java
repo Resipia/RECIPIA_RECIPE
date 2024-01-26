@@ -20,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -107,7 +108,7 @@ class CommentControllerTest extends TotalTestSupport {
     @Test
     void getCommentListWithValidParams() throws Exception {
         // given
-        CommentListResponseDto dto = CommentListResponseDto.of(1L, 1L, "nickname", "commentValue", "2021-01-22", false, 0L);
+        CommentListResponseDto dto = CommentListResponseDto.of(1L, 1L, "nickname", "commentValue", "2020-12-12", false, 0L);
         PagingResponseDto<CommentListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(commentUseCase.getCommentList(anyLong(), anyInt(), anyInt(), eq("new"))).thenReturn(pagingResponseDto);

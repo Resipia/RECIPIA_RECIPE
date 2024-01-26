@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -98,7 +99,7 @@ class CommentServiceTest {
 
         // 테스트에서 예상되는 반환 값. (여기서는 하나의 댓글 데이터만 포함)
         List<CommentListResponseDto> mockCommentList = List.of(
-                CommentListResponseDto.of(1L, 1L, "nickname", "commentValue", "2022-11-22", false, 0L)
+                CommentListResponseDto.of(1L, 1L, "nickname", "commentValue", "2020-12-12", false, 0L)
         );
 
         // PageImpl을 사용해 mockPage 객체 생성

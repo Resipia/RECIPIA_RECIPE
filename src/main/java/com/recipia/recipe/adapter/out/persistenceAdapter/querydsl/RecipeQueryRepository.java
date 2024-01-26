@@ -73,7 +73,7 @@ public class RecipeQueryRepository {
 
         // sort 이전 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
         JPAQuery<RecipeListResponseDto> query = queryFactory
-                .select(Projections.fields(RecipeListResponseDto.class, //subCategory 주의가 필요 (일단 null로 들어가고 아래에서 데이터를 추가해줌)
+                .select(Projections.constructor(RecipeListResponseDto.class, //subCategory 주의가 필요 (일단 null로 들어가고 아래에서 데이터를 추가해줌)
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
@@ -87,7 +87,7 @@ public class RecipeQueryRepository {
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
                                 )), "thumbnailFullPath"),
-                        recipeEntity.createDateTime.as("createDate")
+                        Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", recipeEntity.createDateTime)
                 ))
                 .from(recipeEntity)
                 .where(whereCondition);
@@ -290,7 +290,7 @@ public class RecipeQueryRepository {
 
         // 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
         List<RecipeListResponseDto> resultList = queryFactory
-                .select(Projections.fields(RecipeListResponseDto.class,
+                .select(Projections.constructor(RecipeListResponseDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
@@ -304,7 +304,8 @@ public class RecipeQueryRepository {
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
                                 )), "thumbnailFullPath"),
-                        recipeEntity.createDateTime.as("createDate")))
+                        Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", recipeEntity.createDateTime)
+                ))
                 .from(recipeEntity)
                 .where(whereCondition)
                 .fetch();
@@ -341,7 +342,7 @@ public class RecipeQueryRepository {
 
         // sort 이전 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)
         JPAQuery<RecipeListResponseDto> query = queryFactory
-                .select(Projections.fields(RecipeListResponseDto.class,
+                .select(Projections.constructor(RecipeListResponseDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
@@ -355,7 +356,7 @@ public class RecipeQueryRepository {
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
                                 )), "thumbnailFullPath"),
-                        recipeEntity.createDateTime.as("createDate")
+                        Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", recipeEntity.createDateTime)
                 ))
                 .from(recipeEntity)
                 .where(recipeEntity.delYn.eq("N"), recipeEntity.memberId.eq(targetMemberId));
@@ -412,7 +413,7 @@ public class RecipeQueryRepository {
 
         // 메인 쿼리
         JPAQuery<RecipeListResponseDto> query = queryFactory
-                .select(Projections.fields(RecipeListResponseDto.class,
+                .select(Projections.constructor(RecipeListResponseDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
@@ -426,7 +427,7 @@ public class RecipeQueryRepository {
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
                                 )), "thumbnailFullPath"),
-                        recipeEntity.createDateTime.as("createDate")
+                        Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", recipeEntity.createDateTime)
                 ))
                 .from(bookmarkEntity)
                 .join(bookmarkEntity.recipeEntity, recipeEntity)
@@ -480,7 +481,7 @@ public class RecipeQueryRepository {
 
         // 메인 쿼리
         JPAQuery<RecipeListResponseDto> query = queryFactory
-                .select(Projections.fields(RecipeListResponseDto.class,
+                .select(Projections.constructor(RecipeListResponseDto.class,
                         recipeEntity.id,
                         recipeEntity.recipeName,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
@@ -494,7 +495,7 @@ public class RecipeQueryRepository {
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
                                 )), "thumbnailFullPath"),
-                        recipeEntity.createDateTime.as("createDate")
+                        Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", recipeEntity.createDateTime)
                 ))
                 .from(recipeLikeEntity)
                 .join(recipeLikeEntity.recipeEntity, recipeEntity)

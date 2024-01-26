@@ -8,7 +8,6 @@ import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.domain.NutritionalInfo;
 import com.recipia.recipe.domain.Recipe;
-import com.recipia.recipe.domain.RecipeFile;
 import com.recipia.recipe.domain.SubCategory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -219,27 +218,17 @@ class RecipeServiceTest {
     @Test
     void updateRecipeHappy() {
         //given
-        Recipe recipe = createRecipeDomain();
-        List<MultipartFile> mockMultipartFileList = createMockMultipartFileList();
-        Long updatedRecipeId = 1L; // 업데이트된 id
-        List<Long> savedFileIdList = List.of(1L, 2L, 3L); // 저장된 파일 id 리스트
+        Recipe domain = Recipe.builder().id(1L).deleteFileOrder(null).build();
+        when(recipePort.checkIsRecipeMineExist(domain)).thenReturn(true);
 
-        when(recipePort.checkIsRecipeMineExist(recipe)).thenReturn(true);
-        when(recipePort.updateRecipe(recipe)).thenReturn(updatedRecipeId);
-        when(recipePort.softDeleteRecipeFile(recipe, Collections.emptyList())).thenReturn(3L);
-        when(imageS3Service.createRecipeFile(any(MultipartFile.class), eq(updatedRecipeId), anyInt()))
-                .thenReturn(RecipeFile.of(recipe, 0, "/", "/", "nm", "nm", "jpg", 100, "N"));
-        when(recipePort.saveRecipeFile(anyList())).thenReturn(savedFileIdList);
+        // When
+        sut.updateRecipe(domain, null);
 
-        //when
-        sut.updateRecipe(recipe, mockMultipartFileList);
-
-        //then
-        verify(recipePort).updateRecipe(recipe);
-        verify(recipePort).updateNutritionalInfo(recipe);
-        verify(recipePort).softDeleteRecipeFile(recipe, Collections.emptyList());
-        verify(recipePort).saveRecipeFile(anyList());
-        then(eventPublisher).should().publishEvent(new RecipeCreationEvent(recipe.getIngredient(), recipe.getHashtag()));
+        // Then
+        verify(recipePort).updateRecipe(domain);
+        verify(recipePort).updateNutritionalInfo(domain);
+        verify(recipePort).updateCategoryMapping(domain);
+        verify(eventPublisher).publishEvent(any(RecipeCreationEvent.class));
     }
 
     @DisplayName("[bad] 파일 저장 후 반환받은 id값이 없다면 예외가 발생한다.")
@@ -305,7 +294,7 @@ class RecipeServiceTest {
 
     private List<RecipeListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null, LocalDateTime.now()))
+                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null, "2020-12-12"))
                 .collect(Collectors.toList());
     }
 

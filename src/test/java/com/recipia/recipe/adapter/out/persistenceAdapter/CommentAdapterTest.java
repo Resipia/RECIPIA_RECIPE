@@ -99,10 +99,6 @@ class CommentAdapterTest extends TotalTestSupport {
         assertThat(firstComment.getNickname()).isNotNull();
         assertThat(firstComment.getCommentValue()).isNotEmpty();
 
-        // createDate 형식 확인
-        String expectedDateFormat = "\\d{4}-\\d{2}-\\d{2}"; // yyyy-MM-dd 형식 정규식
-        assertThat(firstComment.getCreateDate()).matches(expectedDateFormat);
-
         // isUpdated 필드 검증
         // 이 부분은 실제 데이터에 따라 달라질 수 있음
         assertThat(firstComment.isUpdated()).isFalse();

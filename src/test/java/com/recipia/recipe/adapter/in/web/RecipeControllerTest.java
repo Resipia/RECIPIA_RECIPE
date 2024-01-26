@@ -70,7 +70,7 @@ class RecipeControllerTest extends TotalTestSupport {
     @Test
     void test() throws Exception {
         //given
-        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, LocalDateTime.now());
+        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, "2020-12-12");
         PagingResponseDto<RecipeListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(readRecipeUseCase.getAllRecipeList(0, 10, "new", null)).thenReturn(pagingResponseDto);

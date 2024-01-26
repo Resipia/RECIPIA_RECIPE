@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,7 @@ public class SubCommentQueryRepository {
         return queryFactory
                 .update(subCommentEntity)
                 .set(subCommentEntity.subcommentText, subComment.getSubCommentText())
+                .set(subCommentEntity.updateDateTime, LocalDateTime.now())
                 .where(subCommentEntity.id.eq(subComment.getId()))
                 .execute();
     }
@@ -45,6 +47,7 @@ public class SubCommentQueryRepository {
         return queryFactory
                 .update(subCommentEntity)
                 .set(subCommentEntity.delYn, "Y")
+                .set(subCommentEntity.updateDateTime, LocalDateTime.now())
                 .where(subCommentEntity.id.eq(subCommentId))
                 .execute();
     }
@@ -101,6 +104,7 @@ public class SubCommentQueryRepository {
         return queryFactory
                 .update(subCommentEntity)
                 .set(subCommentEntity.delYn, "Y")
+                .set(subCommentEntity.updateDateTime, LocalDateTime.now())
                 .where(subCommentEntity.commentEntity.id.in(commentIds))
                 .execute();
     }

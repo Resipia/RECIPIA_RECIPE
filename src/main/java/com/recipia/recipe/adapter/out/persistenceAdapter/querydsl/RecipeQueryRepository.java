@@ -20,12 +20,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QCommentEntity.commentEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QNicknameEntity.nicknameEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfoEntity.nutritionalInfoEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeFileEntity.recipeFileEntity;
@@ -196,6 +198,7 @@ public class RecipeQueryRepository {
                 .set(recipeEntity.recipeDesc, entity.getRecipeDesc())
                 .set(recipeEntity.ingredient, entity.getIngredient())
                 .set(recipeEntity.hashtag, entity.getHashtag())
+                .set(recipeEntity.updateDateTime, LocalDateTime.now())
                 .execute();
     }
 
@@ -203,16 +206,15 @@ public class RecipeQueryRepository {
      * 영양소 업데이트
      * 모든 정보를 한번에 업데이트 한다.
      */
-    public Long updateNutritionalInfo(NutritionalInfoEntity nutritionalInfoEntity) {
-        QNutritionalInfoEntity qNutritionalInfo = QNutritionalInfoEntity.nutritionalInfoEntity;
+    public Long updateNutritionalInfo(NutritionalInfoEntity entity) {
 
-        return queryFactory.update(qNutritionalInfo)
-                .where(qNutritionalInfo.id.eq(nutritionalInfoEntity.getId()))
-                .set(qNutritionalInfo.carbohydrates, nutritionalInfoEntity.getCarbohydrates())
-                .set(qNutritionalInfo.protein, nutritionalInfoEntity.getProtein())
-                .set(qNutritionalInfo.fat, nutritionalInfoEntity.getFat())
-                .set(qNutritionalInfo.vitamins, nutritionalInfoEntity.getVitamins())
-                .set(qNutritionalInfo.minerals, nutritionalInfoEntity.getMinerals())
+        return queryFactory.update(nutritionalInfoEntity)
+                .where(nutritionalInfoEntity.id.eq(entity.getId()))
+                .set(nutritionalInfoEntity.carbohydrates, entity.getCarbohydrates())
+                .set(nutritionalInfoEntity.protein, entity.getProtein())
+                .set(nutritionalInfoEntity.fat, entity.getFat())
+                .set(nutritionalInfoEntity.vitamins, entity.getVitamins())
+                .set(nutritionalInfoEntity.minerals, entity.getMinerals())
                 .execute();
     }
 
@@ -224,6 +226,7 @@ public class RecipeQueryRepository {
         return queryFactory.update(recipeEntity)
                 .where(recipeEntity.id.eq(recipeId))
                 .set(recipeEntity.delYn, "Y")
+                .set(recipeEntity.updateDateTime, LocalDateTime.now())
                 .execute();
     }
 
@@ -234,6 +237,7 @@ public class RecipeQueryRepository {
         return queryFactory.update(recipeLikeCntEntity)
                 .where(recipeLikeCntEntity.id.eq(recipeId))
                 .set(recipeLikeCntEntity.likeCount, likeCount)
+                .set(recipeLikeCntEntity.updateDateTime, LocalDateTime.now())
                 .execute();
     }
 
@@ -242,11 +246,12 @@ public class RecipeQueryRepository {
      */
     public Long softDeleteRecipeFile(Recipe domain, List<Integer> deleteFileOrder) {
         return queryFactory.update(recipeFileEntity)
+                .set(recipeFileEntity.delYn, "Y")
+                .set(recipeFileEntity.updateDateTime, LocalDateTime.now())
                 .where(
                         recipeFileEntity.recipeEntity.id.eq(domain.getId()),
                         recipeFileEntity.fileOrder.in(deleteFileOrder)
                 )
-                .set(recipeFileEntity.delYn, "Y")
                 .execute();
     }
 
@@ -457,7 +462,7 @@ public class RecipeQueryRepository {
     }
 
     /**
-     * 내가 좋아요한 레시피 목록을 가져온다.
+     * [READ] 내가 좋아요한 레시피 목록을 가져온다.
      */
     public Page<RecipeListResponseDto> getAllMyLikeList(Long currentMemberId, Pageable pageable) {
 
@@ -532,6 +537,7 @@ public class RecipeQueryRepository {
         return queryFactory.update(recipeFileEntity)
                 .where(recipeFileEntity.recipeEntity.id.eq(recipeId))
                 .set(recipeFileEntity.delYn, "Y")
+                .set(recipeFileEntity.updateDateTime, LocalDateTime.now())
                 .execute();
     }
 }

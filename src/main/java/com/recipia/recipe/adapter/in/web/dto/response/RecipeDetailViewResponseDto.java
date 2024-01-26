@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -27,6 +28,7 @@ public class RecipeDetailViewResponseDto {
     private List<RecipeFileResponseDto> recipeFileUrlList;             // 레시피와 연관된 파일(이미지) 리스트
     private Long bookmarkId;                            // 북마크 id
     private Long recipeLikeId;                          // 좋아요 id
+    private LocalDateTime createDate;                   // 레시피 생성일
 //    private int viewCount; //todo: 조회수 나중에 추가
 
 
@@ -34,7 +36,7 @@ public class RecipeDetailViewResponseDto {
      * 모든 필드를 다 생성자에 넣으면 querydsl Projection에서 오류가 나서 필요한 데이터는 setter로 넣도록 함
      */
     @Builder
-    private RecipeDetailViewResponseDto(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId) {
+    private RecipeDetailViewResponseDto(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId, LocalDateTime createDate) {
         this.id = id;
         this.memberId = memberId;
         this.recipeName = recipeName;
@@ -45,10 +47,11 @@ public class RecipeDetailViewResponseDto {
         this.nickname = nickname;
         this.bookmarkId = bookmarkId;
         this.recipeLikeId = recipeLikeId;
+        this.createDate = createDate;
     }
 
-    public static RecipeDetailViewResponseDto of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId) {
-        return new RecipeDetailViewResponseDto(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, bookmarkId, recipeLikeId);
+    public static RecipeDetailViewResponseDto of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, String nickname, Long bookmarkId, Long recipeLikeId, LocalDateTime createDate) {
+        return new RecipeDetailViewResponseDto(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nickname, bookmarkId, recipeLikeId, createDate);
     }
 
 }

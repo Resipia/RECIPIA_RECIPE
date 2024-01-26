@@ -23,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,7 +70,7 @@ class RecipeControllerTest extends TotalTestSupport {
     @Test
     void test() throws Exception {
         //given
-        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null);
+        RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, LocalDateTime.now());
         PagingResponseDto<RecipeListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
         when(readRecipeUseCase.getAllRecipeList(0, 10, "new", null)).thenReturn(pagingResponseDto);
@@ -165,7 +166,8 @@ class RecipeControllerTest extends TotalTestSupport {
                 0L,
                 0,
                 null,
-                Collections.emptyList()
+                Collections.emptyList(),
+                LocalDateTime.now()
         );
     }
 

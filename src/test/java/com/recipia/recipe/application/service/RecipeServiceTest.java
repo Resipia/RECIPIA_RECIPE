@@ -25,6 +25,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -304,7 +305,7 @@ class RecipeServiceTest {
 
     private List<RecipeListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null))
+                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null, LocalDateTime.now()))
                 .collect(Collectors.toList());
     }
 
@@ -323,7 +324,8 @@ class RecipeServiceTest {
                 0L,
                 0,
                 null,
-                Collections.emptyList()
+                Collections.emptyList(),
+                LocalDateTime.now()
         );
     }
 

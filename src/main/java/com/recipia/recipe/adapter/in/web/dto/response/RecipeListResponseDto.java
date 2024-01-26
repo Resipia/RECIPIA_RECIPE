@@ -3,6 +3,7 @@ package com.recipia.recipe.adapter.in.web.dto.response;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -18,8 +19,9 @@ public class RecipeListResponseDto {
     private List<String> subCategoryList;       // 서브 카테고리 목록
     private String thumbnailFullPath;           // 썸네일 이미지 저장경로
     private String thumbnailPreUrl;             // 썸네일 이미지 pre-signed-url
+    private LocalDateTime createDate;                  // 레시피 생성 날짜
 
-    private RecipeListResponseDto(Long id, String recipeName, String nickname, Long bookmarkId, List<String> subCategoryList, String thumbnailFullPath, String thumbnailPreUrl) {
+    private RecipeListResponseDto(Long id, String recipeName, String nickname, Long bookmarkId, List<String> subCategoryList, String thumbnailFullPath, String thumbnailPreUrl, LocalDateTime createDate) {
         this.id = id;
         this.recipeName = recipeName;
         this.nickname = nickname;
@@ -27,6 +29,7 @@ public class RecipeListResponseDto {
         this.subCategoryList = subCategoryList;
         this.thumbnailFullPath = thumbnailFullPath;
         this.thumbnailPreUrl = thumbnailPreUrl;
+        this.createDate = createDate;
     }
 
 //    public RecipeMainListResponseDto(Long id, String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl) {
@@ -38,16 +41,16 @@ public class RecipeListResponseDto {
 //        this.thumbnailPreUrl = thumbnailPreUrl;
 //    }
 
-    public static RecipeListResponseDto of(Long id, String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl) {
-        return new RecipeListResponseDto(id, recipeName, nickname, bookmarkId, null, thumbnailFullPath, thumbnailPreUrl);
+    public static RecipeListResponseDto of(Long id, String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl, LocalDateTime createDate) {
+        return new RecipeListResponseDto(id, recipeName, nickname, bookmarkId, null, thumbnailFullPath, thumbnailPreUrl, createDate);
     }
 
-    public static RecipeListResponseDto of(Long id, String recipeName, String nickname, Long bookmarkId, List<String> subCategoryList, String thumbnailFullPath, String thumbnailPreUrl) {
-        return new RecipeListResponseDto(id, recipeName, nickname, bookmarkId, subCategoryList, thumbnailFullPath, thumbnailPreUrl);
+    public static RecipeListResponseDto of(Long id, String recipeName, String nickname, Long bookmarkId, List<String> subCategoryList, String thumbnailFullPath, String thumbnailPreUrl, LocalDateTime createDate) {
+        return new RecipeListResponseDto(id, recipeName, nickname, bookmarkId, subCategoryList, thumbnailFullPath, thumbnailPreUrl, createDate);
     }
 
-    public static RecipeListResponseDto of(String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl) {
-        return new RecipeListResponseDto(null, recipeName, nickname, bookmarkId, null, thumbnailFullPath, thumbnailPreUrl);
+    public static RecipeListResponseDto of(String recipeName, String nickname, Long bookmarkId, String thumbnailFullPath, String thumbnailPreUrl, LocalDateTime createDate) {
+        return new RecipeListResponseDto(null, recipeName, nickname, bookmarkId, null, thumbnailFullPath, thumbnailPreUrl, createDate);
     }
 
 }

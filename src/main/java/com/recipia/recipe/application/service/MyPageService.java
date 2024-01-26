@@ -154,7 +154,7 @@ public class MyPageService implements MyPageUseCase {
             if (dto.getThumbnailFullPath() != null) {
                 String preSignedUrl = imageS3Service.generatePreSignedUrl(dto.getThumbnailFullPath(), 60);
                 // 생성된 pre-signed-url을 세팅해주고 반환한다.
-                return RecipeListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl);
+                return RecipeListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl, dto.getCreateDate());
             }
             // 만약 저장된 썸네일이 없다면 기존 데이터를 반환한다.
             return dto;

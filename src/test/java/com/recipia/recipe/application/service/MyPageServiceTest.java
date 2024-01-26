@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -60,7 +61,7 @@ class MyPageServiceTest {
         Long targetMemberId = 1L;
         List<Long> recipeIds = List.of(1L, 2L);
         String preSignedUrl = "https://example.com/s3/pre-signed-url";
-        RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl);
+        RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl, LocalDateTime.now());
 
         when(recipePort.getTargetMemberRecipeIds(targetMemberId)).thenReturn(recipeIds);
         when(recipePort.getTargetMemberHighRecipeList(eq(targetMemberId), anyList())).thenReturn(List.of(dtoWithPreSignedUrl));
@@ -82,7 +83,7 @@ class MyPageServiceTest {
         Long targetMemberId = 1L;
         List<Long> recipeIds = List.of(1L, 2L);
         String preSignedUrl = "https://example.com/s3/pre-signed-url";
-        RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl);
+        RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl, LocalDateTime.now());
         RecipeListResponseDto dtoWithoutPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, null);
         List<RecipeListResponseDto> finalResult = List.of(dtoWithPreSignedUrl, dtoWithoutPreSignedUrl);
 
@@ -145,7 +146,7 @@ class MyPageServiceTest {
 
     private List<RecipeListResponseDto> createMockRecipeList(int size) {
         return IntStream.range(0, size)
-                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null))
+                .mapToObj(i -> RecipeListResponseDto.of((long) i, "Recipe " + i, "Nickname", null, null, null, LocalDateTime.now()))
                 .collect(Collectors.toList());
     }
 }

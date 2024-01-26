@@ -3,6 +3,7 @@ package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QCommentEntity.commentEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QNicknameEntity.nicknameEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
@@ -82,7 +84,8 @@ public class RecipeQueryRepository {
                                                 .select(recipeFileEntity.id.min())
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
-                                )), "thumbnailFullPath")
+                                )), "thumbnailFullPath"),
+                        recipeEntity.createDateTime.as("createDate")
                 ))
                 .from(recipeEntity)
                 .where(whereCondition);
@@ -173,7 +176,8 @@ public class RecipeQueryRepository {
                         recipeEntity.hashtag,
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
                         ExpressionUtils.as(bookmarkSubQuery, "bookmarkId"),
-                        ExpressionUtils.as(recipeLikeSubQuery, "recipeLikeId")
+                        ExpressionUtils.as(recipeLikeSubQuery, "recipeLikeId"),
+                        recipeEntity.createDateTime.as("createDate")
                 ))
                 .from(recipeEntity)
                 .where(recipeEntity.id.eq(recipeId), recipeEntity.delYn.eq("N"))
@@ -294,7 +298,8 @@ public class RecipeQueryRepository {
                                                 .select(recipeFileEntity.id.min())
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
-                                )), "thumbnailFullPath")))
+                                )), "thumbnailFullPath"),
+                        recipeEntity.createDateTime.as("createDate")))
                 .from(recipeEntity)
                 .where(whereCondition)
                 .fetch();
@@ -344,7 +349,8 @@ public class RecipeQueryRepository {
                                                 .select(recipeFileEntity.id.min())
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
-                                )), "thumbnailFullPath")
+                                )), "thumbnailFullPath"),
+                        recipeEntity.createDateTime.as("createDate")
                 ))
                 .from(recipeEntity)
                 .where(recipeEntity.delYn.eq("N"), recipeEntity.memberId.eq(targetMemberId));
@@ -414,7 +420,8 @@ public class RecipeQueryRepository {
                                                 .select(recipeFileEntity.id.min())
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
-                                )), "thumbnailFullPath")
+                                )), "thumbnailFullPath"),
+                        recipeEntity.createDateTime.as("createDate")
                 ))
                 .from(bookmarkEntity)
                 .join(bookmarkEntity.recipeEntity, recipeEntity)
@@ -481,7 +488,8 @@ public class RecipeQueryRepository {
                                                 .select(recipeFileEntity.id.min())
                                                 .from(recipeFileEntity)
                                                 .where(recipeFileEntity.recipeEntity.id.eq(recipeEntity.id), recipeFileEntity.delYn.eq("N"))
-                                )), "thumbnailFullPath")
+                                )), "thumbnailFullPath"),
+                        recipeEntity.createDateTime.as("createDate")
                 ))
                 .from(recipeLikeEntity)
                 .join(recipeLikeEntity.recipeEntity, recipeEntity)

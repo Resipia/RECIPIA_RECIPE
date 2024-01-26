@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -436,7 +437,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 0L,
                 0,
                 null,
-                Collections.emptyList()
+                Collections.emptyList(),
+                LocalDateTime.now()
         );
     }
 
@@ -456,7 +458,8 @@ class RecipeAdapterTest extends TotalTestSupport {
                 0L,
                 0,
                 null,
-                Collections.emptyList()
+                Collections.emptyList(),
+                LocalDateTime.now()
         );
     }
 

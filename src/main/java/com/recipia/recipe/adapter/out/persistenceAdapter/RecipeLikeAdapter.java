@@ -10,6 +10,8 @@ import com.recipia.recipe.domain.converter.RecipeLikeConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * 좋아요 기능과 관련된 어댑터
  */
@@ -59,8 +61,8 @@ public class RecipeLikeAdapter implements RecipeLikePort {
      * [DELETE] recipeId에 해당하는 좋아요 데이터를 삭제한다.
      */
     @Override
-    public Long deleteRecipeLikeByRecipeId(Long recipeId) {
-        return recipeLikeQuerydslRepository.deleteLikeByRecipeId(recipeId);
+    public Long deleteRecipeLikesInRecipeIds(List<Long> recipeIds) {
+        return recipeLikeQuerydslRepository.deleteLikesInRecipeIds(recipeIds);
     }
 
     /**

@@ -25,11 +25,11 @@ class BookmarkQuerydslRepositoryTest extends TotalTestSupport {
     @Test
     void deleteBookmarkByRecipeId() {
         // given
-        Long recipeId = 1L;
+        List<Long> recipeIds = List.of(1L);
         // when
-        Long deletedCount = sut.deleteBookmarkByRecipeId(recipeId);
+        Long deletedCount = sut.deleteBookmarksInRecipeIds(recipeIds);
         // then
-        List<BookmarkEntity> allByRecipeEntityId = bookmarkRepository.findAllByRecipeEntity_Id(recipeId);
+        List<BookmarkEntity> allByRecipeEntityId = bookmarkRepository.findAllByRecipeEntity_Id(recipeIds.get(0));
         assertThat(allByRecipeEntityId.size()).isEqualTo(0);
     }
 

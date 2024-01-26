@@ -31,7 +31,7 @@ public class SqsListenerService {
     /**
      * [SQS 리스너] 유저 닉네임 변경 시 동작
      */
-    @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
+//    @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
     public void receiveNicknameChangeMessage(String messageJson) throws JsonProcessingException {
 
         // 1. SNS 메타데이터 정보를 추출해서 dto 객체로 만든다.
@@ -68,7 +68,7 @@ public class SqsListenerService {
      *
      * [SQS 리스너] 유저 회원가입 시 동작
      */
-    @SqsListener(value = "${spring.cloud.aws.sqs.signup-sqs-name}")
+//    @SqsListener(value = "${spring.cloud.aws.sqs.signup-sqs-name}")
     public void receiveNicknameInsertMessage(String messageJson) throws JsonProcessingException {
 
         // 1. SNS 메타데이터 정보를 추출해서 dto 객체로 만든다.

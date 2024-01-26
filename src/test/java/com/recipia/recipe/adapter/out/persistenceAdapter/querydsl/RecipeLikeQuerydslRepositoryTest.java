@@ -1,6 +1,5 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
-import com.recipia.recipe.adapter.out.persistence.entity.BookmarkEntity;
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeLikeEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.RecipeLikeRepository;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @DisplayName("[통합] 좋아요 레시피 querydsl 테스트")
@@ -28,11 +26,11 @@ class RecipeLikeQuerydslRepositoryTest extends TotalTestSupport {
     @Test
     void deleteLikeByRecipeId() {
         // given
-        Long recipeId = 1L;
+        List<Long> recipeIds = List.of(1L);
         // when
-        Long deletedCount = sut.deleteLikeByRecipeId(recipeId);
+        Long deletedCount = sut.deleteLikesInRecipeIds(recipeIds);
         // then
-        List<RecipeLikeEntity> allByRecipeEntityId = recipeLikeRepository.findAllByRecipeEntity_Id(recipeId);
+        List<RecipeLikeEntity> allByRecipeEntityId = recipeLikeRepository.findAllByRecipeEntity_Id(recipeIds.get(0));
         assertThat(allByRecipeEntityId.size()).isEqualTo(0);
     }
 

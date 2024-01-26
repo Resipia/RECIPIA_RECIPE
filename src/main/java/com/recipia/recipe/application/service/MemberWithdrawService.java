@@ -40,6 +40,12 @@ public class MemberWithdrawService implements MemberWithdrawUseCase {
             // recipeId에 해당하는 레시피 파일을 전부 삭제한다.
             recipePort.softDeleteRecipeFilesInRecipeIds(recipeIds);
 
+            // recipeId에 해당하는 북마크를 전부 삭제한다.
+            bookmarkPort.deleteBookmarksInRecipeIds(recipeIds);
+
+            // recipeId에 해당하는 좋아요를 전부 삭제한다.
+            recipeLikePort.deleteRecipeLikesInRecipeIds(recipeIds);
+
             // 레시피 영양소 정보를 전부 삭제한다.
             recipePort.deleteNutritionalInfosInRecipeIds(recipeIds);
 

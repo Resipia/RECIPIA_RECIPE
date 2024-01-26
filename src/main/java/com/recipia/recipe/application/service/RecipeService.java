@@ -217,10 +217,10 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         recipePort.softDeleteRecipeFilesInRecipeIds(List.of(recipeId));
 
         // 4. 북마크 테이블에서 레시피 삭제
-        bookmarkPort.deleteBookmarkByRecipeId(recipeId);
+        bookmarkPort.deleteBookmarksInRecipeIds(List.of(recipeId));
 
         // 5. 좋아요한 레시피 테이블에서 레시피 삭제
-        recipeLikePort.deleteRecipeLikeByRecipeId(recipeId);
+        recipeLikePort.deleteRecipeLikesInRecipeIds(List.of(recipeId));
 
         // 6. 영양소 정보 삭제
         recipePort.deleteNutritionalInfosInRecipeIds(List.of(recipeId));

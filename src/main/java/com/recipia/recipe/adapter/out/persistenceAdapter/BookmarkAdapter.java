@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -52,8 +54,8 @@ public class BookmarkAdapter implements BookmarkPort {
      * [DELETE] 레시피 id로 북마크 삭제
      */
     @Override
-    public Long deleteBookmarkByRecipeId(Long recipeId) {
-        return bookmarkQuerydslRepository.deleteBookmarkByRecipeId(recipeId);
+    public Long deleteBookmarksInRecipeIds(List<Long> recipeIds) {
+        return bookmarkQuerydslRepository.deleteBookmarksInRecipeIds(recipeIds);
     }
 
     /**

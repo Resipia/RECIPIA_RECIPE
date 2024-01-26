@@ -4,6 +4,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.recipia.recipe.adapter.out.persistence.entity.QBookmarkEntity.bookmarkEntity;
 
 @RequiredArgsConstructor
@@ -15,10 +17,10 @@ public class BookmarkQuerydslRepository {
     /**
      * [DELETE] recipeId에 해당하는 북마크를 삭제한다.
      */
-    public Long deleteBookmarkByRecipeId(Long recipeId) {
+    public Long deleteBookmarksInRecipeIds(List<Long> recipeIds) {
         return jpaQueryFactory
                 .delete(bookmarkEntity)
-                .where(bookmarkEntity.recipeEntity.id.eq(recipeId))
+                .where(bookmarkEntity.recipeEntity.id.in(recipeIds))
                 .execute();
     }
 

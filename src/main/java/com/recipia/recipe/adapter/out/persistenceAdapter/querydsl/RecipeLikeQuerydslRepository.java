@@ -22,4 +22,13 @@ public class RecipeLikeQuerydslRepository {
                 .execute();
     }
 
+    /**
+     * [DELETE] memberId에 해당하는 좋아요를 삭제한다.
+     */
+    public Long deleteLikeByMemberId(Long memberId) {
+        return jpaQueryFactory
+                .delete(recipeLikeEntity)
+                .where(recipeLikeEntity.memberId.eq(memberId))
+                .execute();
+    }
 }

@@ -64,6 +64,14 @@ public class RecipeLikeAdapter implements RecipeLikePort {
     }
 
     /**
+     * [DELETE] memberId에 해당하는 좋아요를 삭제한다.
+     */
+    @Override
+    public Long deleteLikeByMemberId(Long memberId) {
+        return recipeLikeQuerydslRepository.deleteLikeByMemberId(memberId);
+    }
+
+    /**
      * [EXTRACT]
      * 1. 좋아요 엔티티의 존재 여부 검증
      * 2. 등록/삭제하려는 유저의 좋아요가 맞는지 검증한다.

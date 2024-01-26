@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,13 +22,13 @@ class NutritionalInfoQueryRepositoryTest extends TotalTestSupport {
 
     @DisplayName("[happy] recipeId에 해당하는 영양소 정보를 삭제한다.")
     @Test
-    void deleteNutritionalInfoByRecipeId() {
+    void deleteNutritionalInfo() {
         // given
-        Long recipeId = 1L;
+        List<Long> recipeIds = List.of(1L);
         // when
-        Long deletedCount = sut.deleteNutritionalInfoByRecipeId(recipeId);
+        Long deletedCount = sut.deleteNutritionalInfosInRecipeIds(recipeIds);
         // then
-        Optional<NutritionalInfoEntity> result = nutritionalInfoRepository.findByRecipe_Id(recipeId);
+        Optional<NutritionalInfoEntity> result = nutritionalInfoRepository.findByRecipe_Id(recipeIds.get(0));
         assertThat(result).isEmpty();
     }
 

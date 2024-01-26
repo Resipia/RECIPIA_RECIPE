@@ -36,4 +36,16 @@ class RecipeLikeQuerydslRepositoryTest extends TotalTestSupport {
         assertThat(allByRecipeEntityId.size()).isEqualTo(0);
     }
 
+    @DisplayName("[happy] memberId에 해당하는 좋아요를 삭제한다.")
+    @Test
+    void deleteLikeByMemberId() {
+        // given
+        Long memberId = 1L;
+        // when
+        sut.deleteLikeByMemberId(memberId);
+        // then
+        List<RecipeLikeEntity> allByMemberId = recipeLikeRepository.findAllByMemberId(memberId);
+        assertThat(allByMemberId).isEmpty();
+    }
+
 }

@@ -33,5 +33,17 @@ class BookmarkQuerydslRepositoryTest extends TotalTestSupport {
         assertThat(allByRecipeEntityId.size()).isEqualTo(0);
     }
 
+    @DisplayName("[happy] memberId에 해당하는 북마크를 삭제한다.")
+    @Test
+    void deleteBookmarkByMemberId() {
+        // given
+        Long memberId = 1L;
+        // when
+        Long deletedCount = sut.deleteBookmarkByMemberId(memberId);
+        // then
+        List<BookmarkEntity> allByMemberId = bookmarkRepository.findAllByMemberId(memberId);
+        assertThat(allByMemberId.size()).isEqualTo(0);
+    }
+
 
 }

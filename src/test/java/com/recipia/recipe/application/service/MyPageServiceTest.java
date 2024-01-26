@@ -2,7 +2,7 @@ package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
-import com.recipia.recipe.application.port.out.RecipePort;
+import com.recipia.recipe.application.port.out.MyPagePort;
 import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.domain.MyPage;
 import org.assertj.core.api.Assertions;
@@ -17,13 +17,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +33,7 @@ class MyPageServiceTest {
     @InjectMocks
     private MyPageService sut;
     @Mock
-    private RecipePort recipePort;
+    private MyPagePort myPagePort;
     @Mock
     private ImageS3Service imageS3Service;
     @Mock
@@ -45,7 +45,7 @@ class MyPageServiceTest {
         // given
         Long targetMemberId = 1L;
         Long count = 1L;
-        when(recipePort.getTargetMemberIdRecipeCount(targetMemberId)).thenReturn(count);
+        when(myPagePort.getTargetMemberIdRecipeCount(targetMemberId)).thenReturn(count);
         MyPage domain = MyPage.of(count);
 
         // when
@@ -63,8 +63,8 @@ class MyPageServiceTest {
         String preSignedUrl = "https://example.com/s3/pre-signed-url";
         RecipeListResponseDto dtoWithPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, preSignedUrl, "2020-12-12");
 
-        when(recipePort.getTargetMemberRecipeIds(targetMemberId)).thenReturn(recipeIds);
-        when(recipePort.getTargetMemberHighRecipeList(eq(targetMemberId), anyList())).thenReturn(List.of(dtoWithPreSignedUrl));
+        when(myPagePort.getTargetMemberRecipeIds(targetMemberId)).thenReturn(recipeIds);
+        when(myPagePort.getTargetMemberHighRecipeList(eq(targetMemberId), anyList())).thenReturn(List.of(dtoWithPreSignedUrl));
 
         // when
         List<RecipeListResponseDto> result = sut.getTargetMemberRecipeHigh(targetMemberId);
@@ -87,8 +87,8 @@ class MyPageServiceTest {
         RecipeListResponseDto dtoWithoutPreSignedUrl = RecipeListResponseDto.of(1L, "레시피명", "닉네임", 1L, null, null, null);
         List<RecipeListResponseDto> finalResult = List.of(dtoWithPreSignedUrl, dtoWithoutPreSignedUrl);
 
-        when(recipePort.getTargetMemberRecipeIds(targetMemberId)).thenReturn(recipeIds);
-        when(recipePort.getTargetMemberHighRecipeList(eq(targetMemberId), anyList())).thenReturn(finalResult);
+        when(myPagePort.getTargetMemberRecipeIds(targetMemberId)).thenReturn(recipeIds);
+        when(myPagePort.getTargetMemberHighRecipeList(eq(targetMemberId), anyList())).thenReturn(finalResult);
 
         // when
         List<RecipeListResponseDto> result = sut.getTargetMemberRecipeHigh(targetMemberId);
@@ -111,7 +111,7 @@ class MyPageServiceTest {
         List<RecipeListResponseDto> recipeList = createMockRecipeList(size);
         Page<RecipeListResponseDto> mockPage = new PageImpl<>(recipeList);
 
-        when(recipePort.getTargetMemberRecipeList(targetMemberId, pageable, sortType)).thenReturn(mockPage);
+        when(myPagePort.getTargetMemberRecipeList(targetMemberId, pageable, sortType)).thenReturn(mockPage);
 
         // When
         PagingResponseDto<RecipeListResponseDto> result = sut.getTargetMemberRecipeList(page, size, sortType, targetMemberId);
@@ -132,7 +132,7 @@ class MyPageServiceTest {
         List<RecipeListResponseDto> recipeList = createMockRecipeList(size);
         Page<RecipeListResponseDto> mockPage = new PageImpl<>(recipeList);
 
-        when(recipePort.getAllMyBookmarkList(pageable)).thenReturn(mockPage);
+        when(myPagePort.getAllMyBookmarkList(pageable)).thenReturn(mockPage);
 
         // When
         PagingResponseDto<RecipeListResponseDto> result = sut.getAllMyBookmarkList(page, size);

@@ -1,6 +1,5 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter.querydsl;
 
-import com.recipia.recipe.adapter.in.web.dto.response.CommentListResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.SubCommentListResponseDto;
 import com.recipia.recipe.adapter.out.persistence.entity.SubCommentEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.SubCommentRepository;
@@ -79,9 +78,21 @@ class SubCommentQueryRepositoryTest extends TotalTestSupport {
         // given
         List<Long> commentIds = List.of(1L);
         // when
-        sut.softDeleteSubCommentByCommentIds(commentIds);
+        sut.softDeleteSubCommentsInCommentIds(commentIds);
         // then
         List<SubCommentEntity> allByCommentEntityId = subCommentRepository.findAllByCommentEntity_Id(commentIds.get(0));
         assertEquals(allByCommentEntityId.get(0).getDelYn(), "Y");
+    }
+
+    @DisplayName("[happy] memberId에 해당하는 대댓글은 전부 삭제처리한다.")
+    @Test
+    void softDeleteSubCommentByMemberId() {
+        // given
+        Long memberId = 1L;
+        // when
+        sut.softDeleteSubCommentByMemberId(memberId);
+        // then
+        List<SubCommentEntity> allByMemberId = subCommentRepository.findAllByMemberId(memberId);
+        assertThat(allByMemberId.get(0).getDelYn()).isEqualTo("Y");
     }
 }

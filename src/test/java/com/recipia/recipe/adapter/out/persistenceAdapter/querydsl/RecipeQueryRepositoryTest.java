@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -372,9 +373,9 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     @Test
     void softDeleteRecipeFile() {
         // given
-        Long recipeId = 1L;
+        List<Long> recipeIds = List.of(1L);
         // when
-        Long updatedCount = sut.softDeleteRecipeFileByRecipeId(recipeId);
+        Long updatedCount = sut.softDeleteRecipeFilesInRecipeIds(recipeIds);
         // then
         assertThat(updatedCount).isEqualTo(1L);
     }
@@ -383,11 +384,35 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
     @Test
     void softDeleteNonRecipeFile() {
         // given
-        Long recipeId = 3L;
+        List<Long> recipeIds = List.of(4L);
         // when
-        Long updatedCount = sut.softDeleteRecipeFileByRecipeId(recipeId);
+        Long updatedCount = sut.softDeleteRecipeFilesInRecipeIds(recipeIds);
         // then
         assertThat(updatedCount).isEqualTo(0L);
+    }
+
+    @DisplayName("[happy] memberId가 작성한 레시피를 전부 soft delete 처리한다.")
+    @Test
+    void softDeleteRecipeByMemberId() {
+        // given
+        Long memberId = 1L;
+        // when
+        sut.softDeleteRecipeByMemberId(memberId);
+        // then
+        List<RecipeEntity> allByMemberId = recipeRepository.findAllByMemberId(memberId);
+        assertTrue(allByMemberId.get(0).getDelYn().equals("Y"));
+    }
+
+    @DisplayName("[happy] memberId가 작성한 레시피 id를 성공적으로 반환한다.")
+    @Test
+    void getAllRecipeIdsByMemberId() {
+        // given
+        Long memberId = 1L;
+        // when
+        List<Long> allRecipeIdsByMemberId = sut.getAllRecipeIdsByMemberId(memberId);
+        // then
+        assertThat(allRecipeIdsByMemberId.size()).isEqualTo(2L);
+
     }
 
 }

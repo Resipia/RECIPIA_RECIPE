@@ -45,7 +45,7 @@ public class RecipeController {
         List<MultipartFile> files = requestDto.getFileList();
 
         // 2. dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
-        Recipe recipe = recipeConverter.dtoToDomain(requestDto);
+        Recipe recipe = recipeConverter.dtoToDomainCreate(requestDto);
 
         // 3. 레시피 저장
         Long savedRecipeId = createRecipeUseCase.createRecipe(recipe, files);
@@ -98,7 +98,7 @@ public class RecipeController {
         List<MultipartFile> files = requestDto.getFileList();
 
         // 2. dto to domain -> 이때 jwt가 없으면 MISSING_JWT 예외 발생, 유저가 없으면 USER_NOT_FOUND 예외 발생
-        Recipe recipe = recipeConverter.dtoToDomain(requestDto);
+        Recipe recipe = recipeConverter.dtoToDomainUpdate(requestDto);
 
         // 3. 레시피 업데이트
         updateRecipeUseCase.updateRecipe(recipe, files);

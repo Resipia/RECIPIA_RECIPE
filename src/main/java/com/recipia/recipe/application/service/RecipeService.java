@@ -172,10 +172,12 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         recipePort.updateCategoryMapping(domain);
 
         // 3. 유저가 파일 삭제만 하고 업데이트를 했을수도 있으니 이 로직은 무조건 동작시킨다.
-        recipePort.softDeleteRecipeFile(domain, domain.getDeleteFileOrder());
+        if (domain.getDeleteFileOrder() != null) {
+            recipePort.softDeleteRecipeFile(domain, domain.getDeleteFileOrder());
+        }
 
         // 4. 파일이 null이면 저장을 하지 않는다.
-        if (!files.isEmpty()) {
+        if (files != null) {
 
             // 순차적으로 file order를 올리기 위한 변수 선언
             AtomicInteger currentMaxFileOrder = new AtomicInteger(recipePort.findMaxFileOrder(domain.getId()));

@@ -49,8 +49,22 @@ public class NutritionalInfoConverter {
     /**
      * 레시피를 생성할때 요청 dto에서 영양소 정보를 뽑아낸 후 영양소 도메인 객체로 변환해주는 메서드
      */
-    public NutritionalInfo dtoToDomain(RecipeCreateUpdateRequestDto dto) {
+    public NutritionalInfo dtoToDomainCreate(RecipeCreateUpdateRequestDto dto) {
         return NutritionalInfo.of(
+                dto.getNutritionalInfo().getCarbohydrates(),
+                dto.getNutritionalInfo().getProtein(),
+                dto.getNutritionalInfo().getFat(),
+                dto.getNutritionalInfo().getVitamins(),
+                dto.getNutritionalInfo().getMinerals()
+        );
+    }
+
+    /**
+     * 레시피를 업데이트 할 때 요청 dto에서 영양소 정보를 뽑아낸 후 영양소 도메인 객체로 변환해주는 메서드
+     */
+    public NutritionalInfo dtoToDomainUpdate(RecipeCreateUpdateRequestDto dto) {
+        return NutritionalInfo.of(
+                dto.getNutritionalInfo().getId(),
                 dto.getNutritionalInfo().getCarbohydrates(),
                 dto.getNutritionalInfo().getProtein(),
                 dto.getNutritionalInfo().getFat(),

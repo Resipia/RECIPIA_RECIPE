@@ -38,9 +38,9 @@ public class RecipeConverter {
      * 레시피를 생성할때 컨트롤러에 들어온 요청 dto객체를 도메인으로 변환시키는 메서드
      * 여기서 도메인 객체를 만들어서 서비스 레이어에 보낸다.
      */
-    public Recipe dtoToDomain(RecipeCreateUpdateRequestDto dto) {
+    public Recipe dtoToDomainCreate(RecipeCreateUpdateRequestDto dto) {
         // 1.영양소 도메인을 받아온다.
-        NutritionalInfo nutritionalInfo = nutritionalInfoConverter.dtoToDomain(dto);
+        NutritionalInfo nutritionalInfo = nutritionalInfoConverter.dtoToDomainCreate(dto);
         // 2. 서브 카테고리 도메인 리스트를 받아온다.
         List<SubCategory> subCategories = dtoToDomainList(dto);
 
@@ -62,6 +62,38 @@ public class RecipeConverter {
                 dto.getDeleteFileOrder()
         );
     }
+
+    /**
+     * [entity to domain]
+     * 레시피를 업데이트 할 때 컨트롤러에 들어온 요청 dto객체를 도메인으로 변환시키는 메서드
+     * 여기서 도메인 객체를 만들어서 서비스 레이어에 보낸다.
+     */
+    public Recipe dtoToDomainUpdate(RecipeCreateUpdateRequestDto dto) {
+        // 1.영양소 도메인을 받아온다.
+        NutritionalInfo nutritionalInfo = nutritionalInfoConverter.dtoToDomainUpdate(dto);
+        // 2. 서브 카테고리 도메인 리스트를 받아온다.
+        List<SubCategory> subCategories = dtoToDomainList(dto);
+
+        // 3. jwt 클레임으로부터 memberId, nickname을 꺼내서 주입한다.
+        return Recipe.of(
+                dto.getId(),
+                securityUtil.getCurrentMemberId(),
+                dto.getRecipeName(),
+                dto.getRecipeDesc(),
+                dto.getTimeTaken(),
+                dto.getIngredient(),
+                dto.getHashtag(),
+                nutritionalInfo,
+                subCategories,
+                securityUtil.getCurrentMemberNickname(),
+                "N",
+                0L, // todo: 저장할때라서 일단 0L을 넣어줬다.
+                0,
+                null,
+                dto.getDeleteFileOrder()
+        );
+    }
+
 
     /**
      * Recipe 도메인을 받아서 RecipeEntity 엔티티로 변환

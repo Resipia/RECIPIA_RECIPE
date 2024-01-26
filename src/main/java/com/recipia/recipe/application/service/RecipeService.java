@@ -105,7 +105,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         List<RecipeListResponseDto> finalResult = beforeContent.stream().map(dto -> {
             if (dto.getThumbnailFullPath() != null) {
                 String preSignedUrl = imageS3Service.generatePreSignedUrl(dto.getThumbnailFullPath(), 60);
-                return RecipeListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl);
+                return RecipeListResponseDto.of(dto.getId(), dto.getRecipeName(), dto.getNickname(), dto.getBookmarkId(), dto.getSubCategoryList(), null, preSignedUrl, dto.getCreateDate());
             }
             return dto;
         }).collect(Collectors.toList());

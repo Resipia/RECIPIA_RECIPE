@@ -105,9 +105,7 @@ public class RecipeAdapter implements RecipePort {
         Long currentMemberId = securityUtil.getCurrentMemberId();
 
         // 2. 조건에 맞는 모든 레시피 리스트를 가져온다.
-        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllRecipeList(currentMemberId, pageable, sortType, subCategoryList);
-
-        return recipeResponseDtoList;
+        return recipeQuerydslRepository.getAllRecipeList(currentMemberId, pageable, sortType, subCategoryList);
     }
 
     /**
@@ -117,9 +115,7 @@ public class RecipeAdapter implements RecipePort {
     @Override
     public Recipe getRecipeDetailView(Recipe domain) {
         // recipe 기본 정보를 가져온다.
-        Recipe recipe = recipeQuerydslRepository.getRecipeDetailView(domain.getId(), domain.getMemberId()).orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
-
-        return recipe;
+        return recipeQuerydslRepository.getRecipeDetailView(domain.getId(), domain.getMemberId()).orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
     }
 
     /**

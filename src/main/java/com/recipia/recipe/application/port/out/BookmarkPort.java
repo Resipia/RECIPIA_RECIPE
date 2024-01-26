@@ -8,4 +8,6 @@ public interface BookmarkPort {
 
     void removeBookmark(Long bookmarkId);
     Long deleteBookmarkByRecipeId(Long recipeId);
+
+    Long deleteBookmarkByMemberId(Long memberId);
 }

@@ -11,4 +11,6 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> 
     Long deleteAllByRecipeEntity_Id(Long recipeId);
 
     List<BookmarkEntity> findAllByRecipeEntity_Id(Long recipeId);
+
+    List<BookmarkEntity> findAllByMemberId(Long memberId);
 }

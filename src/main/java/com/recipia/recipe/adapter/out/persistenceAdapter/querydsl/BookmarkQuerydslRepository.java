@@ -22,4 +22,13 @@ public class BookmarkQuerydslRepository {
                 .execute();
     }
 
+    /**
+     * [DELETE] memberId에 해당하는 북마그를 삭제한다.
+     */
+    public Long deleteBookmarkByMemberId(Long memberId) {
+        return jpaQueryFactory
+                .delete(bookmarkEntity)
+                .where(bookmarkEntity.memberId.eq(memberId))
+                .execute();
+    }
 }

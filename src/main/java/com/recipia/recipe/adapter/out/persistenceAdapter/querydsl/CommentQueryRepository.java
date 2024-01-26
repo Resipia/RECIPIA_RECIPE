@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static com.recipia.recipe.adapter.out.persistence.entity.QCommentEntity.commentEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QNicknameEntity.nicknameEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QSubCommentEntity.subCommentEntity;
 
 @RequiredArgsConstructor
 @Repository
@@ -60,6 +61,12 @@ public class CommentQueryRepository {
                 .from(nicknameEntity)
                 .where(nicknameEntity.memberId.eq(commentEntity.memberId));
 
+        // 댓글에 작성된 대댓글 갯수 조회 서브쿼리
+        JPQLQuery<Long> subCommentCountSubQuery = JPAExpressions
+                .select(subCommentEntity.count())
+                .from(subCommentEntity)
+                .where(subCommentEntity.commentEntity.id.eq(commentEntity.id));
+
         // 기본 쿼리 설정
         JPAQuery<CommentListResponseDto> query = queryFactory
                 .select(Projections.constructor(
@@ -69,7 +76,8 @@ public class CommentQueryRepository {
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
                         commentEntity.commentText,
                         Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", commentEntity.createDateTime),
-                        commentEntity.createDateTime.ne(commentEntity.updateDateTime)
+                        commentEntity.createDateTime.ne(commentEntity.updateDateTime),
+                        ExpressionUtils.as(subCommentCountSubQuery, "subCommentCount")
                 ))
                 .from(commentEntity)
                 .where(commentEntity.recipeEntity.id.eq(recipeId), commentEntity.delYn.eq("N"));

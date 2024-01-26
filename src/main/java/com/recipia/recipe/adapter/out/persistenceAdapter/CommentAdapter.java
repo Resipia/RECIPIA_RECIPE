@@ -76,8 +76,7 @@ public class CommentAdapter implements CommentPort {
      */
     @Override
     public Page<CommentListResponseDto> getCommentList(Long recipeId, Pageable pageable, String sortType) {
-        Page<CommentListResponseDto> commentDtoList = commentQueryRepository.getCommentDtoList(recipeId, pageable, sortType);
-        return commentDtoList;
+        return commentQueryRepository.getCommentDtoList(recipeId, pageable, sortType);
     }
 
     /**

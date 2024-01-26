@@ -100,12 +100,24 @@ public class SubCommentQueryRepository {
     /**
      * [DELETE] commentId에 해당하는 대댓글을 삭제처리(del_yn = "Y")한다.
      */
-    public Long softDeleteSubCommentByCommentIds(List<Long> commentIds) {
+    public Long softDeleteSubCommentsInCommentIds(List<Long> commentIds) {
         return queryFactory
                 .update(subCommentEntity)
                 .set(subCommentEntity.delYn, "Y")
                 .set(subCommentEntity.updateDateTime, LocalDateTime.now())
                 .where(subCommentEntity.commentEntity.id.in(commentIds))
+                .execute();
+    }
+
+    /**
+     * [DELETE] memberId에 해당하는 대댓글을 삭제한다.
+     */
+    public void softDeleteSubCommentByMemberId(Long memberId) {
+        queryFactory
+                .update(subCommentEntity)
+                .set(subCommentEntity.delYn, "Y")
+                .set(subCommentEntity.updateDateTime, LocalDateTime.now())
+                .where(subCommentEntity.memberId.eq(memberId))
                 .execute();
     }
 }

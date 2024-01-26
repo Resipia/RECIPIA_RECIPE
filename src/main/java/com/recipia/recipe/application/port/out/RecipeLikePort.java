@@ -9,4 +9,6 @@ public interface RecipeLikePort {
     void deleteRecipeLike(RecipeLike domain);
 
     Long deleteRecipeLikeByRecipeId(Long recipeId);
+
+    Long deleteLikeByMemberId(Long memberId);
 }

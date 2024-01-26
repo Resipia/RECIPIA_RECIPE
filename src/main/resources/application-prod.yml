@@ -16,6 +16,8 @@ spring:
       sqs:
         nickname-sqs-name: nickname-change-sqs
         signup-sqs-name: signup-sqs
+        member-withdraw-sqs-name: member-withdraw-sqs
+
       s3:
         bucketName: recipia-file
 

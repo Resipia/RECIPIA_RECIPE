@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recipia.recipe.adapter.in.listener.aws.dto.MessageMemberIdDto;
 import com.recipia.recipe.adapter.in.listener.aws.dto.SnsNotificationDto;
 import com.recipia.recipe.adapter.in.listener.aws.dto.TraceIdDto;
+import com.recipia.recipe.common.event.MemberWithdrawEvent;
 import com.recipia.recipe.common.event.NicknameChangeEvent;
 import com.recipia.recipe.common.event.SignUpEvent;
 import io.awspring.cloud.sqs.annotation.SqsListener;
@@ -28,8 +29,7 @@ public class SqsListenerService {
 
 
     /**
-     * [SQS 리스너]
-     *  유저 닉네임 변경 시 동작
+     * [SQS 리스너] 유저 닉네임 변경 시 동작
      */
     @SqsListener(value = "${spring.cloud.aws.sqs.nickname-sqs-name}")
     public void receiveNicknameChangeMessage(String messageJson) throws JsonProcessingException {
@@ -66,8 +66,7 @@ public class SqsListenerService {
 
     /**
      *
-     * [SQS 리스너]
-     *  유저 회원가입 시 동작
+     * [SQS 리스너] 유저 회원가입 시 동작
      */
     @SqsListener(value = "${spring.cloud.aws.sqs.signup-sqs-name}")
     public void receiveNicknameInsertMessage(String messageJson) throws JsonProcessingException {
@@ -93,6 +92,43 @@ public class SqsListenerService {
         // 5. SNS 메시지에 담겨있던 memberId로 이벤트 발행 및 로깅 진행
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
             eventPublisher.publishEvent(new SignUpEvent(snsMessageDto.memberId()));
+        } catch (Exception e) {
+            span.tag("error", e.toString());
+            log.error("Error processing SQS message: ", e);
+        } finally {
+            span.finish();
+        }
+
+    }
+
+    /**
+     *
+     * [SQS 리스너] 유저 회원 탈퇴시 동작
+     */
+    @SqsListener(value = "${spring.cloud.aws.sqs.member-withdraw-sqs-name}")
+    public void receiveMemberWithdrawMessage(String messageJson) throws JsonProcessingException {
+
+        // 1. SNS 메타데이터 정보를 추출해서 dto 객체로 만든다.
+        SnsNotificationDto snsNotificationDto = objectMapper.readValue(messageJson, SnsNotificationDto.class);
+        TraceIdDto traceIdDto = snsNotificationDto.MessageAttributes().traceId();
+        String traceId = traceIdDto.Value();
+
+        // 2. SNS 토픽 이름을 추출하고 span 메시지를 생성한다.
+        String topicName = extractSnsTopicName(snsNotificationDto.TopicArn());
+        String spanName = String.format("[RECIPE] TopicName: %s SQS Received", topicName);
+
+        // 3. SNS 내부의 메시지를 Dto로 만든다. (이벤트 발행할 때 사용)
+        MessageMemberIdDto snsMessageDto = objectMapper.readValue(snsNotificationDto.Message(), MessageMemberIdDto.class);
+
+        // 4. 이전 서버에서 보낸 traceId를 사용하여 새로운 TraceContext를 생성한다.
+        TraceContext context = buildTraceContext(traceId);
+        Span span = tracer.nextSpan(TraceContextOrSamplingFlags.create(context))
+                .name(spanName)
+                .start();
+
+        // 5. SNS 메시지에 담겨있던 memberId로 이벤트 발행 및 로깅 진행
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
+            eventPublisher.publishEvent(new MemberWithdrawEvent(snsMessageDto.memberId()));
         } catch (Exception e) {
             span.tag("error", e.toString());
             log.error("Error processing SQS message: ", e);

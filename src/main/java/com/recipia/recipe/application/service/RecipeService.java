@@ -2,10 +2,7 @@ package com.recipia.recipe.application.service;
 
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
-import com.recipia.recipe.application.port.in.CreateRecipeUseCase;
-import com.recipia.recipe.application.port.in.DeleteRecipeUseCase;
-import com.recipia.recipe.application.port.in.ReadRecipeUseCase;
-import com.recipia.recipe.application.port.in.UpdateRecipeUseCase;
+import com.recipia.recipe.application.port.in.*;
 import com.recipia.recipe.application.port.out.*;
 import com.recipia.recipe.common.event.RecipeCreationEvent;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -217,7 +214,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         Long updatedCount = recipePort.softDeleteByRecipeId(domain);
 
         // 3. DB에서 레시피 파일 삭제
-        recipePort.softDeleteRecipeFileByRecipeId(recipeId);
+        recipePort.softDeleteRecipeFilesInRecipeIds(List.of(recipeId));
 
         // 4. 북마크 테이블에서 레시피 삭제
         bookmarkPort.deleteBookmarkByRecipeId(recipeId);
@@ -226,13 +223,13 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         recipeLikePort.deleteRecipeLikeByRecipeId(recipeId);
 
         // 6. 영양소 정보 삭제
-        recipePort.deleteNutritionalInfoByRecipeId(recipeId);
+        recipePort.deleteNutritionalInfosInRecipeIds(List.of(recipeId));
 
         // 7. 레시피-카테고리 맵핑 제거
-        recipePort.deleteRecipeCategoryMapByRecipeId(recipeId);
+        recipePort.deleteRecipeCategoryMapsInRecipeIds(List.of(recipeId));
 
         // 8. 댓글/대댓글 삭제
-        commentPort.softDeleteAllCommentsWithSubComments(recipeId);
+        commentPort.softDeleteCommentsAndSubCommentsInRecipeIds(List.of(recipeId));
 
 
         // todo: redis에서 삭제된 레시피 조회수 삭제
@@ -240,8 +237,6 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
 
         return updatedCount;
     }
-
-
 
     /**
      * 레시피 도메인에서 recipeId, memberId, del_yn을 준비한다.

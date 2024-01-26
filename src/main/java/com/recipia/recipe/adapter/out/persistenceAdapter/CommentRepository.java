@@ -11,5 +11,5 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
     Optional<CommentEntity> findByIdAndDelYn(Long id, String delYn);
 
-    List<CommentEntity> findAllByRecipeEntity_Id(Long recipeId);
+    List<CommentEntity> findAllById(Long commentId);
 }

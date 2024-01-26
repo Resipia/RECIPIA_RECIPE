@@ -1,6 +1,7 @@
 package com.recipia.recipe.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.recipia.recipe.adapter.in.listener.springevent.MemberWithdrawListener;
 import com.recipia.recipe.adapter.in.web.dto.request.RecipeCreateUpdateRequestDto;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
@@ -27,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -45,6 +46,7 @@ class RecipeControllerTest extends TotalTestSupport {
     @MockBean CreateRecipeUseCase createRecipeUseCase;
     @MockBean UpdateRecipeUseCase updateRecipeUseCase;
     @MockBean DeleteRecipeUseCase deleteRecipeUseCase;
+    @MockBean MemberWithdrawListener memberWithdrawListener;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 

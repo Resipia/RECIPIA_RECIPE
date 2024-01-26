@@ -3,13 +3,13 @@ package com.recipia.recipe.application.service;
 import com.recipia.recipe.adapter.in.web.dto.response.PagingResponseDto;
 import com.recipia.recipe.adapter.in.web.dto.response.RecipeListResponseDto;
 import com.recipia.recipe.application.port.in.MyPageUseCase;
-import com.recipia.recipe.application.port.out.RecipePort;
+import com.recipia.recipe.application.port.out.MyPagePort;
 import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.domain.MyPage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class MyPageService implements MyPageUseCase {
 
-    private final RecipePort recipePort;
+    private final MyPagePort MyPagePort;
     private final RedisPort redisPort;
     private final ImageS3Service imageS3Service;
 
@@ -35,7 +35,7 @@ public class MyPageService implements MyPageUseCase {
      */
     @Override
     public MyPage getRecipeCount(Long targetMemberId) {
-        Long recipeCount = recipePort.getTargetMemberIdRecipeCount(targetMemberId);
+        Long recipeCount = MyPagePort.getTargetMemberIdRecipeCount(targetMemberId);
         return MyPage.of(recipeCount);
     }
 
@@ -45,7 +45,7 @@ public class MyPageService implements MyPageUseCase {
     @Override
     public List<RecipeListResponseDto> getTargetMemberRecipeHigh(Long targetMemberId) {
 
-        List<Long> recipeIds = recipePort.getTargetMemberRecipeIds(targetMemberId);
+        List<Long> recipeIds = MyPagePort.getTargetMemberRecipeIds(targetMemberId);
 
         // targetMember가 작성한 레시피가 존재하지 않는다면 그냥 return null
         if (recipeIds.isEmpty()) {
@@ -56,7 +56,7 @@ public class MyPageService implements MyPageUseCase {
         List<Long> highRecipeIds = getTargetMemberHighRecipeIds(recipeIds);
 
         // 레시피 조회수 top5에 해당하는 레시피 목록 가져오기
-        List<RecipeListResponseDto> databaseResult = recipePort.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
+        List<RecipeListResponseDto> databaseResult = MyPagePort.getTargetMemberHighRecipeList(targetMemberId, highRecipeIds);
 
         // 가져온 레시피중에서 썸네일이 존재하는 레시피가 있다면 preUrl을 세팅해준다.
         List<RecipeListResponseDto> finalResult = setPreUrls(databaseResult);
@@ -73,7 +73,7 @@ public class MyPageService implements MyPageUseCase {
         Pageable pageable = PageRequest.of(page, size);
 
         // 데이터를 받아온다.
-        Page<RecipeListResponseDto> databaseResult = recipePort.getTargetMemberRecipeList(targetMemberId, pageable, sortType);
+        Page<RecipeListResponseDto> databaseResult = MyPagePort.getTargetMemberRecipeList(targetMemberId, pageable, sortType);
 
         // 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해 준다.
         List<RecipeListResponseDto> beforeContent = databaseResult.getContent();
@@ -93,7 +93,7 @@ public class MyPageService implements MyPageUseCase {
         Pageable pageable = PageRequest.of(page, size);
 
         // 데이터를 받아온다.
-        Page<RecipeListResponseDto> databaseResult = recipePort.getAllMyBookmarkList(pageable);
+        Page<RecipeListResponseDto> databaseResult = MyPagePort.getAllMyBookmarkList(pageable);
         // 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해 준다.
         List<RecipeListResponseDto> beforeContent = databaseResult.getContent();
         // 썸네일 데이터를 preUrl로 세팅해준다.
@@ -112,7 +112,7 @@ public class MyPageService implements MyPageUseCase {
         Pageable pageable = PageRequest.of(page, size);
 
         // 데이터를 받아온다.
-        Page<RecipeListResponseDto> databaseResult = recipePort.getAllMyLikeList(pageable);
+        Page<RecipeListResponseDto> databaseResult = MyPagePort.getAllMyLikeList(pageable);
 
         // 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해 준다.
         List<RecipeListResponseDto> beforeContent = databaseResult.getContent();

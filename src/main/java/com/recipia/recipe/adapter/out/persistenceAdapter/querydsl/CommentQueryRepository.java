@@ -120,23 +120,34 @@ public class CommentQueryRepository {
     /**
      * [READ] recipeId에 해당하는 Comment entity의 id값을 List로 반환한다.
      */
-    public List<Long> findCommentIdsByRecipeId(Long recipeId) {
+    public List<Long> findCommentIdsInRecipeIds(List<Long> recipeIds) {
         return queryFactory
                 .select(commentEntity.id)
                 .from(commentEntity)
-                .where(commentEntity.recipeEntity.id.eq(recipeId))
+                .where(commentEntity.recipeEntity.id.in(recipeIds))
                 .fetch();
     }
 
     /**
-     * [DELETE] recipeId에 해당하는 댓글을 삭제처리 (del_yn = Y)한다.
+     * [DELETE] commentIds 해당하는 댓글을 삭제처리 (del_yn = Y)한다.
      */
-    public Long softDeleteCommentByRecipeId(Long recipeId) {
+    public Long softDeleteCommentsInCommentIds(List<Long> commentIds) {
         return queryFactory
                 .update(commentEntity)
                 .set(commentEntity.delYn, "Y")
                 .set(commentEntity.updateDateTime, LocalDateTime.now())
-                .where(commentEntity.recipeEntity.id.eq(recipeId))
+                .where(commentEntity.id.in(commentIds))
                 .execute();
+    }
+
+    /**
+     * [READ] memberId가 작성한 댓글의 id를 List 형태로 반환한다.
+     */
+    public List<Long> findCommentIdsByMemberId(Long memberId) {
+        return queryFactory
+                .select(commentEntity.id)
+                .from(commentEntity)
+                .where(commentEntity.memberId.eq(memberId))
+                .fetch();
     }
 }

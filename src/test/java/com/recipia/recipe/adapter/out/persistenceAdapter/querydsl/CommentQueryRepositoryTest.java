@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -75,24 +76,24 @@ class CommentQueryRepositoryTest extends TotalTestSupport {
 
     @DisplayName("[happy] recipeId에 해당하는 Comment pk값인 id를 List 형태로 반환한다.")
     @Test
-    void findCommentIdsByRecipeId() {
+    void findCommentIdsInRecipeId() {
         // given
-        Long recipeId = 1L;
+        List<Long> recipeIds = List.of(1L);
         // when
-        List<Long> commentIdsByRecipeId = sut.findCommentIdsByRecipeId(recipeId);
+        List<Long> commentIdsByRecipeId = sut.findCommentIdsInRecipeIds(recipeIds);
         // then
         assertThat(commentIdsByRecipeId.size()).isEqualTo(1);
     }
 
-    @DisplayName("[happy] recipeId에 해당하는 댓글이 존재할때 soft delete 한다.")
+    @DisplayName("[happy] commentIds에 해당하는 댓글이 존재할때 soft delete 한다.")
     @Test
-    void softDeleteCommentByRecipeId() {
+    void softDeleteCommentsInCommentIds() {
         // given
-        Long recipeId = 1L;
+        List<Long> commentIds = List.of(1L);
         // when
-        sut.softDeleteCommentByRecipeId(recipeId);
+        sut.softDeleteCommentsInCommentIds(commentIds);
         // then
-        List<CommentEntity> allByRecipeEntityId = commentRepository.findAllByRecipeEntity_Id(recipeId);
+        List<CommentEntity> allByRecipeEntityId = commentRepository.findAllById(commentIds.get(0));
         assertThat(allByRecipeEntityId.get(0).getDelYn()).isEqualTo("Y");
     }
 
@@ -110,5 +111,18 @@ class CommentQueryRepositoryTest extends TotalTestSupport {
         // then
         List<CommentListResponseDto> commentList = commentDtoList.getContent();
         assertThat(commentList.get(0).getSubCommentCount()).isEqualTo(2L);
+    }
+
+    @DisplayName("[happy] memberId에 해당하는 commentId를 가져온다.")
+    @Test
+    void findCommentIdsByMemberId() {
+        // given
+        Long memberId = 1L;
+        // when
+        List<Long> commentIdsByMemberId = sut.findCommentIdsByMemberId(memberId);
+        // then
+        CommentEntity optionalCommentEntity = commentRepository.findById(commentIdsByMemberId.get(0)).orElseThrow();
+        assertThat(optionalCommentEntity.getMemberId()).isEqualTo(memberId);
+
     }
 }

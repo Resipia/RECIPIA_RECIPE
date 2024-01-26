@@ -56,4 +56,12 @@ public class BookmarkAdapter implements BookmarkPort {
         return bookmarkQuerydslRepository.deleteBookmarkByRecipeId(recipeId);
     }
 
+    /**
+     * [DELETE] memberId에 해당하는 북마크 삭제
+     */
+    @Override
+    public Long deleteBookmarkByMemberId(Long memberId) {
+        return bookmarkQuerydslRepository.deleteBookmarkByMemberId(memberId);
+    }
+
 }

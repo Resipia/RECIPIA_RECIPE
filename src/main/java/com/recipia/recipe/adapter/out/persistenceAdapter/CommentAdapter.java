@@ -141,13 +141,31 @@ public class CommentAdapter implements CommentPort {
      * recipeId에 해당하는 댓글/대댓글 삭제처리(soft delete)
      */
     @Override
-    public void softDeleteAllCommentsWithSubComments(Long recipeId) {
-        // recipeId에 해당하는 commentId를 가져온다.
-        List<Long> commentIds = commentQueryRepository.findCommentIdsByRecipeId(recipeId);
+    public void softDeleteCommentsAndSubCommentsInRecipeIds(List<Long> recipeIds) {
+        // recipeIds에 해당하는 commentId를 가져온다.
+        List<Long> commentIds = commentQueryRepository.findCommentIdsInRecipeIds(recipeIds);
         // 그리고 댓글을 삭제처리한다.
-        commentQueryRepository.softDeleteCommentByRecipeId(recipeId);
+        commentQueryRepository.softDeleteCommentsInCommentIds(commentIds);
         // commentId에 해당하는 대댓글을 전부 삭제처리한다.
-        subCommentQueryRepository.softDeleteSubCommentByCommentIds(commentIds);
+        subCommentQueryRepository.softDeleteSubCommentsInCommentIds(commentIds);
+    }
+
+    /**
+     * memberId가 작성한 댓글/대댓글 삭제처리(soft delete)
+     */
+    @Override
+    public Long softDeleteCommentsAndSubCommentsInMemberId(Long memberId) {
+        // memberId에 해당하는 commentId를 가져온다.
+        List<Long> commentIds = commentQueryRepository.findCommentIdsByMemberId(memberId);
+        // 그리고 댓글을 삭제처리한다.
+        commentQueryRepository.softDeleteCommentsInCommentIds(commentIds);
+        // commentId에 해당하는 대댓글을 전부 삭제처리한다.
+        subCommentQueryRepository.softDeleteSubCommentsInCommentIds(commentIds);
+
+        // memberId에 해당하는 대댓글을 전부 삭제처리한다.
+        subCommentQueryRepository.softDeleteSubCommentByMemberId(memberId);
+
+        return 0L;
     }
 
 }

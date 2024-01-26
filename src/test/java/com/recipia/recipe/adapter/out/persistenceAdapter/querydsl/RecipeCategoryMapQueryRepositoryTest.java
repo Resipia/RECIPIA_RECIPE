@@ -21,13 +21,13 @@ class RecipeCategoryMapQueryRepositoryTest extends TotalTestSupport {
 
     @DisplayName("[happy] recipeId에 해당하는 레시피-카테고리 맵핑 데이터를 삭제한다.")
     @Test
-    void deleteRecipeCategoryMapByRecipeId() {
+    void deleteRecipeCategoryMapsInRecipeIds() {
         // given
-        Long recipeId = 1L;
+        List<Long> recipeIds = List.of(1L);
         // when
-        sut.deleteRecipeCategoryMapByRecipeId(recipeId);
+        sut.deleteRecipeCategoryMapsInRecipeIds(recipeIds);
         // then
-        List<RecipeCategoryMapEntity> recipeCategoryMapEntityList = recipeCategoryMapRepository.findByRecipeEntityId(recipeId);
+        List<RecipeCategoryMapEntity> recipeCategoryMapEntityList = recipeCategoryMapRepository.findByRecipeEntityId(recipeIds.get(0));
         assertThat(recipeCategoryMapEntityList).isEmpty();
     }
 

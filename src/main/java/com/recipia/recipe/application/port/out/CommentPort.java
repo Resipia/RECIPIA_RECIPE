@@ -7,6 +7,8 @@ import com.recipia.recipe.domain.SubComment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface CommentPort {
     Long createComment(Comment comment);
 
@@ -30,5 +32,7 @@ public interface CommentPort {
 
     Page<SubCommentListResponseDto> getSubCommentList(Long parentCommentId, Pageable pageable);
 
-    void softDeleteAllCommentsWithSubComments(Long recipeId);
+    void softDeleteCommentsAndSubCommentsInRecipeIds(List<Long> recipeIds);
+
+    Long softDeleteCommentsAndSubCommentsInMemberId(Long memberId);
 }

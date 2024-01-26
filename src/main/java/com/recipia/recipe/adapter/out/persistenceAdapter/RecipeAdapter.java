@@ -225,95 +225,43 @@ public class RecipeAdapter implements RecipePort {
     }
 
     /**
-     * [READ] targetMemberId에 해당하는 회원이 작성한 레시피의 갯수를 반환한다.
+     * [DELETE] 레시피 id에 해당하는 레시피 파일 삭제
      */
     @Override
-    public Long getTargetMemberIdRecipeCount(Long targetMemberId) {
-        return recipeRepository.countByMemberIdAndDelYn(targetMemberId, "N");
-    }
-
-    /**
-     * [READ] targetMember가 작성한 recipe id 목록을 반환한다.
-     */
-    @Override
-    public List<Long> getTargetMemberRecipeIds(Long targetMemberId) {
-        return recipeQuerydslRepository.findTargetMemberRecipeIds(targetMemberId);
-    }
-
-    /**
-     * [READ] targetMember가 작성한 recipe중에서 조회수가 높은 5개의 목록을 가져온다.
-     */
-    @Override
-    public List<RecipeListResponseDto> getTargetMemberHighRecipeList(Long targetMemberId, List<Long> highRecipeIds) {
-        Long loggedId = securityUtil.getCurrentMemberId();
-        List<RecipeListResponseDto> resultList = recipeQuerydslRepository.getTargetMemberHighRecipeList(targetMemberId, loggedId, highRecipeIds);
-
-        Map<Long, RecipeListResponseDto> recipesMap = resultList.stream()
-                .collect(Collectors.toMap(RecipeListResponseDto::getId, dto -> dto));
-
-        return highRecipeIds.stream()
-                .map(recipesMap::get)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * [READ] targetMember가 작성한 레시피 목록을 page 객체로 가져온다.
-     */
-    public Page<RecipeListResponseDto> getTargetMemberRecipeList(Long targetMemberId, Pageable pageable, String sortType) {
-        Long loggedId = securityUtil.getCurrentMemberId();
-        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getTargetRecipeList(targetMemberId, loggedId, pageable, sortType);
-
-        return recipeResponseDtoList;
-    }
-
-    /**
-     * [READ] 내가 북마크한 레시피 목록을 page 객체로 가져온다.
-     */
-    @Override
-    public Page<RecipeListResponseDto> getAllMyBookmarkList(Pageable pageable) {
-        Long currentMemberId = securityUtil.getCurrentMemberId();
-
-        // 조건에 맞는 모든 레시피 리스트를 가져온다.
-        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllMyBookmarkList(currentMemberId, pageable);
-
-        return recipeResponseDtoList;
-    }
-
-    /**
-     * [READ] 내가 좋아요한 레시피 목록을 page 객체로 가져온다.
-     */
-    @Override
-    public Page<RecipeListResponseDto> getAllMyLikeList(Pageable pageable) {
-        Long currentMemberId = securityUtil.getCurrentMemberId();
-
-        // 조건에 맞는 모든 레시피 리스트를 가져온다.
-        Page<RecipeListResponseDto> recipeResponseDtoList = recipeQuerydslRepository.getAllMyLikeList(currentMemberId, pageable);
-
-        return recipeResponseDtoList;
-    }
-
-    /**
-     * [DELETE] 레시피 id로 레시피 파일 삭제
-     */
-    @Override
-    public Long softDeleteRecipeFileByRecipeId(Long recipeId) {
-        return recipeQuerydslRepository.softDeleteRecipeFileByRecipeId(recipeId);
+    public Long softDeleteRecipeFilesInRecipeIds(List<Long> recipeIds) {
+        return recipeQuerydslRepository.softDeleteRecipeFilesInRecipeIds(recipeIds);
     }
 
     /**
      * [DELETE] recipeId에 해당하는 영양소 정보 삭제
      */
     @Override
-    public Long deleteNutritionalInfoByRecipeId(Long recipeId) {
-        return nutritionalInfoQueryRepository.deleteNutritionalInfoByRecipeId(recipeId);
+    public Long deleteNutritionalInfosInRecipeIds(List<Long> recipeIds) {
+        return nutritionalInfoQueryRepository.deleteNutritionalInfosInRecipeIds(recipeIds);
     }
 
     /**
      * [DELETE] recipeId에 해당하는 레시피-카테고리 맵펭 데이터 제거
      */
     @Override
-    public Long deleteRecipeCategoryMapByRecipeId(Long recipeId) {
-        return recipeCategoryMapQueryRepository.deleteRecipeCategoryMapByRecipeId(recipeId);
+    public Long deleteRecipeCategoryMapsInRecipeIds(List<Long> recipeIds) {
+        return recipeCategoryMapQueryRepository.deleteRecipeCategoryMapsInRecipeIds(recipeIds);
+    }
+
+    /**
+     * [READ] memberId가 작성한 레시피 id를 목록으로 반환한다.
+     */
+    @Override
+    public List<Long> getAllRecipeIdsByMemberId(Long memberId) {
+        return recipeQuerydslRepository.getAllRecipeIdsByMemberId(memberId);
+    }
+
+    /**
+     * [DELETE] memberId에 해당하는 레시피를 soft delete 한다.
+     */
+    @Override
+    public Long softDeleteRecipeByMemberId(Long memberId) {
+        return recipeQuerydslRepository.softDeleteRecipeByMemberId(memberId);
     }
 
     /**

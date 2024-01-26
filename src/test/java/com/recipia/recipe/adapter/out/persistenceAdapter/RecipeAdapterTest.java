@@ -411,17 +411,6 @@ class RecipeAdapterTest extends TotalTestSupport {
         Assertions.assertThat(deleteCount).isEqualTo(1);
     }
 
-    @DisplayName("[happy] 유효한 targetMemberId가 들어왔을때 이 사용자가 작성한 레시피 갯수를 반환한다.")
-    @Test
-    void getRecipeCountSuccess() {
-        // given
-        Long targetMemberId = 2L;
-        // when
-        Long myRecipeCount = sut.getTargetMemberIdRecipeCount(targetMemberId);
-        // then
-        assertThat(myRecipeCount).isEqualTo(0L);
-    }
-
     private Recipe createRecipeDomain(long memberId, List<SubCategory> subCategory) {
         return Recipe.of(
                 memberId,

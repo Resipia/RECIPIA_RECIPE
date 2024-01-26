@@ -53,4 +53,12 @@ public class NicknameAdapter implements NicknamePort {
 
         return nicknameRepository.save(nicknameEntity).getId();
     }
+
+    /**
+     * [DELETE] memberId에 해당하는 닉네임을 삭제
+     */
+    @Override
+    public void deleteNickname(Long memberId) {
+        nicknameQuerydslRepository.deleteNickname(memberId);
+    }
 }

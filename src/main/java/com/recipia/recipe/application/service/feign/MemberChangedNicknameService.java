@@ -1,7 +1,7 @@
 package com.recipia.recipe.application.service.feign;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
-import com.recipia.recipe.application.port.in.FeignClientUseCase;
+import com.recipia.recipe.application.port.in.NicknameUseCase;
 import com.recipia.recipe.application.port.out.NicknamePort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class MemberChangedNicknameService implements FeignClientUseCase {
+public class MemberChangedNicknameService implements NicknameUseCase {
 
     private final NicknamePort nicknamePort;
 

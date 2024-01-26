@@ -5,7 +5,7 @@ import brave.Span;
 import brave.Tracer;
 import com.recipia.recipe.adapter.out.feign.MemberFeignClient;
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
-import com.recipia.recipe.application.port.in.FeignClientUseCase;
+import com.recipia.recipe.application.port.in.NicknameUseCase;
 import com.recipia.recipe.common.event.NicknameChangeEvent;
 import com.recipia.recipe.common.event.SignUpEvent;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RequestFeignListener {
 
     private final MemberFeignClient memberFeignClient;
-    private final FeignClientUseCase feignClientUseCase;
+    private final NicknameUseCase nicknameUseCase;
     private final Tracer tracer;
 
     /**
@@ -40,7 +40,7 @@ public class RequestFeignListener {
 
             // Feign 요청으로 받은 dto가 존재하면 Nickname 엔티티에서 유저 닉네임 변경
             if (nicknameDto != null) {
-                feignClientUseCase.updateNickname(nicknameDto);
+                nicknameUseCase.updateNickname(nicknameDto);
             }
 
         } catch (Exception e) {
@@ -68,7 +68,7 @@ public class RequestFeignListener {
 
             // Feign 요청으로 받은 dto가 존재하면 Nickname 엔티티에서 유저 닉네임 변경
             if (nicknameDto != null) {
-                feignClientUseCase.saveNickname(nicknameDto);
+                nicknameUseCase.saveNickname(nicknameDto);
             }
 
         } catch (Exception e) {

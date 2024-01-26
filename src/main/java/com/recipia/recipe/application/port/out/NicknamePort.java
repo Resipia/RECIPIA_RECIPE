@@ -6,4 +6,6 @@ public interface NicknamePort {
     Long updateNickname(NicknameDto nicknameDto);
 
     Long saveNickname(NicknameDto nicknameDto);
+
+    void deleteNickname(Long memberId);
 }

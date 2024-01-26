@@ -24,4 +24,14 @@ public class NicknameQuerydslRepository {
                 .where(nicknameEntity.memberId.eq(nicknameDto.memberId()))
                 .execute();
     }
+
+    /**
+     * [DELETE] memberId에 해당하는 닉네임을 삭제한다.
+     */
+    public void deleteNickname(Long memberId) {
+        queryFactory
+                .delete(nicknameEntity)
+                .where(nicknameEntity.memberId.eq(memberId))
+                .execute();
+    }
 }

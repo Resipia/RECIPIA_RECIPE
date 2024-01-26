@@ -3,7 +3,7 @@ package com.recipia.recipe.application.port.in;
 
 import com.recipia.recipe.adapter.out.feign.dto.NicknameDto;
 
-public interface FeignClientUseCase {
+public interface NicknameUseCase {
 
     Long updateNickname(NicknameDto nicknameDto);
 

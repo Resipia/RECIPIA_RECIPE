@@ -54,7 +54,7 @@ class RecipeControllerTest extends TotalTestSupport {
         RecipeCreateUpdateRequestDto recipeCreateUpdateRequestDto = RecipeCreateUpdateRequestDto.of("고구마찜", "고구마찜이다");
         Recipe domain = createRecipeDomain();
 
-        when(converter.dtoToDomain(recipeCreateUpdateRequestDto)).thenReturn(domain);
+        when(converter.dtoToDomainCreate(recipeCreateUpdateRequestDto)).thenReturn(domain);
         when(createRecipeUseCase.createRecipe(domain, Collections.emptyList())).thenReturn(2L);
 
         //when & then
@@ -126,7 +126,7 @@ class RecipeControllerTest extends TotalTestSupport {
         Recipe domain = createRecipeDomain();
 
         //when
-        when(converter.dtoToDomain(recipeCreateUpdateRequestDto)).thenReturn(domain);
+        when(converter.dtoToDomainUpdate(recipeCreateUpdateRequestDto)).thenReturn(domain);
 
         //then
         mockMvc.perform(put("/recipe/updateRecipe")

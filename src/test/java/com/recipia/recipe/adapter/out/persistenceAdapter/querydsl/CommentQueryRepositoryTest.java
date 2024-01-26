@@ -95,4 +95,20 @@ class CommentQueryRepositoryTest extends TotalTestSupport {
         List<CommentEntity> allByRecipeEntityId = commentRepository.findAllByRecipeEntity_Id(recipeId);
         assertThat(allByRecipeEntityId.get(0).getDelYn()).isEqualTo("Y");
     }
+
+    @DisplayName("[happy] 댓글 목록을 조회할때 댓글에 포함된 대댓글의 갯수도 함께 반환한다.")
+    @Test
+    void getCommentDtoListWithSubCommentCount() {
+        // given
+        Long recipeId = 1L;
+        Pageable pageable = PageRequest.of(0, 10);
+        String sortType = "new";
+
+        // when
+        Page<CommentListResponseDto> commentDtoList = sut.getCommentDtoList(recipeId, pageable, sortType);
+
+        // then
+        List<CommentListResponseDto> commentList = commentDtoList.getContent();
+        assertThat(commentList.get(0).getSubCommentCount()).isEqualTo(2L);
+    }
 }

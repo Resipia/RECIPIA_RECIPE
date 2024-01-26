@@ -167,7 +167,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
         checkIsRecipeExistAndMine(domain);
 
         // 2. 레시피, 영양소, 카테고리 매핑 업데이트
-        Long recipeId = recipePort.updateRecipe(domain);
+        recipePort.updateRecipe(domain);
         recipePort.updateNutritionalInfo(domain);
         recipePort.updateCategoryMapping(domain);
 
@@ -186,7 +186,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
             // 4-1. 레시피 파일 저장을 위한 엔티티 생성 (이때 s3에는 이미 이미지가 업로드 완료되고 저장된 경로의 url을 받은 엔티티를 리스트로 생성)
             List<RecipeFile> recipeFileList = files
                     .stream()
-                    .map(file -> imageS3Service.createRecipeFile(file, recipeId, currentMaxFileOrder.incrementAndGet()))
+                    .map(file -> imageS3Service.createRecipeFile(file, domain.getId(), currentMaxFileOrder.incrementAndGet()))
                     .collect(Collectors.toList());
 
             // 4-2. rdb에 레시피 파일(이미지)을 저장

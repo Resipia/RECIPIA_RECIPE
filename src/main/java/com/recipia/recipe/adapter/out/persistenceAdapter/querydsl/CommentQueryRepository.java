@@ -68,7 +68,7 @@ public class CommentQueryRepository {
         JPQLQuery<Long> subCommentCountSubQuery = JPAExpressions
                 .select(subCommentEntity.count())
                 .from(subCommentEntity)
-                .where(subCommentEntity.commentEntity.id.eq(commentEntity.id));
+                .where(subCommentEntity.commentEntity.id.eq(commentEntity.id), subCommentEntity.delYn.eq("N"));
 
         // 기본 쿼리 설정
         JPAQuery<CommentListResponseDto> query = queryFactory
@@ -79,6 +79,7 @@ public class CommentQueryRepository {
                         ExpressionUtils.as(nicknameSubQuery, "nickname"),
                         commentEntity.commentText,
                         Expressions.stringTemplate("TO_CHAR({0}, 'YYYY-MM-DD')", commentEntity.createDateTime),
+//                        commentEntity.createDateTime,
                         commentEntity.createDateTime.ne(commentEntity.updateDateTime),
                         ExpressionUtils.as(subCommentCountSubQuery, "subCommentCount")
                 ))

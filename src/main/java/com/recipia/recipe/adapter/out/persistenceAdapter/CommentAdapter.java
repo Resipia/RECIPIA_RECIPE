@@ -134,8 +134,7 @@ public class CommentAdapter implements CommentPort {
      */
     @Override
     public Page<SubCommentListResponseDto> getSubCommentList(Long parentCommentId, Pageable pageable) {
-        Page<SubCommentListResponseDto> subCommentDtoList = subCommentQueryRepository.getSubCommentDtoList(parentCommentId, pageable);
-        return subCommentDtoList;
+        return subCommentQueryRepository.getSubCommentDtoList(parentCommentId, pageable);
     }
 
     /**

@@ -3,9 +3,7 @@ package com.recipia.recipe.adapter.in.listener.springevent;
 import brave.Span;
 import brave.Tracer;
 import com.recipia.recipe.application.port.in.MemberWithdrawUseCase;
-import com.recipia.recipe.application.port.in.MyPageUseCase;
 import com.recipia.recipe.common.event.MemberWithdrawEvent;
-import com.recipia.recipe.domain.MyPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class MemberWithdrawListener {
 
-    private final MyPageUseCase myPageUseCase;
     private final MemberWithdrawUseCase memberWithdrawUseCase;
     private final Tracer tracer;
 

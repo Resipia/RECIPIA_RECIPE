@@ -31,15 +31,9 @@ public class MemberWithdrawListener {
     @EventListener
     public void deleteMemberRecipe(MemberWithdrawEvent event) {
         Span span = tracer.nextSpan().name("[RECIPE] delete member's recipes").start();
-        Long memberId = event.memberId();
 
         try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
-            MyPage myPage = myPageUseCase.getRecipeCount(memberId);
-
-            // 회원이 작성한 레시피가 있을때만 레시피 관련 데이터 삭제 프로세스 진행
-            if (!myPage.getRecipeCount().equals(0L)) {
-                memberWithdrawUseCase.deleteRecipeByMemberId(event.memberId());
-            }
+            memberWithdrawUseCase.deleteRecipeByMemberId(event.memberId());
         }catch (Exception e) {
             // 에러 태그 추가
             span.tag("error", e.toString());

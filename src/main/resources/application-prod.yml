@@ -30,3 +30,6 @@ spring:
 
 feign:
   member_url: ${MEMBER_URL}
+
+mongo:
+  documentId: 65b628620ecc5780c4c53850

@@ -70,7 +70,7 @@ class CommentControllerTest extends TotalTestSupport {
     @Test
     void ifUserUpdateCommentShouldComplete() throws Exception {
         // given
-        CommentUpdateRequestDto dto = CommentUpdateRequestDto.of(1L, "update-value");
+        CommentUpdateRequestDto dto = CommentUpdateRequestDto.of(1L, 1L, "update-value");
         Comment domain = Comment.of(dto.getId(), null, 1L, dto.getCommentText(), "N");
 
         when(commentConverter.updateRequestDtoToDomain(dto)).thenReturn(domain);

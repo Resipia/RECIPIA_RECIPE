@@ -33,7 +33,7 @@ public class CommentConverter {
 
     public Comment updateRequestDtoToDomain(CommentUpdateRequestDto dto) {
         Long memberId = securityUtil.getCurrentMemberId();
-        return Comment.of(dto.getId(), null, memberId, dto.getCommentText(), "N");
+        return Comment.of(dto.getId(), dto.getRecipeId(), memberId, dto.getCommentText(), "N");
     }
 
     public Comment deleteRequestDtoToDomain(CommentDeleteRequestDto dto) {

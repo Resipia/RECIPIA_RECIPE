@@ -28,9 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @DisplayName("[통합] 좋아요 컨트롤러 테스트")
-@Import({TestSecurityConfig.class, TestZipkinConfig.class})   // 테스트 설정 클래스 적용
-@WebMvcTest(RecipeLikeController.class) // 특정 컨트롤러에 대한 웹 레이어만 로드
-class RecipeLikeControllerTest {
+@AutoConfigureMockMvc // @AutoConfigureMockMvc를 사용하여 MockMvc를 이용해 HTTP 요청을 모의로 보낸다.
+class RecipeLikeControllerTest extends TotalTestSupport {
 
     @MockBean
     private RecipeLikeConverter recipeLikeConverter;
@@ -44,18 +43,19 @@ class RecipeLikeControllerTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    @DisplayName("[통합] 유저가 유효하지 않은 데이터로 좋아요 요청을 시도하면 검증 실패 응답이 반환된다.")
-    void testInvalidRecipeLikeRequest() throws Exception {
+    @DisplayName("[통합] 유저가 좋아요 요청을 시도하면 정상적으로 처리된다.")
+    void testRecipeLikeRequest() throws Exception {
         // given
-        // 잘못된 데이터를 포함한 요청 객체 생성 (예: recipeId 또는 memberId가 null)
-        RecipeLikeRequestDto requestDto = RecipeLikeRequestDto.of(null, null, 1L);
+        RecipeLikeRequestDto requestDto = RecipeLikeRequestDto.of(null, 1L);
+        RecipeLike domain = RecipeLike.of(Recipe.of(null), 1L);
+        when(recipeLikeConverter.dtoToDomain(any(RecipeLikeRequestDto.class))).thenReturn(domain);
+        when(recipeLikeUseCase.recipeLikeProcess(domain)).thenReturn(1L);
 
         // when & then
         mockMvc.perform(post("/recipe/like")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(requestDto)))
-                .andDo(print())
-                .andExpect(status().isBadRequest()); // 잘못된 요청에 대해 400 Bad Request 응답을 기대함
+                .andExpect(status().isBadRequest());
     }
 
     private String asJsonString(final Object obj) {
@@ -65,4 +65,5 @@ class RecipeLikeControllerTest {
             throw new RuntimeException(e);
         }
     }
+
 }

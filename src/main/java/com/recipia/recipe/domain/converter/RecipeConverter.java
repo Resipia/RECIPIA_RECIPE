@@ -88,7 +88,7 @@ public class RecipeConverter {
                 subCategories,
                 securityUtil.getCurrentMemberNickname(),
                 "N",
-                0L, // todo: 저장할때라서 일단 0L을 넣어줬다.
+                null,
                 0,
                 null,
                 dto.getDeleteFileOrder(),

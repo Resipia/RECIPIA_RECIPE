@@ -193,6 +193,7 @@ public class RecipeQueryRepository {
         return queryFactory.update(recipeEntity)
                 .where(recipeEntity.id.eq(entity.getId()))
                 .set(recipeEntity.recipeName, entity.getRecipeName())
+                .set(recipeEntity.timeTaken, entity.getTimeTaken())
                 .set(recipeEntity.recipeDesc, entity.getRecipeDesc())
                 .set(recipeEntity.ingredient, entity.getIngredient())
                 .set(recipeEntity.hashtag, entity.getHashtag())

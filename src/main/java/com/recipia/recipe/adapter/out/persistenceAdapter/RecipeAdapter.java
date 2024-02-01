@@ -100,12 +100,12 @@ public class RecipeAdapter implements RecipePort {
      * querydsl을 사용해서 데이터를 조회를 최적화 했다. (목록, count)
      */
     @Override
-    public Page<RecipeListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList) {
+    public Page<RecipeListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList, String searchWord) {
         // 1. 로그인 된 유저 정보가 있어야 북마크 여부 확인이 가능하여 securityContext에서 id를 꺼내서 사용한다.
         Long currentMemberId = securityUtil.getCurrentMemberId();
 
         // 2. 조건에 맞는 모든 레시피 리스트를 가져온다.
-        return recipeQuerydslRepository.getAllRecipeList(currentMemberId, pageable, sortType, subCategoryList);
+        return recipeQuerydslRepository.getAllRecipeList(currentMemberId, pageable, sortType, subCategoryList, searchWord);
     }
 
     /**

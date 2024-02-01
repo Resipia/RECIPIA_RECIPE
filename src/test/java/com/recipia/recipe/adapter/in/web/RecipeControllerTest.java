@@ -75,7 +75,7 @@ class RecipeControllerTest extends TotalTestSupport {
         RecipeListResponseDto dto = RecipeListResponseDto.of("레시피명", "닉네임", null, null, null, "2020-12-12");
         PagingResponseDto<RecipeListResponseDto> pagingResponseDto = PagingResponseDto.of(List.of(dto), 100L);
 
-        when(readRecipeUseCase.getAllRecipeList(0, 10, "new", null)).thenReturn(pagingResponseDto);
+        when(readRecipeUseCase.getAllRecipeList(0, 10, "new", null, null)).thenReturn(pagingResponseDto);
 
         //when & then
         mockMvc.perform(get("/recipe/getAllRecipeList")

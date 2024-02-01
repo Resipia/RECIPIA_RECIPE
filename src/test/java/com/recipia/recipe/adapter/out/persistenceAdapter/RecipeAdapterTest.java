@@ -154,7 +154,7 @@ class RecipeAdapterTest extends TotalTestSupport {
         List<Long> subCategoryList = null;
 
         // when
-        Page<RecipeListResponseDto> result = sut.getAllRecipeList(pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> result = sut.getAllRecipeList(pageable, sortType, subCategoryList, null);
         System.out.println(result.getContent());
 
         // then

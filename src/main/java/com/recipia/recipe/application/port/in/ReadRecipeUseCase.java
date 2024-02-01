@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReadRecipeUseCase {
 
-    PagingResponseDto<RecipeListResponseDto> getAllRecipeList(int page, int size, String sortType, List<Long> subCategoryList);
+    PagingResponseDto<RecipeListResponseDto> getAllRecipeList(int page, int size, String sortType, List<Long> subCategoryList, String searchWord);
 
     Recipe getRecipeDetailView(Recipe domain);
 }

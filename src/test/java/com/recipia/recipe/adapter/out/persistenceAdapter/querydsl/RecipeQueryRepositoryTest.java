@@ -56,7 +56,31 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         List<Long> subCategoryList = List.of();
 
         //when
-        Page<RecipeListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList, null);
+
+        //then
+        assertThat(result).isNotNull();
+        Assertions.assertThat(result.getContent()).isNotEmpty();
+        result.getContent().forEach(recipe -> {
+            assertThat(recipe.getId()).isNotNull();
+            assertThat(recipe.getRecipeName()).isNotNull();
+            assertThat(recipe.getNickname()).isNotNull();
+            // 북마크 여부는 memberId에 따라 다를 수 있으므로, 테스트 케이스 작성시 주의 필요
+        });
+    }
+
+    @DisplayName("[happy] 검색어가 있는 상황에서 전체 레시피 목록을 페이징하여 조회한다.")
+    @Test
+    void getAllRecipeListSearchWorldTest() {
+        //given
+        Long memberId = 1L; // 예시로 사용할 멤버 ID
+        Pageable pageable = PageRequest.of(0, 10);
+        String sortType = "new";
+        List<Long> subCategoryList = List.of();
+        String searchWorld = "김치찌개";
+
+        //when
+        Page<RecipeListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList, searchWorld);
 
         //then
         assertThat(result).isNotNull();
@@ -79,7 +103,7 @@ class RecipeQueryRepositoryTest extends TotalTestSupport {
         List<Long> subCategoryList = List.of(1L);
 
         //when
-        Page<RecipeListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> result = sut.getAllRecipeList(memberId, pageable, sortType, subCategoryList, null);
 
         //then
         assertThat(result).isNotNull();

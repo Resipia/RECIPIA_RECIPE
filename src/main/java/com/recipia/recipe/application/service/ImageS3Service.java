@@ -9,10 +9,13 @@ import com.recipia.recipe.domain.Recipe;
 import com.recipia.recipe.domain.RecipeFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -83,19 +86,30 @@ public class ImageS3Service {
 
         // 이미지를 s3에 업로드(PutObject) 한다.
         try {
+            // 이미지 압축 및 크기 조정
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            Thumbnails.of(image.getInputStream())
+                    .size(720, 1280) // SNS에 적합한 해상도로 조정
+                    .outputQuality(0.75)
+                    .toOutputStream(outputStream);
+
+            byte[] compressedImageBytes = outputStream.toByteArray();
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(compressedImageBytes);
+            metadata.setContentLength(compressedImageBytes.length); // 압축된 이미지의 길이 설정
+
+            // 압축된 이미지를 S3에 업로드
             amazonS3.putObject(new PutObjectRequest(
-                    bucketName, finalPath, image.getInputStream(), metadata
+                    bucketName, finalPath, inputStream, metadata
             ).withCannedAcl(CannedAccessControlList.PublicRead));
+            // inputStream 닫아주기
+            inputStream.close();
+
+            // 저장된 객체의 url 반환
+            return amazonS3.getUrl(bucketName, finalPath).toString();
         } catch (IOException e) {
             throw new RecipeApplicationException(ErrorCode.S3_UPLOAD_ERROR);
         }
-
-        // 저장된 객체의 url 반환
-        return amazonS3.getUrl(bucketName, finalPath).toString();
     }
-
-
-
 
 
     /**
@@ -153,6 +167,7 @@ public class ImageS3Service {
 
     /**
      * Pre-Signed URL을 생성하고 반환한다.
+     *
      * @param filePath 버킷에서의 파일 경로
      * @param duration URL의 유효 시간(분 단위)
      * @return 생성된 Pre-Signed URL

@@ -44,7 +44,7 @@ public class RecipeQueryRepository {
      * fetch join을 사용하면 관련된 엔티티들이 메모리에 모두 로드되어서, 데이터베이스 레벨에서의 페이징이 아닌 메모리 레벨에서의 페이징이 발생할 수 있다.
      * 이는 대량의 데이터를 처리할 때 메모리 사용량이 증가하고, 성능 저하를 초래할 수 있다. 그래서 여기서는 fetchJoin을 사용하지 않는다.
      */
-    public Page<RecipeListResponseDto> getAllRecipeList(Long memberId, Pageable pageable, String sortType, List<Long> subCategoryList) {
+    public Page<RecipeListResponseDto> getAllRecipeList(Long memberId, Pageable pageable, String sortType, List<Long> subCategoryList, String searchWord) {
 
         // 로그인 한 사용자가 북마크 한 레시피인지 확인하는 용도로 북마크 id 가져오는 서브쿼리
         JPQLQuery<Long> bookmarkSubQuery = JPAExpressions
@@ -67,6 +67,10 @@ public class RecipeQueryRepository {
                             .from(recipeCategoryMapEntity)
                             .where(recipeCategoryMapEntity.subCategoryEntity.id.in(subCategoryList))
             ));
+        }
+        // 검색어는 옵션값
+        if(searchWord != null && !searchWord.equals("")) {
+            whereCondition = whereCondition.and(recipeEntity.recipeName.contains(searchWord));
         }
 
         // sort 이전 메인 쿼리 추출 (레시피 기본 정보 및 북마크 여부 조회)

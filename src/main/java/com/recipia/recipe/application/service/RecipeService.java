@@ -89,12 +89,12 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
      * page=1과 size=10이면 '두 번째 페이지에 10개의 항목을 보여달라'는 요청이다.
      */
     @Override
-    public PagingResponseDto<RecipeListResponseDto> getAllRecipeList(int page, int size, String sortType, List<Long> subCategoryList) {
+    public PagingResponseDto<RecipeListResponseDto> getAllRecipeList(int page, int size, String sortType, List<Long> subCategoryList, String searchWord) {
         // 1. Pageable 객체 생성
         Pageable pageable = PageRequest.of(page, size);
 
         // 2. 데이터를 받아온다.
-        Page<RecipeListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType, subCategoryList);
+        Page<RecipeListResponseDto> allRecipeList = recipePort.getAllRecipeList(pageable, sortType, subCategoryList, searchWord);
 
         // 3. 받아온 데이터를 꺼내서 응답 dto에 값을 세팅해 준다.
         List<RecipeListResponseDto> beforeContent = allRecipeList.getContent();

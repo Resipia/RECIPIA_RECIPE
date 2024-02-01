@@ -22,7 +22,7 @@ public interface RecipePort {
 
     void createRecipeCategoryMap(Recipe recipe, Long savedRecipeId);
 
-    Page<RecipeListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList);
+    Page<RecipeListResponseDto> getAllRecipeList(Pageable pageable, String sortType, List<Long> subCategoryList, String searchWord);
 
     Recipe getRecipeDetailView(Recipe domain);
 

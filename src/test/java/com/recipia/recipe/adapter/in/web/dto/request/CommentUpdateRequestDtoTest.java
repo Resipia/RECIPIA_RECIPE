@@ -20,7 +20,7 @@ class CommentUpdateRequestDtoTest {
     @Test
     void validInputTest() {
         // given
-        CommentUpdateRequestDto dto = CommentUpdateRequestDto.of(1L, "update-value");
+        CommentUpdateRequestDto dto = CommentUpdateRequestDto.of(1L, 1L, "update-value");
         // when
         // ConstraintViolation은 유효성 검사에서 발견된 제약 조건 위반을 나타내는 클래스다.
         Set<ConstraintViolation<CommentUpdateRequestDto>> violations = validator.validate(dto);

@@ -92,10 +92,10 @@ class RecipeServiceTest {
         List<RecipeListResponseDto> recipeList = createMockRecipeList(size);
         Page<RecipeListResponseDto> mockPage = new PageImpl<>(recipeList);
 
-        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList())).thenReturn(mockPage);
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList(), anyString())).thenReturn(mockPage);
 
         // When
-        PagingResponseDto<RecipeListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList);
+        PagingResponseDto<RecipeListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList, null);
 
         // Then
         Assertions.assertThat(result.getContent()).hasSize(size);
@@ -112,10 +112,10 @@ class RecipeServiceTest {
         List<Long> subCategoryList = List.of();
         Page<RecipeListResponseDto> emptyPage = Page.empty();
 
-        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList())).thenReturn(emptyPage);
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList(), anyString())).thenReturn(emptyPage);
 
         // When
-        PagingResponseDto<RecipeListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList);
+        PagingResponseDto<RecipeListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList, null);
 
         // Then
         Assertions.assertThat(result.getContent()).isEmpty();
@@ -131,7 +131,7 @@ class RecipeServiceTest {
         String sortType = "new";
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> sut.getAllRecipeList(invalidPage, size, sortType, null));
+        assertThrows(IllegalArgumentException.class, () -> sut.getAllRecipeList(invalidPage, size, sortType, null, null));
     }
 
     // todo: 예외처리가 필요하다.
@@ -154,10 +154,10 @@ class RecipeServiceTest {
         int page = 0;
         int size = 10;
         String sortType = "new";
-        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList())).thenThrow(new RuntimeException("DB Error"));
+        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList(), anyString())).thenThrow(new RuntimeException("DB Error"));
 
         // When & Then
-        assertThrows(RuntimeException.class, () -> sut.getAllRecipeList(page, size, sortType, null));
+        assertThrows(RuntimeException.class, () -> sut.getAllRecipeList(page, size, sortType, null, null));
     }
 
     @Test

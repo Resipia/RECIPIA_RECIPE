@@ -182,7 +182,8 @@ public class RecipeConverter {
                 domain.getNickname(),
                 domain.getBookmarkId(),
                 domain.getRecipeLikeId(),   // 이 값은 꼭 존재해야 한다.(좋아요를 안했다면 0L 반환),
-                domain.getCreateDate()
+                domain.getCreateDate(),
+                domain.getLikeCount()
         );
 
         recipeDetailViewResponseDto.setNutritionalInfoDto(nutritionalInfoDto);

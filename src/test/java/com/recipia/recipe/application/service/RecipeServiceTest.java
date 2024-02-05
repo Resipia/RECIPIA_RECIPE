@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
@@ -91,8 +92,8 @@ class RecipeServiceTest {
         List<Long> subCategoryList = List.of();
         List<RecipeListResponseDto> recipeList = createMockRecipeList(size);
         Page<RecipeListResponseDto> mockPage = new PageImpl<>(recipeList);
-
-        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList(), anyString())).thenReturn(mockPage);
+        Pageable pageable = PageRequest.of(0, 10);
+        when(recipePort.getAllRecipeList(pageable, sortType, subCategoryList, null)).thenReturn(mockPage);
 
         // When
         PagingResponseDto<RecipeListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList, null);
@@ -111,8 +112,8 @@ class RecipeServiceTest {
         String sortType = "new";
         List<Long> subCategoryList = List.of();
         Page<RecipeListResponseDto> emptyPage = Page.empty();
-
-        when(recipePort.getAllRecipeList(any(Pageable.class), eq(sortType), anyList(), anyString())).thenReturn(emptyPage);
+        Pageable pageable = PageRequest.of(0, 10);
+        when(recipePort.getAllRecipeList(pageable, sortType, subCategoryList, null)).thenReturn(emptyPage);
 
         // When
         PagingResponseDto<RecipeListResponseDto> result = sut.getAllRecipeList(page, size, sortType, subCategoryList, null);

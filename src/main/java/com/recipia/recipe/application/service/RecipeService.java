@@ -146,6 +146,9 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
 
         recipe.setRecipeFileList(recipeFileListWithPreUrl);
 
+        // 5. 레시피 좋아요 갯수 redis에서 가져오기
+        recipe.setLikeCount(redisPort.getLikes(recipeId));
+
         // 조회수 증가 로직 호출 (트랜잭션에 포함되지 않음)
         redisPort.incrementViewCount(recipeId);
 

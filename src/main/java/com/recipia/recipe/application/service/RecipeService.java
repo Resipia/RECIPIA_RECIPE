@@ -151,6 +151,7 @@ public class RecipeService implements CreateRecipeUseCase, ReadRecipeUseCase, Up
 
         // 조회수 증가 로직 호출 (트랜잭션에 포함되지 않음)
         redisPort.incrementViewCount(recipeId);
+        redisPort.getViews(recipeId);
 
         return recipe;
     }

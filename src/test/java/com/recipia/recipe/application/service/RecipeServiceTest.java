@@ -314,6 +314,7 @@ class RecipeServiceTest {
                 0L,
                 0,
                 null,
+                0,
                 Collections.emptyList(),
                 LocalDateTime.now()
         );

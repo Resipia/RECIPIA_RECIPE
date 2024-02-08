@@ -14,12 +14,15 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * 좋아요, 조회수 등 Redis를 활용하는 어댑터
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class RedisAdapter implements RedisPort {
-    private final RecipeRepository recipeRepository;
 
+    private final RecipeRepository recipeRepository;
     private final RecipeViewCountRepository recipeViewCountRepository;
     private final RecipeQueryRepository querydslJpaRepository;
     private final RedisTemplate<String, Integer> redisTemplate;
@@ -52,13 +55,6 @@ public class RedisAdapter implements RedisPort {
         return Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse(0);
     }
 
-    // 조회수를 가져온다.
-    @Override
-    public Integer getViews(Long recipeId) {
-        String key = "recipe:view:" + recipeId;
-        return Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse(0);
-    }
-
     /**
      * 메서드는 Redis에 저장된 특정 키에 대한 값(좋아요 수)을 증가시킨다.
      * 이 메서드는 Redis에 해당 키가 이미 존재한다고 가정한다.
@@ -77,7 +73,16 @@ public class RedisAdapter implements RedisPort {
     }
 
     /**
-     * 조회수를 증가시킨다.
+     * 조회수를 가져온다.
+     */
+    @Override
+    public Integer getViews(Long recipeId) {
+        String key = "recipe:view:" + recipeId;
+        return Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse(0);
+    }
+
+    /**
+     * 레시피의 조회수를 증가시킨다.
      */
     @Override
     public void incrementViewCount(Long recipeId) {
@@ -109,7 +114,7 @@ public class RedisAdapter implements RedisPort {
     }
 
     /**
-     * RDB에서 레시피의 조회수를 업데이트한다.
+     * [Extract Method] -  RDB에서 레시피의 조회수를 업데이트한다.
      * <p>
      * 이 메서드는 레시피의 조회수 엔티티(RecipeViewCntEntity)를 레시피 ID를 기반으로 조회한다.
      * 조회된 엔티티가 존재하면 주어진 조회수(viewCount)로 엔티티의 조회수를 업데이트한다.
@@ -136,6 +141,14 @@ public class RedisAdapter implements RedisPort {
     }
 
     /**
+     * [Extract Method]
+     * redis에 있던 조회수 count를 rdb에 저장
+     */
+    public Long updateLikesInDatabase(Long recipeId, Integer likes) {
+        return querydslJpaRepository.updateLikesInDatabase(recipeId, likes);
+    }
+
+    /**
      * 레시피 id를 추출한다. (이 id를 통해 레시피 내부의 like 갯수를 업데이트 한다.)
      */
     public Long extractRecipeIdFromKey(String key) {
@@ -147,13 +160,6 @@ public class RedisAdapter implements RedisPort {
             log.error("Invalid key format for Redis key: {}", key, e);
             throw new RecipeApplicationException(ErrorCode.REDIS_RECIPE_ID_NOT_FOUND);
         }
-    }
-
-    /**
-     * redis에 있던 조회수 count를 rdb에 저장
-     */
-    public Long updateLikesInDatabase(Long recipeId, Integer likes) {
-        return querydslJpaRepository.updateLikesInDatabase(recipeId, likes);
     }
 
 

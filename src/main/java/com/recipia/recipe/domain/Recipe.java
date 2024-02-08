@@ -32,11 +32,12 @@ public class Recipe {
     private Long recipeLikeId;                  // 좋아요 id
     private Integer likeCount;                  // 레시피 좋아유 개수
     private Long bookmarkId;                    // 북마크 id
+    private Integer viewCount;                  // 레시피 조회수
     private List<Integer> deleteFileOrder;      // 삭제할 이미지의 order
     private LocalDateTime createDate;           // 레시피 생성일
 
     @Builder
-    public Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, List<Integer> deleteFileOrder, LocalDateTime createDate) {
+    public Recipe(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, Integer viewCount, List<Integer> deleteFileOrder, LocalDateTime createDate) {
         this.id = id;
         this.memberId = memberId;
         this.recipeName = recipeName;
@@ -52,6 +53,7 @@ public class Recipe {
         this.recipeLikeId = recipeLikeId;
         this.likeCount = likeCount;
         this.bookmarkId = bookmarkId;
+        this.viewCount = viewCount;
         this.deleteFileOrder = deleteFileOrder;
         this.createDate = createDate;
     }
@@ -59,39 +61,40 @@ public class Recipe {
     /**
      * 파일이 존재할때 도메인 객체 생성
      */
-    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, List<Integer> deleteFileOrder, LocalDateTime createDate) {
-        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, recipeFileList, delYn, recipeLikeId, likeCount, bookmarkId, deleteFileOrder, createDate);
+    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, Integer viewCount, List<Integer> deleteFileOrder, LocalDateTime createDate) {
+        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, recipeFileList, delYn, recipeLikeId, likeCount, bookmarkId, viewCount, deleteFileOrder, createDate);
     }
 
     /**
      * 파일이 없을때 도메인 객체 생성
+     * 레시피를 업데이트 할때는 DB에 좋아요 수, 조회수를 넣지 않기에 null로 세팅한다.
      */
-    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, List<Integer> deleteFileOrder, LocalDateTime createDate) {
-        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn, recipeLikeId, likeCount, bookmarkId, deleteFileOrder, createDate);
+    public static Recipe of(Long id, Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn, Long recipeLikeId, Long bookmarkId, List<Integer> deleteFileOrder, LocalDateTime createDate) {
+        return new Recipe(id, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn, recipeLikeId, null, bookmarkId, null, deleteFileOrder, createDate);
     }
 
     /**
      * 레시피 생성할때 컨버터에서 사용
      */
-    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, List<Integer> deleteFileOrder, LocalDateTime createDate) {
-        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, recipeFileList, delYn, recipeLikeId, likeCount, bookmarkId, deleteFileOrder, createDate);
+    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, List<RecipeFile> recipeFileList, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, Integer viewCount, List<Integer> deleteFileOrder, LocalDateTime createDate) {
+        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, recipeFileList, delYn, recipeLikeId, likeCount, bookmarkId, viewCount, deleteFileOrder, createDate);
     }
 
-    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, List<Integer> deleteFileOrder, LocalDateTime createDate) {
-        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn, recipeLikeId, likeCount, bookmarkId, deleteFileOrder, createDate);
+    public static Recipe of(Long memberId, String recipeName, String recipeDesc, Integer timeTaken, String ingredient, String hashtag, NutritionalInfo nutritionalInfo, List<SubCategory> subCategory, String nickname, String delYn, Long recipeLikeId, Integer likeCount, Long bookmarkId, Integer viewCount, List<Integer> deleteFileOrder, LocalDateTime createDate) {
+        return new Recipe(null, memberId, recipeName, recipeDesc, timeTaken, ingredient, hashtag, nutritionalInfo, subCategory, nickname, Collections.emptyList(), delYn, recipeLikeId, likeCount, bookmarkId, viewCount, deleteFileOrder, createDate);
     }
 
     /**
      * s3 업로드에 사용
      */
     public static Recipe of(Long id) {
-        return new Recipe(id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new Recipe(id, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
      * 상세조회에서 도메인 객체를 만들때 사용
      */
     public static Recipe of(Long recipeId, Long currentMemberId) {
-        return new Recipe(recipeId, currentMemberId, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return new Recipe(recipeId, currentMemberId, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 }

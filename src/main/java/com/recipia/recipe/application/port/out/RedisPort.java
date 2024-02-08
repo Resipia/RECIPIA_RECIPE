@@ -6,11 +6,11 @@ public interface RedisPort {
 
     Integer getLikes(Long recipeId);
 
-    Integer getViews(Long recipeId);
-
     void incrementLikeCount(Long recipeId);
 
     void decreaseLikeCount(Long recipeId);
+
+    Integer getViews(Long recipeId);
 
     void incrementViewCount(Long recipeId);
 

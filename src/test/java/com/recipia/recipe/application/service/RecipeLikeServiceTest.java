@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class) // 목 객체 초기화
 @DisplayName("[단위] 좋아요 서비스 테스트")
-class RecipeLikeAndViewServiceTest {
+class RecipeLikeServiceTest {
 
     @Mock
     private RedisPort redisPort;
@@ -29,7 +29,7 @@ class RecipeLikeAndViewServiceTest {
     private RecipeLikePort recipeLikePort;
 
     @InjectMocks
-    private RecipeLikeAndViewService sut;
+    private RecipeLikeService sut;
 
     @Test
     @DisplayName("[happy] 좋아요 저장 및 레디스 카운트 증가")

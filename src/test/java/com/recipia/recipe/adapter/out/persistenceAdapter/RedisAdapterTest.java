@@ -1,8 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeLikeCntEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeViewCntEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeLikeCountEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeViewCountEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -61,8 +60,8 @@ class RedisAdapterTest extends TotalTestSupport {
         sut.syncLikesAndViewsWithDatabase();
 
         // 검증
-        RecipeLikeCntEntity recipeLikeCntEntity = recipeLikeCountRepository.findByRecipeEntityId(recipeId).orElseThrow();
-        Assertions.assertThat(recipeLikeCntEntity.getLikeCount()).isEqualTo(3);
+        RecipeLikeCountEntity recipeLikeCountEntity = recipeLikeCountRepository.findByRecipeEntityId(recipeId).orElseThrow();
+        Assertions.assertThat(recipeLikeCountEntity.getLikeCount()).isEqualTo(3);
     }
 
     @DisplayName("[bad] 레디스 키 포맷이 잘못되었을 때, RecipeApplicationException 예외를 발생시킨다.")
@@ -182,7 +181,7 @@ class RedisAdapterTest extends TotalTestSupport {
         sut.syncViewCountWithDatabase();
 
         //then
-        RecipeViewCntEntity entity = recipeViewCountRepository.findByRecipeEntityId(recipeId).orElseThrow();
+        RecipeViewCountEntity entity = recipeViewCountRepository.findByRecipeEntityId(recipeId).orElseThrow();
         Integer viewCount = entity.getViewCount();
 
         Assertions.assertThat(viewCount).isEqualTo(4);

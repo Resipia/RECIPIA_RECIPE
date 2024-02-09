@@ -1,5 +1,7 @@
 package com.recipia.recipe.application.port.out;
 
+import java.util.Map;
+
 public interface RedisPort {
 
     void syncLikesAndViewsWithDatabase();
@@ -15,4 +17,6 @@ public interface RedisPort {
     void incrementViewCount(Long recipeId);
 
     void syncViewCountWithDatabase();
+
+    Map<Long, Integer> fetchAllViewCounts();
 }

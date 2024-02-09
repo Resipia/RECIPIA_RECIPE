@@ -1,7 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
 import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeViewCntEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeViewCountEntity;
 import com.recipia.recipe.adapter.out.persistenceAdapter.querydsl.RecipeQueryRepository;
 import com.recipia.recipe.application.port.out.RedisPort;
 import com.recipia.recipe.common.exception.ErrorCode;
@@ -11,8 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 좋아요, 조회수 등 Redis를 활용하는 어댑터
@@ -114,6 +117,24 @@ public class RedisAdapter implements RedisPort {
     }
 
     /**
+     * Redis에서 "recipe:view:*" 패턴에 일치하는 모든 키를 검색하고
+     * 각 키에 대한 조회수 값을 가져온 다음, recipeId와 조회수 값을 매핑하여 반환한다.
+     */
+    @Override
+    public Map<Long, Integer> fetchAllViewCounts() {
+        Set<String> keys = redisTemplate.keys("recipe:view:*");
+        if (keys == null) {
+            return new HashMap<>();
+        }
+
+        return keys.stream()
+                .collect(Collectors.toMap(
+                        this::extractRecipeIdFromKey,
+                        key -> Optional.ofNullable(redisTemplate.opsForValue().get(key)).orElse(0)
+                ));
+    }
+
+    /**
      * [Extract Method] -  RDB에서 레시피의 조회수를 업데이트한다.
      * <p>
      * 이 메서드는 레시피의 조회수 엔티티(RecipeViewCntEntity)를 레시피 ID를 기반으로 조회한다.
@@ -122,7 +143,7 @@ public class RedisAdapter implements RedisPort {
      * <p>
      */
     public void updateViewCountInDatabase(Long recipeId, Integer viewCount) {
-        Optional<RecipeViewCntEntity> viewCountEntityOptional = recipeViewCountRepository.findByRecipeEntityId(recipeId);
+        Optional<RecipeViewCountEntity> viewCountEntityOptional = recipeViewCountRepository.findByRecipeEntityId(recipeId);
 
         viewCountEntityOptional.ifPresentOrElse(
                 viewCntEntity -> {
@@ -134,8 +155,8 @@ public class RedisAdapter implements RedisPort {
                     RecipeEntity recipeEntity = recipeRepository.findById(recipeId)
                             .orElseThrow(() -> new RecipeApplicationException(ErrorCode.RECIPE_NOT_FOUND));
 
-                    RecipeViewCntEntity recipeViewCntEntity = RecipeViewCntEntity.of(recipeEntity, viewCount);
-                    recipeViewCountRepository.save(recipeViewCntEntity);
+                    RecipeViewCountEntity recipeViewCountEntity = RecipeViewCountEntity.of(recipeEntity, viewCount);
+                    recipeViewCountRepository.save(recipeViewCountEntity);
                 }
         );
     }
@@ -149,7 +170,7 @@ public class RedisAdapter implements RedisPort {
     }
 
     /**
-     * 레시피 id를 추출한다. (이 id를 통해 레시피 내부의 like 갯수를 업데이트 한다.)
+     * 레시피 id를 추출한다. (이 id를 통해 레시피 내부의 like, view 갯수를 업데이트 한다.)
      */
     public Long extractRecipeIdFromKey(String key) {
         try {

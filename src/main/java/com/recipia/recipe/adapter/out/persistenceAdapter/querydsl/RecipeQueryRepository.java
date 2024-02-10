@@ -29,7 +29,7 @@ import static com.recipia.recipe.adapter.out.persistence.entity.QNutritionalInfo
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeCategoryMapEntity.recipeCategoryMapEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeEntity.recipeEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeFileEntity.recipeFileEntity;
-import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeLikeCntEntity.recipeLikeCntEntity;
+import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeLikeCountEntity.recipeLikeCountEntity;
 import static com.recipia.recipe.adapter.out.persistence.entity.QRecipeLikeEntity.recipeLikeEntity;
 
 
@@ -237,10 +237,10 @@ public class RecipeQueryRepository {
      * 레시피 좋아요 개수를 저장하는 테이블에 내용을 업데이트 한다.
      */
     public Long updateLikesInDatabase(Long recipeId, Integer likeCount) {
-        return queryFactory.update(recipeLikeCntEntity)
-                .where(recipeLikeCntEntity.id.eq(recipeId))
-                .set(recipeLikeCntEntity.likeCount, likeCount)
-                .set(recipeLikeCntEntity.updateDateTime, LocalDateTime.now())
+        return queryFactory.update(recipeLikeCountEntity)
+                .where(recipeLikeCountEntity.id.eq(recipeId))
+                .set(recipeLikeCountEntity.likeCount, likeCount)
+                .set(recipeLikeCountEntity.updateDateTime, LocalDateTime.now())
                 .execute();
     }
 

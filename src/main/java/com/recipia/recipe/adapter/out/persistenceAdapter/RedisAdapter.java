@@ -31,26 +31,6 @@ public class RedisAdapter implements RedisPort {
     private final RedisTemplate<String, Integer> redisTemplate;
 
 
-    /**
-     * RDB와 레디스의 싱크를 맞춘다.
-     */
-    @Override
-    public void syncLikesAndViewsWithDatabase() {
-        try {
-            Set<String> keys = redisTemplate.keys("recipe:like:*");
-            if (keys != null) {
-                keys.forEach(key -> {
-                    Integer likes = redisTemplate.opsForValue().get(key);
-                    Long recipeId = extractRecipeIdFromKey(key);
-                    Long updatedLikeCount = updateLikesInDatabase(recipeId, likes);
-                    log.info("updatedLikeCount is : {}", updatedLikeCount);
-                });
-            }
-        } catch (Exception e) {
-            throw new RecipeApplicationException(ErrorCode.REDIS_ERROR_OCCUR);
-        }
-    }
-
     // 좋아요 수를 가져온다.
     @Override
     public Integer getLikes(Long recipeId) {

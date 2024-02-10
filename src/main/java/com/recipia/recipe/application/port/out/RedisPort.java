@@ -4,8 +4,6 @@ import java.util.Map;
 
 public interface RedisPort {
 
-    void syncLikesAndViewsWithDatabase();
-
     Integer getLikes(Long recipeId);
 
     void incrementLikeCount(Long recipeId);

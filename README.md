@@ -35,17 +35,36 @@
 
 
 ## 🔶 인프라
-1. 프로젝트는 MSA로 구성되어있으며 ECS 클러스터에 Recipe서버를 구축하였습니다.
-2. 외부 서비스는 RDS(PostgreSQL), Redis, MongoDB를 사용합니다.
+- 프로젝트는 MSA로 구성되어있으며 ECS 클러스터에 Recipe서버를 구축하였습니다.
+- 외부 서비스는 RDS(PostgreSQL), Redis, MongoDB를 사용합니다.
 <img width="1076" alt="스크린샷 2024-02-10 오후 3 45 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/2a400b2d-6ebf-4505-8a76-2aa0142b7205">
 
-3. ECS인프라는 다음과 같이 ECR에 저장된 스프링부트 이미지를 받아서 컨테이너에 띄운다.
-<img width="923" alt="aws-infra" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/95564592-81c7-4e0f-a257-e4015b3f2f3c">
+- ECS인프라는 다음과 같이 ECR에 저장된 스프링부트 이미지를 받아서 컨테이너로 동작시킵니다.
+- SpringBoot에는 Zipkin서버로 로그를 전송하도록 설계하였습니다.
+<img width="1024" alt="스크린샷 2024-02-10 오후 4 08 23" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/6684b823-55a9-4332-aa22-acc967379def">
+
+- CI/CD는 AWS의 CodePipeline으로 구축하였습니다.
+- GitHub와 CodeBuild를 연결했고 CodeDeploy에서는 ECR에 접근해서 빌드된 이미지를 사용해서 배포하도록 했습니다.
+- 이렇게 설계하여 만약 main에 merge가 발생하면 Github 훅이 동작하여 CodePipeline이 동작합니다.
+<img width="814" alt="ci-cd" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/7fa3c701-dfd7-46f3-9e4a-af7589ef9cb0">
+
+<br/>
+
+## 🔶 아키텍처
+
+- 이벤트 드리븐 (DB 정합성 보장)
+<img width="1009" alt="spring-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/945f2187-aac3-4ee8-98cd-f181d20111f1">
+
+- ZeroPayload 정책
+<img width="814" alt="zero-payload" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/c5cad953-a027-4ac6-955f-9d1940bf8abf">
+
+- 배치를 통한 미발행된 SNS 메시지는 재발행 실시
+<img width="1034" alt="batch-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/466f5cc4-5510-4477-9ec2-711ce7c6a23b">
 
 
 <br/>
 
-## 🔶 아키텍처, 기술 스택
+## 🔶 기술 스택
 
 
 

@@ -56,6 +56,8 @@
 <br/>
 
 ## 🔶 아키텍처
+- 헥사고날 아키텍처 도입
+
 
 - 이벤트 드리븐 (DB 정합성 보장)
 <img width="1009" alt="spring-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/945f2187-aac3-4ee8-98cd-f181d20111f1">
@@ -65,13 +67,6 @@
 
 - 배치를 통한 미발행된 SNS 메시지는 재발행 실시
 <img width="1034" alt="batch-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/466f5cc4-5510-4477-9ec2-711ce7c6a23b">
-
-
-<br/>
-
-## 🔶 기술 스택
-
-
 
 <br/>
 
@@ -90,5 +85,30 @@
 4. 좋아요 기능
 5. 조회수 기능
 
+## 🔶 기술 스택
+1. 커스텀 예외처리 구현
+
+
+- 에러코드 작성
+<img width="891" alt="스크린샷 2024-02-10 오후 6 17 02" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/760e1cf0-3719-4429-9a79-bb624829db93">
+
+- 레시피아 예러코드 생성
+<img width="585" alt="스크린샷 2024-02-10 오후 6 18 33" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/a7f69ab0-be37-4303-bfa5-2a4a2ca4711f">
+
+- 예외를 중앙집중 처리하는 ControllerAdvice 코드 작성 (이때 NPE는 따로 처리하도록 작성)
+<img width="924" alt="스크린샷 2024-02-10 오후 6 18 45" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/0bacdd2d-2b1b-4284-8c79-da38e38b1434">
+
+- 코드에서 아래와 같이 예외를 throw
+<img width="798" alt="스크린샷 2024-02-10 오후 6 20 46" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/afe9000d-7fbc-4b4f-93ff-a6b005a760e2">
+
+
+
+<br/>
+
+## 🔶 테스트 코드 작성
+- 단위/통합 테스트 진행 (238개)
+- Junit5, mockito, S3Mock, BddMockito 사용
+
+<img width="961" alt="스크린샷 2024-02-10 오후 6 13 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d46ca797-c4da-48fc-b8d1-c5ed0039533a">
 
 #### 로그인

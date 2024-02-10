@@ -6,6 +6,9 @@
 <br/>
 소개 페이지 (노션): https://upbeat-willow-06b.notion.site/7ece9e5f602a43f583d7f4cf101e7d69?pvs=4
 
+
+<img width="960" alt="프레젠테이션2" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/74906042/42e8e9fe-882b-4fcd-a164-ee9f22354fe6">
+
 <br/>
 
 ## 🔶 프로젝트 소개

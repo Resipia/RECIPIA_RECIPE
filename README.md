@@ -119,6 +119,17 @@
 - S3에 저장된 이미지는 보안을 위해 pre-signed-url로 변환하여 사용한다.
 <img width="1024" alt="레시피_상세조회" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/85fdab5c-34c2-426f-9797-20813b45a8e1">
 
+### 3️⃣ 레시피 삭제
+- 기본정보, 댓글, 파일은 soft delete 처리한다.
+- soft delete된 데이터는 한달이 지나면 배치를 통해 삭제를 진행한다.
+<img width="1024" alt="레시피_삭제" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/af0f860a-885c-4b88-ac35-c8b22a6b958e">
+
+### 4️⃣ 북마크
+<img width="1024" alt="북마크_여부" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/3f7e6587-057c-4c4c-9ab4-3a1c4f2fdeda">
+
+### 5️⃣ 좋아요
+- 분기처리를 통해 처리한다.
+<img width="1024" alt="좋아요_저장_삭제" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/94118ba9-9d6f-4aa4-9e88-301e2fe704cb">
 
 
 <br/>
@@ -126,7 +137,6 @@
 ## 🔶 테스트 코드 작성
 - 단위/통합 테스트 진행 (238개)
 - Junit5, mockito, S3Mock, BddMockito 사용
+- 외부 DB (MongoDB, Redis)를 사용한 테스트도 진행
 
 <img width="1024" alt="스크린샷 2024-02-10 오후 6 13 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d46ca797-c4da-48fc-b8d1-c5ed0039533a">
-
-#### 로그인

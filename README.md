@@ -112,24 +112,28 @@
 ### 1️⃣ 레시피 생성
 - 재료, 해시태그는 RDB에 저장과 동시에 MongoDB에 저장한다.
 - MongoDB에 재료, 해시태그 정보를 저장하여 검색기능에서 연관검색어 기능을 구현했다.
-<img width="1024" alt="레시피_생성" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/49993ff7-1ae7-4858-be68-9795854b56be">
+<img width="1024" alt="레시피_작성" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/6eb41b27-c18f-4ba6-b69d-cbfc9ae6e47a">
+
 
 ### 2️⃣ 레시피 상세조회 (이미지는 PreUrl을 가져온다.)
 - 좋아요 횟수, 조회수는 Redis에 저장하고 조회한다.
 - S3에 저장된 이미지는 보안을 위해 pre-signed-url로 변환하여 사용한다.
-<img width="1024" alt="레시피_상세조회" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/85fdab5c-34c2-426f-9797-20813b45a8e1">
+<img width="1024" alt="레시피_상세조회" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/8d94cdc6-23c4-4cac-b53c-57804df7d825">
+
 
 ### 3️⃣ 레시피 삭제
 - 기본정보, 댓글, 파일은 soft delete 처리한다.
 - soft delete된 데이터는 한달이 지나면 배치를 통해 삭제를 진행한다.
-<img width="1024" alt="레시피_삭제" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/af0f860a-885c-4b88-ac35-c8b22a6b958e">
+<img width="1024" alt="레시피_삭제" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/c13149bf-6f14-43c8-92d8-bccda66c2621">
+
 
 ### 4️⃣ 북마크
 <img width="1024" alt="북마크_여부" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/3f7e6587-057c-4c4c-9ab4-3a1c4f2fdeda">
 
 ### 5️⃣ 좋아요
 - 분기처리를 통해 처리한다.
-<img width="1024" alt="좋아요_저장_삭제" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/94118ba9-9d6f-4aa4-9e88-301e2fe704cb">
+<img width="1024" alt="좋아요_여부" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d9a5a80c-a79a-4774-9d6c-8320ac7c48ac">
+
 
 
 <br/>

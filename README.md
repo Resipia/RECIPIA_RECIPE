@@ -55,6 +55,11 @@
 
 <br/>
 
+## 🔶 ERD
+<img width="1024" alt="레시피_ERD" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/31cbf837-b7a2-485a-b39d-2a9eb940b23d">
+
+<br/>
+
 ## 🔶 아키텍처
 - 헥사고날 아키텍처 도입
 

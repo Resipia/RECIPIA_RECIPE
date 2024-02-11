@@ -22,32 +22,36 @@
 <br/>
 
 ## 🔶 개발 기간
-- 2023.05 ~ 현재 진행 중
+- 2023.05 ~ 2023.02 (베타버전 출시)
+- 계속해서 추가개발을 진행중입니다.
 
 
 <br/>
 
 ## 🔶 개발 환경
 - Java 17
-- Spring Boot 3.1.2, Spring Security
+- Spring Boot 3.1.2, Spring Security6
 - IDE: Intellij, Datagrip
 - Database: RDS(PostgreSQL), MongoDB, Redis
 - ORM: JPA
 - 버전 및 이슈관리
-- 협업 툴
+- 협업 툴: Jira, Confluence, Notion
 
 <br/>
 
 
 ## 🔶 인프라
+### MSA 인프라 구성
 - 프로젝트는 MSA로 구성되어있으며 ECS 클러스터에 Recipe서버를 구축하였습니다.
 - 외부 서비스는 RDS(PostgreSQL), Redis, MongoDB를 사용합니다.
 <img width="1024" alt="스크린샷 2024-02-10 오후 3 45 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/2a400b2d-6ebf-4505-8a76-2aa0142b7205">
 
+### ECS 구성
 - ECS인프라는 다음과 같이 ECR에 저장된 스프링부트 이미지를 받아서 컨테이너로 동작시킵니다.
 - SpringBoot에는 Zipkin서버로 로그를 전송하도록 설계하였습니다.
 <img width="1024" alt="스크린샷 2024-02-10 오후 4 08 23" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/6684b823-55a9-4332-aa22-acc967379def">
 
+### CI/CD 설계
 - CI/CD는 AWS의 CodePipeline으로 구축하였습니다.
 - GitHub와 CodeBuild를 연결했고 CodeDeploy에서는 ECR에 접근해서 빌드된 이미지를 사용해서 배포하도록 했습니다.
 - 이렇게 설계하여 만약 main에 merge가 발생하면 Github 훅이 동작하여 CodePipeline이 동작합니다.
@@ -56,21 +60,34 @@
 <br/>
 
 ## 🔶 ERD
+### AQuery를 사용하여 레시피 서버의 ERD를 설계하였습니다.
 <img width="1024" alt="레시피_ERD" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/31cbf837-b7a2-485a-b39d-2a9eb940b23d">
 
 <br/>
 
 ## 🔶 아키텍처
-- 헥사고날 아키텍처 도입
+### 헥사고날 아키텍처 도입
 
 
-- 이벤트 드리븐 (DB 정합성 보장)
+### MSA의 DB 정합성 보장 과정
+- 유저가 닉네임을 변경하면 멤버서버에서는 닉네임 변경사항을 멤버 DB에 반영하고 Spring Event를 발행합니다. (이벤트 리스너는 2개를 선언)
+- 스프링 이벤트 리스너중 1개가 동작하여 멤버 DB의 Outbox 테이블에 이벤트 발행 여부를 기록하고 DB커밋을 합니다.(트랜잭션 커밋완료)
+- 트랜잭션 커밋이 완료되면 AFTER_COMMIT을 적어준 또다른 스프링 이벤트 리스너가 동작하여 SNS에 메시지를 발행합니다.
+- SNS 메시지가 발행되면 2개의 SQS리스너가 동시에 동작하게 됩니다.
+    1. 레시피 서버에서 SNS에서 발행한 메시지를 polling해서 레시피DB의 멤버 정보를 업데이트 처리하는 SQS리스너
+    2. 멤버 서버의 Outbox 테이블에 스프링 이벤트의 발행 여부(published 컬럼)를 true로 변경하는 SQS리스너
+- 첫번째 SQS리스너가 동작하여 레시피 서버에서는 FeignClient를 통해 멤버 서버에 가장 최신의 유저 정보를 요청합니다.
+- 멤버 서버로부터 받아온 가장 최신의 유저정보를 레시피DB에 반영합니다.
 <img width="1024" alt="spring-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/945f2187-aac3-4ee8-98cd-f181d20111f1">
 
-- ZeroPayload 정책
+### ZeroPayload 정책
+- 데이터 전송시 메시지 내부에는 memberId만을 포함하도록 합니다.
+- 분산추적을 위한 traceId는 SNS의 messageAttributes를 사용하여 전송합니다.
 <img width="1024" alt="zero-payload" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/c5cad953-a027-4ac6-955f-9d1940bf8abf">
 
-- 배치를 통한 미발행된 SNS 메시지는 재발행 실시
+### 미발행된 SNS 메시지는 재발행
+- Spring Batch를 사용하여 5분마다 미발행된 메시지를 재발행 합니다.
+- Outbox 테이블에 저장된 발행여부(published)가 false것을 조회하여 배치가 동작합니다.
 <img width="1024" alt="batch-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/466f5cc4-5510-4477-9ec2-711ce7c6a23b">
 
 <br/>
@@ -94,7 +111,11 @@
 <br/>
 
 ## 🔶 개발 전략
-1. 커스텀 예외처리 구현
+### 1. 스프링 시큐리티를 통한 JWT 인증기능 구현
+<img width="1024" alt="시큐리티_동작" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/8a3a5a99-4b5a-4eb6-a0a8-eb2921815f0a">
+
+
+### 2. 커스텀 예외처리 구현
 
 
 - 에러코드 작성
@@ -115,20 +136,20 @@
 
 ## 🔶 기능 설명
 ### 1️⃣ 레시피 생성
-- 재료, 해시태그는 RDB에 저장과 동시에 MongoDB에 저장한다.
-- MongoDB에 재료, 해시태그 정보를 저장하여 검색기능에서 연관검색어 기능을 구현했다.
+- 재료, 해시태그는 RDB에 저장과 동시에 MongoDB에 저장합니다.
+- MongoDB에는 재료, 해시태그 정보를 저장하여 검색기능에서 연관검색어 기능이 동작하도록 구현했습니다.
 <img width="1024" alt="레시피_작성" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/6eb41b27-c18f-4ba6-b69d-cbfc9ae6e47a">
 
 
 ### 2️⃣ 레시피 상세조회 (이미지는 PreUrl을 가져온다.)
-- 좋아요 횟수, 조회수는 Redis에 저장하고 조회한다.
-- S3에 저장된 이미지는 보안을 위해 pre-signed-url로 변환하여 사용한다.
+- 좋아요 횟수, 조회수는 Redis에 저장하고 조회합니다.
+- S3에 저장된 이미지는 보안을 위해 pre-signed-url로 변환하여 사용자에게 보여줍니다.
 <img width="1024" alt="레시피_상세조회" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/8d94cdc6-23c4-4cac-b53c-57804df7d825">
 
 
 ### 3️⃣ 레시피 삭제
-- 기본정보, 댓글, 파일은 soft delete 처리한다.
-- soft delete된 데이터는 한달이 지나면 배치를 통해 삭제를 진행한다.
+- 기본정보, 댓글, 파일은 soft delete 처리를 하도록 설계했습니다.
+- soft delete된 데이터는 한달이 지나면 배치를 통해 삭제를 진행합니다.
 <img width="1024" alt="레시피_삭제" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/c13149bf-6f14-43c8-92d8-bccda66c2621">
 
 
@@ -136,7 +157,7 @@
 <img width="1024" alt="북마크_여부" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/3f7e6587-057c-4c4c-9ab4-3a1c4f2fdeda">
 
 ### 5️⃣ 좋아요
-- 분기처리를 통해 처리한다.
+- 분기처리를 통해 처리합니다.
 <img width="1024" alt="좋아요_여부" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d9a5a80c-a79a-4774-9d6c-8320ac7c48ac">
 
 
@@ -146,6 +167,6 @@
 ## 🔶 테스트 코드 작성
 - 단위/통합 테스트 진행 (238개)
 - Junit5, mockito, S3Mock, BddMockito 사용
-- 외부 DB (MongoDB, Redis)를 사용한 테스트도 진행
+- 외부 DB (MongoDB, Redis)를 사용한 테스트도 진행했습니다.
 
 <img width="1024" alt="스크린샷 2024-02-10 오후 6 13 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d46ca797-c4da-48fc-b8d1-c5ed0039533a">

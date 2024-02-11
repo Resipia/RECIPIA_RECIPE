@@ -42,7 +42,7 @@
 ## 🔶 인프라
 - 프로젝트는 MSA로 구성되어있으며 ECS 클러스터에 Recipe서버를 구축하였습니다.
 - 외부 서비스는 RDS(PostgreSQL), Redis, MongoDB를 사용합니다.
-<img width="1076" alt="스크린샷 2024-02-10 오후 3 45 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/2a400b2d-6ebf-4505-8a76-2aa0142b7205">
+<img width="1024" alt="스크린샷 2024-02-10 오후 3 45 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/2a400b2d-6ebf-4505-8a76-2aa0142b7205">
 
 - ECS인프라는 다음과 같이 ECR에 저장된 스프링부트 이미지를 받아서 컨테이너로 동작시킵니다.
 - SpringBoot에는 Zipkin서버로 로그를 전송하도록 설계하였습니다.
@@ -51,7 +51,7 @@
 - CI/CD는 AWS의 CodePipeline으로 구축하였습니다.
 - GitHub와 CodeBuild를 연결했고 CodeDeploy에서는 ECR에 접근해서 빌드된 이미지를 사용해서 배포하도록 했습니다.
 - 이렇게 설계하여 만약 main에 merge가 발생하면 Github 훅이 동작하여 CodePipeline이 동작합니다.
-<img width="814" alt="ci-cd" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/7fa3c701-dfd7-46f3-9e4a-af7589ef9cb0">
+<img width="1024" alt="ci-cd" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/7fa3c701-dfd7-46f3-9e4a-af7589ef9cb0">
 
 <br/>
 
@@ -60,13 +60,13 @@
 
 
 - 이벤트 드리븐 (DB 정합성 보장)
-<img width="1009" alt="spring-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/945f2187-aac3-4ee8-98cd-f181d20111f1">
+<img width="1024" alt="spring-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/945f2187-aac3-4ee8-98cd-f181d20111f1">
 
 - ZeroPayload 정책
-<img width="814" alt="zero-payload" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/c5cad953-a027-4ac6-955f-9d1940bf8abf">
+<img width="1024" alt="zero-payload" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/c5cad953-a027-4ac6-955f-9d1940bf8abf">
 
 - 배치를 통한 미발행된 SNS 메시지는 재발행 실시
-<img width="1034" alt="batch-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/466f5cc4-5510-4477-9ec2-711ce7c6a23b">
+<img width="1024" alt="batch-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/466f5cc4-5510-4477-9ec2-711ce7c6a23b">
 
 <br/>
 
@@ -88,21 +88,36 @@
 
 <br/>
 
-## 🔶 기능 설명
+## 🔶 개발 전략
 1. 커스텀 예외처리 구현
 
 
 - 에러코드 작성
-<img width="891" alt="스크린샷 2024-02-10 오후 6 17 02" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/760e1cf0-3719-4429-9a79-bb624829db93">
+<img width="1024" alt="스크린샷 2024-02-10 오후 6 17 02" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/760e1cf0-3719-4429-9a79-bb624829db93">
 
-- 레시피아 예러코드 생성
-<img width="585" alt="스크린샷 2024-02-10 오후 6 18 33" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/a7f69ab0-be37-4303-bfa5-2a4a2ca4711f">
+- 레시피아 전용 예외코드 작성
+<img width="1024" alt="스크린샷 2024-02-10 오후 6 18 33" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/a7f69ab0-be37-4303-bfa5-2a4a2ca4711f">
 
-- 예외를 중앙집중 처리하는 ControllerAdvice 코드 작성 (이때 NPE는 따로 처리하도록 작성)
-<img width="924" alt="스크린샷 2024-02-10 오후 6 18 45" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/0bacdd2d-2b1b-4284-8c79-da38e38b1434">
+- 중앙집중 예외처리 ControllerAdvice 코드 작성 (이때 NPE는 따로 처리하도록 작성)
+<img width="1024" alt="스크린샷 2024-02-10 오후 6 18 45" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/0bacdd2d-2b1b-4284-8c79-da38e38b1434">
 
-- 코드에서 아래와 같이 예외를 throw
-<img width="798" alt="스크린샷 2024-02-10 오후 6 20 46" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/afe9000d-7fbc-4b4f-93ff-a6b005a760e2">
+- 코드에서 아래와 같이 예외를 throw해서 커스텀 예외를 적용시켰다.
+<img width="1024" alt="스크린샷 2024-02-10 오후 6 20 46" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/afe9000d-7fbc-4b4f-93ff-a6b005a760e2">
+
+
+
+<br/>
+
+## 🔶 기능 설명
+### 1️⃣ 레시피 생성
+- 재료, 해시태그는 RDB에 저장과 동시에 MongoDB에 저장한다.
+- MongoDB에 재료, 해시태그 정보를 저장하여 검색기능에서 연관검색어 기능을 구현했다.
+<img width="1024" alt="레시피_생성" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/49993ff7-1ae7-4858-be68-9795854b56be">
+
+### 2️⃣ 레시피 상세조회 (이미지는 PreUrl을 가져온다.)
+- 좋아요 횟수, 조회수는 Redis에 저장하고 조회한다.
+- S3에 저장된 이미지는 보안을 위해 pre-signed-url로 변환하여 사용한다.
+<img width="1024" alt="레시피_상세조회" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/85fdab5c-34c2-426f-9797-20813b45a8e1">
 
 
 
@@ -112,6 +127,6 @@
 - 단위/통합 테스트 진행 (238개)
 - Junit5, mockito, S3Mock, BddMockito 사용
 
-<img width="961" alt="스크린샷 2024-02-10 오후 6 13 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d46ca797-c4da-48fc-b8d1-c5ed0039533a">
+<img width="1024" alt="스크린샷 2024-02-10 오후 6 13 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d46ca797-c4da-48fc-b8d1-c5ed0039533a">
 
 #### 로그인

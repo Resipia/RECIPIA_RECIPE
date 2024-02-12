@@ -126,6 +126,7 @@
 
 
 ### 2. 커스텀 예외처리 구현
+<img width="1024" alt="레시피_커스텀_예외처리" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/92fb5261-c45d-42ab-9cb9-033b3ed5b2ed">
 
 
 - 에러코드 작성

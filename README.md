@@ -41,6 +41,23 @@
 
 <br/>
 
+## 🔶 주요 기능
+#### 최진안, 김이준 (페어)
+1. JWT로 사용자 검증
+2. 레시피 CRUD (S3에 이미지 저장, 카테고리, 재료, 해시태그, 영양소 저장)
+3. 댓글, 대댓글 작성기능
+4. 회원탈퇴시 유저의 레시피 관련 데이터 삭제
+
+
+#### 최진안
+1. 레시피 내부의 닉네임 변경
+2. 재료, 해시태그 검색기능
+3. 북마크 기능
+4. 좋아요 기능
+5. 조회수 기능
+
+
+<br/>
 
 ## 🔶 인프라
 ### MSA 인프라 구성
@@ -65,18 +82,19 @@
 - 롤링 업데이트를 통해 새 버전의 애플리케이션을 점진적으로 배포하면서 서비스 중단 없이 업데이트를 완료할 수 있습니다.
 <img width="1024" alt="ci-cd" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/7fa3c701-dfd7-46f3-9e4a-af7589ef9cb0">
 
-<br/>
+<br/><br/>
+
 
 ## 🔶 ERD
 ### AQuery를 사용하여 레시피 서버의 ERD를 설계하였습니다.
 <img width="1024" alt="레시피_ERD" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/31cbf837-b7a2-485a-b39d-2a9eb940b23d">
 
-<br/>
+<br/><br/>
+
 
 ## 🔶 아키텍처
 ### 헥사고날 아키텍처 도입
 <img width="1024" alt="레시피아_헥사고날" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d02a5999-c348-42f3-8144-46902d0ec6a9">
-
 
 
 ### MSA의 DB 정합성 보장 과정
@@ -109,25 +127,7 @@
 <img width="1024" alt="Redis_복구" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/511a7d86-0265-4f44-9d71-cbd84c7a114f">
 
 
-<br/>
-
-## 🔶 주요 기능
-#### 최진안, 김이준 (페어)
-1. JWT로 사용자 검증
-2. 레시피 CRUD (S3에 이미지 저장, 카테고리, 재료, 해시태그, 영양소 저장)
-3. 댓글, 대댓글 작성기능
-4. 회원탈퇴시 유저의 레시피 관련 데이터 삭제
-
-
-#### 최진안
-1. 레시피 내부의 닉네임 변경
-2. 재료, 해시태그 검색기능
-3. 북마크 기능
-4. 좋아요 기능
-5. 조회수 기능
-
-
-<br/>
+<br/><br/>
 
 ## 🔶 개발 전략
 ### 1. 스프링 시큐리티를 통한 JWT 인증기능 구현
@@ -152,7 +152,8 @@
 
 
 
-<br/>
+<br/><br/>
+
 
 ## 🔶 기능 설명
 ### 1️⃣ 레시피 생성
@@ -161,10 +162,15 @@
 <img width="1024" alt="레시피_작성" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/6eb41b27-c18f-4ba6-b69d-cbfc9ae6e47a">
 
 
-### 2️⃣ 레시피 상세조회 (이미지는 PreUrl을 가져온다.)
+### 2️⃣ 레시피 상세조회
 - 좋아요 횟수, 조회수는 Redis에 저장하고 조회합니다.
 - S3에 저장된 이미지는 보안을 위해 pre-signed-url로 변환하여 사용자에게 보여줍니다.
 <img width="1024" alt="레시피_상세조회" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/8d94cdc6-23c4-4cac-b53c-57804df7d825">
+
+### 2️⃣-1️⃣ 이미지 pre-signed-url 변환과정 설명
+- 파일 테이블에는 S3버킷에 접근 가능한 이미지의 저장 경로(path)가 존재해야 합니다.
+- AWS SDK를 통해 url을 pre-signed-url로 변환합니다. (S3에 접근하여 처리하고 반환받는게 아니라 스프링 내부의 SDK 코드로 처리)
+<img width="1024" alt="pre-signed-url" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/453fe60e-275a-4b62-bdc0-dedbcfc515e6">
 
 
 ### 3️⃣ 레시피 삭제
@@ -182,7 +188,8 @@
 
 
 
-<br/>
+<br/><br/>
+
 
 ## 🔶 테스트 코드 작성
 - 단위/통합 테스트 진행 (238개)

@@ -29,13 +29,15 @@
 <br/>
 
 ## 🔶 개발 환경
-- Java 17
-- Spring Boot 3.1.2, Spring Security6
-- IDE: Intellij, Datagrip
-- Database: RDS(PostgreSQL), MongoDB, Redis
-- ORM: JPA
-- 버전 및 이슈관리
-- 협업 툴: Jira, Confluence, Notion
+- **언어:** Java 17
+- **프레임워크:** Spring Boot 3.1.2, Spring Security 6
+- **ORM:** JPA, Querydsl
+- **테스트 및 모니터링:** JUnit, Mockito, P6Spy, Zipkin
+- **API 및 서비스 통신:** JWT, Feign Client
+- **클라우드:** AWS SDK
+- **데이터베이스:** PostgreSQL (RDS), MongoDB, Redis
+- **개발 도구:** IntelliJ IDEA, DataGrip
+- **협업 도구:** Jira, Confluence, Notion
 
 <br/>
 

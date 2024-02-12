@@ -44,10 +44,10 @@
 
 ## 🔶 인프라
 ### MSA 인프라 구성
-- 프로젝트는 MSA로 구성되어있으며 총 세개(멤버, 레시피, 지프킨)의 서비스로 이루어져있습니다.
-- 그 중 멤버서버 ECS 클러스터에 MEMBER 서버를 구축하였습니다.
-- 외부 데이터베이스는 RDS(PostgreSQL), Redis, S3를 사용합니다.
-- 이벤트 드리븐, 메시지 드리븐으로는 SNS, SQS를 사용합니다.
+- 프로젝트는 MSA로 구성되어 있으며 총 3개(멤버, 레시피, 지프킨)의 서비스로 이루어져 있습니다. 
+- 그중 레시피서버 ECS 클러스터에 RECIPE 서버를 구축하였습니다. 
+- 외부 데이터베이스는 RDS(PostgreSQL), Redis, MongoDB, S3를 사용합니다.
+- MessageQueue로는 SNS, SQS를 사용합니다.
 <img width="1024" alt="스크린샷 2024-02-10 오후 3 45 08" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/2a400b2d-6ebf-4505-8a76-2aa0142b7205">
 
 ### ECS 구성
@@ -57,11 +57,11 @@
 <img width="1024" alt="스크린샷 2024-02-10 오후 4 08 23" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/6684b823-55a9-4332-aa22-acc967379def">
 
 ### CI/CD 설계
-- CI/CD는 AWS의 CodePipeline으로 구축하였습니다.
-- main 브랜치에 merge 발생 시 AWS CodePipeline이 자동으로 활성화됩니다.
-- 이 과정은 GitHub 웹훅을 통해 이루어지며, GitHub의 변경 사항을 감지하여 트리거합니다.
-- GitHub에서 웹훅이 트리거되면 CodeBuild가 동작합니다. 이때 SpringBoot의 소스 코드를 Docker 이미지로 빌드하고, 생성된 이미지를 ECR에 안전하게 업로드합니다.
-- CodeDeploy가 ECR에 저장된 Docker 이미지를 감지하고, ECS에 롤링 업데이트 방식을 사용하여 무중단 배포를 진행합니다.
+- CI/CD는 AWS의 CodePipeline으로 구축하였습니다. 
+- main 브랜치에 merge 발생 시 AWS CodePipeline이 자동으로 활성화됩니다. 
+- 이 과정은 GitHub 웹훅을 통해 이루어지며, GitHub의 변경 사항을 감지하여 트리거합니다. 
+- GitHub에서 웹훅이 트리거 되면 CodeBuild가 동작합니다. 이때 SpringBoot의 소스 코드를 Docker 이미지로 빌드하고, 생성된 이미지를 ECR에 안전하게 업로드합니다. 
+- CodeDeploy가 ECR에 저장된 Docker 이미지를 감지하고, ECS에 롤링 업데이트 방식을 사용하여 무중단 배포를 진행합니다. 
 - 롤링 업데이트를 통해 새 버전의 애플리케이션을 점진적으로 배포하면서 서비스 중단 없이 업데이트를 완료할 수 있습니다.
 <img width="1024" alt="ci-cd" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/7fa3c701-dfd7-46f3-9e4a-af7589ef9cb0">
 
@@ -80,14 +80,14 @@
 
 
 ### MSA의 DB 정합성 보장 과정
-- 유저가 닉네임을 변경하면 멤버 서버에서는 닉네임 변경사항을 멤버 DB에 반영하고 Spring Event를 발행합니다. (이벤트 리스너는 2개를 선언)
-- 스프링 이벤트 리스너중 1개가 동작하여 멤버 DB의 Outbox 테이블에 이벤트 발행 여부를 기록하고 DB 커밋을 합니다.(트랜잭션 커밋완료)
-- 트랜잭션 커밋이 완료되면 AFTER_COMMIT을 적어준 또다른 스프링 이벤트 리스너가 동작하여 닉네임 변경 토픽으로 SNS 메시지를 발행합니다.
-- SNS 메시지가 발행되면 2개의 SQS리스너가 동시에 동작하게 됩니다.
-  - 레시피 서버에서 닉네임 변경 토픽을 리스닝하고있던 SQS가 실행됩니다.
-  - 멤버 서버에서 닉네임 변경 토픽을 리스닝하고 있던 SQS가 실행됩니다. 이때 Outbox 테이블에 이벤트 발행 여부(published 컬럼)를 true로 업데이트합니다.
-- 레시피 서버의 SQS 리스너가 동작할때 FeignClient를 사용하여 멤버 서버에 가장 최신의 유저 닉네임 정보를 요청합니다.
-- 멤버 서버로부터 받아온 가장 최신의 유저 닉네임 정보를 레시피DB에 반영합니다.
+- 유저가 닉네임을 변경하면 멤버 서버에서는 닉네임 변경사항을 멤버 DB에 반영하고 Spring Event를 발행합니다. (이벤트 리스너는 2개를 선언) 
+- 스프링 이벤트 리스너 중 1개가 동작하여 멤버 DB의 Outbox 테이블에 이벤트 발행 여부를 기록하고 DB 커밋을 합니다.(트랜잭션 커밋완료) 
+- 트랜잭션 커밋이 완료되면 AFTER_COMMIT을 적어준 또 다른 스프링 이벤트 리스너가 동작하여 닉네임 변경 토픽으로 SNS 메시지를 발행합니다. 
+- SNS 메시지가 발행되면 2개의 SQS리스너가 동시에 동작하게 됩니다. 
+- 레시피 서버에서 닉네임 변경 토픽을 리스닝하고 있던 SQS가 실행됩니다. 
+- 멤버 서버에서 닉네임 변경 토픽을 리스닝하고 있던 SQS가 실행됩니다. 이때 Outbox 테이블에 이벤트 발행 여부(published 칼럼)를 true로 업데이트합니다. 
+- 레시피 서버의 SQS 리스너가 동작할 때 FeignClient를 사용하여 멤버 서버에 가장 최신의 유저 닉네임 정보를 요청합니다. 
+- 멤버 서버로부터 받아온 가장 최신의 유저 닉네임 정보를 레시피 DB에 반영합니다.
 <img width="1024" alt="spring-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/945f2187-aac3-4ee8-98cd-f181d20111f1">
 
 ### ZeroPayload 정책
@@ -99,6 +99,15 @@
 - Spring Batch를 사용하여 5분마다 미발행된 메시지를 재발행 합니다.
 - Outbox 테이블에 저장된 발행여부(published)가 false것을 조회하여 배치가 동작합니다.
 <img width="1024" alt="batch-event" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/466f5cc4-5510-4477-9ec2-711ce7c6a23b">
+
+### Redis 데이터 복구전략 (RDBMS)
+- Redis의 기본적인 복구전략은 AOF, RDB(Redis Database)를 사용하도록 했습니다.
+- Redis에 저장된 조회수, 좋아요 데이터는 스케쥴러를 통해 매일 6시간마다 PostgreSQL에 업데이트하도록 설계했습니다.
+    1. 6시간마다 백업을 수행하여 최근 상태의 데이터를 안정적으로 보존합니다.
+    2. 만약 Redis 인스턴스에 문제가 생겨 데이터가 손실되더라도, PostgreSQL에 저장된 최대 6시간 전의 데이터로 복구가 가능합니다.
+    3. 백업은 시스템 리소스를 상당히 사용할 수 있지만 6시간마다 백업을 실행하면 시스템이 피크 시간 외에 백업 작업을 처리할 수 있도록 일정을 조정할 수 있습니다.
+<img width="1024" alt="Redis_복구" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/511a7d86-0265-4f44-9d71-cbd84c7a114f">
+
 
 <br/>
 

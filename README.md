@@ -233,7 +233,7 @@
 <br/><br/>
 ## 🔶 성능(부하) 테스트: nGrinder 사용
 
-### 상용 레시피 서버에 296명을 기준으로 부하 테스트를 진행했다.
+### 상용 레시피 서버 부하 테스트
 - 상용 ECS의 레시피 SpringBoot서버에 테스트를 진행한 결과다. 
 <img width="1024" alt="recipe-detail-test-296" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/b4054ea5-269c-41bc-b5f1-4fdab3c3360c">
 

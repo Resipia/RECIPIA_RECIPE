@@ -161,11 +161,11 @@
 <br/><br/>
 
 ## 🔶 개발 전략
-### 1. 스프링 시큐리티를 통한 JWT 인증기능 구현
+### 스프링 시큐리티를 통한 JWT 인증기능 구현
 <img width="1024" alt="시큐리티_동작" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/8a3a5a99-4b5a-4eb6-a0a8-eb2921815f0a">
 
 
-### 2. 커스텀 예외처리 구현
+### 커스텀 예외처리 구현
 <img width="1024" alt="레시피_커스텀_예외처리" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/92fb5261-c45d-42ab-9cb9-033b3ed5b2ed">
 
 
@@ -187,33 +187,33 @@
 
 
 ## 🔶 기능 설명
-### 1️⃣ 레시피 생성
+### 레시피 생성
 - 재료, 해시태그는 RDB에 저장과 동시에 MongoDB에 저장합니다.
 - MongoDB에는 재료, 해시태그 정보를 저장하여 검색기능에서 연관검색어 기능이 동작하도록 구현했습니다.
 <img width="1024" alt="레시피_작성" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/6eb41b27-c18f-4ba6-b69d-cbfc9ae6e47a">
 
 
-### 2️⃣ 레시피 상세조회
+### 레시피 상세조회
 - 좋아요 횟수, 조회수는 Redis에 저장하고 조회합니다.
 - S3에 저장된 이미지는 보안을 위해 pre-signed-url로 변환하여 사용자에게 보여줍니다.
 <img width="1024" alt="레시피_상세조회" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/8d94cdc6-23c4-4cac-b53c-57804df7d825">
 
-### 2️⃣-1️⃣ 이미지 pre-signed-url 변환과정 설명
+### 이미지 pre-signed-url 변환과정 설명
 - 파일 테이블에는 S3버킷에 접근 가능한 이미지의 저장 경로(path)가 존재해야 합니다.
 - AWS SDK를 통해 url을 pre-signed-url로 변환합니다. (S3에 접근하여 처리하고 반환받는게 아니라 스프링 내부의 SDK 코드로 처리)
 <img width="1024" alt="pre-signed-url" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/453fe60e-275a-4b62-bdc0-dedbcfc515e6">
 
 
-### 3️⃣ 레시피 삭제
+### 레시피 삭제
 - 기본정보, 댓글, 파일은 soft delete 처리를 하도록 설계했습니다.
 - soft delete된 데이터는 한달이 지나면 배치를 통해 삭제를 진행합니다.
 <img width="1024" alt="레시피_삭제" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/c13149bf-6f14-43c8-92d8-bccda66c2621">
 
 
-### 4️⃣ 북마크
+### 북마크
 <img width="1024" alt="북마크_여부" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/3f7e6587-057c-4c4c-9ab4-3a1c4f2fdeda">
 
-### 5️⃣ 좋아요
+### 좋아요
 - 분기처리를 통해 처리합니다.
 <img width="1024" alt="좋아요_여부" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/d9a5a80c-a79a-4774-9d6c-8320ac7c48ac">
 
@@ -232,11 +232,11 @@
 
 <br/><br/>
 ## 🔶 성능(부하) 테스트: nGrinder 사용
-### 1. 상용 레시피 서버에 296명을 기준으로 부하 테스트를 진행했다.
+### 상용 레시피 서버에 296명을 기준으로 부하 테스트를 진행했다.
 - 상용 ECS의 레시피 SpringBoot서버에 테스트를 진행한 결과다. 
 <img width="1024" alt="recipe-detail-test-296" src="https://github.com/Resipia/RECIPIA_RECIPE/assets/79524077/b4054ea5-269c-41bc-b5f1-4fdab3c3360c">
 
-### 2. 로컬 vs 상용 성능 비교표
+### 로컬 vs 상용 성능 비교표
 - **로컬 (Mac):** m1(16GB), m2 max(64GB)
 - **상용 (ECS):** t4g.small 
 - **테스트 결과:**

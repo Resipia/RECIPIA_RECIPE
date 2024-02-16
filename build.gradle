@@ -60,8 +60,6 @@ dependencies {
 	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.0'
 	testImplementation 'io.findify:s3mock_2.12:0.2.4'
 
-
-
 	// queryDsl
 	implementation 'com.querydsl:querydsl-core:5.0.0'
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -77,6 +75,9 @@ dependencies {
 		exclude group: 'org.json', module: 'json'
 	}
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+	// kafka
+	implementation 'org.springframework.kafka:spring-kafka'
 
 	// AWS - SNS, SQS, S3
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")

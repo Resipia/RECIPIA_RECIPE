@@ -70,7 +70,8 @@ public class RecipeController {
     }
 
     /**
-     * 레시피 단건 조회
+     * 레시피 단건 조회 (상세조회)
+     * 레시피 조회 + 조회수 증가
      */
     @GetMapping("/getRecipeDetail")
     public ResponseEntity<ResponseDto<RecipeDetailViewResponseDto>> getRecipeDetailView(

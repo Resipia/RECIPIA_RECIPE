@@ -59,6 +59,7 @@ public class RecipeConverter {
                 0L, // todo: 저장할때라서 일단 0L을 넣어줬다.
                 0,
                 null,
+                0,   // 조회수는 0으로 넣어준다.
                 dto.getDeleteFileOrder(),
                 null
         );
@@ -89,7 +90,6 @@ public class RecipeConverter {
                 securityUtil.getCurrentMemberNickname(),
                 "N",
                 null,
-                0,
                 null,
                 dto.getDeleteFileOrder(),
                 null

@@ -1,8 +1,7 @@
 package com.recipia.recipe.adapter.out.persistenceAdapter;
 
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeLikeCntEntity;
-import com.recipia.recipe.adapter.out.persistence.entity.RecipeViewCntEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeLikeCountEntity;
+import com.recipia.recipe.adapter.out.persistence.entity.RecipeViewCountEntity;
 import com.recipia.recipe.common.exception.ErrorCode;
 import com.recipia.recipe.common.exception.RecipeApplicationException;
 import com.recipia.recipe.config.TotalTestSupport;
@@ -48,37 +47,6 @@ class RedisAdapterTest extends TotalTestSupport {
             redisTemplate.delete(keys);
         }
     }
-
-    @DisplayName("[happy] RDB와 레디스의 좋아요 수를 동기화한다.")
-    @Test
-    void testSyncLikesAndViewsWithDatabase() {
-        Long recipeId = 1L;
-        String likeKey = "recipe:like:" + recipeId;
-        Integer likesInRedis = 3;
-        valueOperations.set(likeKey, likesInRedis);
-
-
-        sut.syncLikesAndViewsWithDatabase();
-
-        // 검증
-        RecipeLikeCntEntity recipeLikeCntEntity = recipeLikeCountRepository.findByRecipeEntityId(recipeId).orElseThrow();
-        Assertions.assertThat(recipeLikeCntEntity.getLikeCount()).isEqualTo(3);
-    }
-
-    @DisplayName("[bad] 레디스 키 포맷이 잘못되었을 때, RecipeApplicationException 예외를 발생시킨다.")
-    @Test
-    void testSyncLikesAndViewsWithDatabaseWithInvalidKey() {
-        // 잘못된 형식의 레디스 키 설정
-        String invalidKey = "recipe:like:invalid";
-        redisTemplate.opsForValue().set(invalidKey, 1);
-
-        // 예외가 발생하는지 검증
-        Assertions.assertThatThrownBy(() -> sut.syncLikesAndViewsWithDatabase())
-                .isInstanceOf(RecipeApplicationException.class)
-                .hasMessageContaining("레디스에서 오류가 발생했습니다.")
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.REDIS_ERROR_OCCUR);
-    }
-
 
     @DisplayName("[happy] 레디스에서 레시피의 좋아요 수를 정확히 가져온다.")
     @Test
@@ -182,7 +150,7 @@ class RedisAdapterTest extends TotalTestSupport {
         sut.syncViewCountWithDatabase();
 
         //then
-        RecipeViewCntEntity entity = recipeViewCountRepository.findByRecipeEntityId(recipeId).orElseThrow();
+        RecipeViewCountEntity entity = recipeViewCountRepository.findByRecipeEntityId(recipeId).orElseThrow();
         Integer viewCount = entity.getViewCount();
 
         Assertions.assertThat(viewCount).isEqualTo(4);

@@ -426,30 +426,30 @@ class RecipeAdapterTest extends TotalTestSupport {
                 0L,
                 0,
                 null,
+                0,
                 Collections.emptyList(),
                 LocalDateTime.now()
         );
     }
 
     public Recipe createRecipeDomainWithId(Long recipeId, NutritionalInfo savingNutritionInfo, long memberId, List<SubCategory> subCategory) {
-        return Recipe.of(
-                recipeId,
-                memberId,
-                "수정할 이름",
-                "수정할 내용",
-                2000,
-                "수정1, 수정2, 수정3",
-                "수정이다, 수정맞아, 수정이네",
-                savingNutritionInfo,
-                subCategory,
-                "진안",
-                "N",
-                0L,
-                0,
-                null,
-                Collections.emptyList(),
-                LocalDateTime.now()
-        );
+        return Recipe.builder()
+                .id(recipeId)
+                .memberId(memberId)
+                .recipeName("수정할 이름")
+                .recipeDesc("수정할 내용")
+                .timeTaken(2000)
+                .ingredient("수정1, 수정2, 수정3")
+                .hashtag("수정이다, 수정맞아, 수정이네")
+                .nutritionalInfo(savingNutritionInfo)
+                .subCategory(subCategory)
+                .delYn("N")
+                .likeCount(0)
+                .viewCount(0)
+                .bookmarkId(0L)
+                .deleteFileOrder(Collections.emptyList())
+                .createDate(LocalDateTime.now())
+                .build();
     }
 
     public NutritionalInfo createNutritionalInfoEntity(long id, int carbohydrates, int protein, int fat, int vitamins, int minerals) {

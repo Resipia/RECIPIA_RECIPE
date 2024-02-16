@@ -11,7 +11,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "recipe_view_cnt")
-public class RecipeViewCntEntity extends UpdateDateTimeForEntity {
+public class RecipeViewCountEntity extends UpdateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,24 +27,24 @@ public class RecipeViewCntEntity extends UpdateDateTimeForEntity {
     private Integer viewCount;
 
     @Builder
-    private RecipeViewCntEntity(Long id, RecipeEntity recipeEntity, Integer viewCount) {
+    private RecipeViewCountEntity(Long id, RecipeEntity recipeEntity, Integer viewCount) {
         this.id = id;
         this.recipeEntity = recipeEntity;
         this.viewCount = viewCount;
     }
 
-    public static RecipeViewCntEntity of(Long id, RecipeEntity recipeEntity, Integer viewCount) {
-        return new RecipeViewCntEntity(id, recipeEntity, viewCount);
+    public static RecipeViewCountEntity of(Long id, RecipeEntity recipeEntity, Integer viewCount) {
+        return new RecipeViewCountEntity(id, recipeEntity, viewCount);
     }
 
-    public static RecipeViewCntEntity of(RecipeEntity recipeEntity, Integer viewCount) {
-        return new RecipeViewCntEntity(null, recipeEntity, viewCount);
+    public static RecipeViewCountEntity of(RecipeEntity recipeEntity, Integer viewCount) {
+        return new RecipeViewCountEntity(null, recipeEntity, viewCount);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RecipeViewCntEntity that)) return false;
+        if (!(o instanceof RecipeViewCountEntity that)) return false;
         return this.id != null && Objects.equals(getId(), that.getId());
     }
 

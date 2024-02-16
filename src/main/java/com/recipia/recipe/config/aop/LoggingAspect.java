@@ -18,13 +18,11 @@ public class LoggingAspect {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     @Around("execution(* com.recipia.recipe.adapter.in.web..*.*(..))")
-    public Object logMethodExecution(ProceedingJoinPoint joinPoint) {
+    public Object logMethodExecution(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
 
         try {
             return joinPoint.proceed();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
         } finally {
             long endTime = System.currentTimeMillis();
 

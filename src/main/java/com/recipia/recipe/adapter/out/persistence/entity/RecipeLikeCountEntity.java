@@ -11,7 +11,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "recipe_like_count")
-public class RecipeLikeCntEntity extends UpdateDateTimeForEntity {
+public class RecipeLikeCountEntity extends UpdateDateTimeForEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,20 +27,20 @@ public class RecipeLikeCntEntity extends UpdateDateTimeForEntity {
     private Integer likeCount;
 
     @Builder
-    private RecipeLikeCntEntity(Long id, RecipeEntity recipeEntity, Integer likeCount) {
+    private RecipeLikeCountEntity(Long id, RecipeEntity recipeEntity, Integer likeCount) {
         this.id = id;
         this.recipeEntity = recipeEntity;
         this.likeCount = likeCount;
     }
 
-    public static RecipeLikeCntEntity of(Long id, RecipeEntity recipeEntity, Integer likeCount) {
-        return new RecipeLikeCntEntity(id, recipeEntity, likeCount);
+    public static RecipeLikeCountEntity of(Long id, RecipeEntity recipeEntity, Integer likeCount) {
+        return new RecipeLikeCountEntity(id, recipeEntity, likeCount);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RecipeLikeCntEntity that)) return false;
+        if (!(o instanceof RecipeLikeCountEntity that)) return false;
         return this.id != null && Objects.equals(getId(), that.getId());
     }
 

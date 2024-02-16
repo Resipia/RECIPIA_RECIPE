@@ -40,15 +40,4 @@ public class RecipeLikeService implements RecipeLikeUseCase {
         }
     }
 
-    // 좋아요 가져오기 // todo: recipe 상세조회 포트에서 바로 호출
-    public Integer getLikes(Long recipeId) {
-        return redisPort.getLikes(recipeId);
-    }
-
-    // 1시간마다 스케쥴러로 RDB랑 레디스 데이터 동기화하기
-    @Scheduled(cron = "0 0 * * * *")
-    public void syncLikesAndViewsWithDatabase() {
-        redisPort.syncLikesAndViewsWithDatabase();
-    }
-
 }

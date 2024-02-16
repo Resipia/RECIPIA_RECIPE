@@ -1,8 +1,10 @@
 package com.recipia.recipe.common.exception;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,8 +19,11 @@ import java.util.stream.Collectors;
  * RestController를 사용중이니 Advice도 @RestControllerAdvice를 사용한다.
  */
 @Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalControllerAdvice {
+
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     /**
      * RecipeApplicationException 처리
@@ -35,7 +40,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<?> handleNullPointerException(NullPointerException e) {
         log.error("NullPointerException occurred", e);
-        return buildErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, "Null reference accessed");
+        return buildKafkaErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, "(NullPointerException) Internal Server Error", e);
     }
 
     /**
@@ -44,7 +49,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
         log.error("IllegalArgumentException occurred", e);
-        return buildErrorResponse(ErrorCode.BAD_REQUEST, "Invalid argument provided");
+        return buildKafkaErrorResponse(ErrorCode.BAD_REQUEST, "(IllegalArgumentException) Bad Request Error", e);
     }
 
     /**
@@ -68,13 +73,28 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         log.error("RuntimeException occurred", e);
-        return buildErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, "Internal server error");
+        return buildKafkaErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, "(RuntimeException) Internal Server Error", e);
     }
 
     /**
      * 공통 에러 응답 생성 메서드
      */
-    private ResponseEntity<Map<String, Object>> buildErrorResponse(ErrorCode errorCode, String customMessage) {
+    public ResponseEntity<Map<String, Object>> buildErrorResponse(ErrorCode errorCode, String customMessage) {
+        return getErrorResponseEntity(errorCode, customMessage);
+    }
+
+    /**
+     * Kafka 공통 에러 응답 생성 메서드
+     */
+    public ResponseEntity<Map<String, Object>> buildKafkaErrorResponse(ErrorCode errorCode, String customMessage, RuntimeException e) {
+        kafkaTemplate.send("error-messages", customMessage + " Occurred: " + e.getMessage());
+        return getErrorResponseEntity(errorCode, customMessage);
+    }
+
+    /**
+     * [Extract] - 예외코드를 처리하는 메서드
+     */
+    public ResponseEntity<Map<String, Object>> getErrorResponseEntity(ErrorCode errorCode, String customMessage) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("status", errorCode.getStatus());
         errorResponse.put("code", errorCode.getCode());
